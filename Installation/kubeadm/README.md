@@ -70,7 +70,7 @@ Dans le répertoire *Installation/kubeadm/provisionning/Vagrant/*, vous trouvere
 Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |v|
       v.memory = 2048
-      v.cpus = 1
+      v.cpus = 2
   end
 
   nodes_number = 3
@@ -82,6 +82,21 @@ Vagrant.configure("2") do |config|
       node.vm.box = "ubuntu/bionic64"
       node.vm.network "private_network", ip: ip
     end
+  end
+
+  config.vm.provision "shell" do |s|
+    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    s.inline = <<-SHELL
+      echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+      echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
+
+      # kubelet requires swap off
+      swapoff -a
+      # keep swap off after reboot
+      sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+      # Use systemd as the default docker cgroup driver
+      # sed -i '0,/ExecStart=/s//Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"\\n&/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    SHELL
   end
 end
 ```
@@ -106,7 +121,7 @@ Depuis l'interface de [DigitalOcean](https://digitalocean.com), créez un compte
 
 ### Création des machines virtuelles
 
-Depuis le répertoire *Installation/kubeadm/provisionning/DigitalOcean*, lancez la commande suivante afin d'initialisé le provider (afin que Terraform puisse communiquer avec l'API de DigitalOcean).
+Depuis le répertoire *Installation/kubeadm/provisionning/DigitalOcean*, lancez la commande suivante afin d'initialiser le provider (afin que Terraform puisse communiquer avec l'API de DigitalOcean).
 
 ```
 $ terraform init
@@ -138,7 +153,9 @@ Une fois les VMs provisionnées, vous pouvez passer à l'étape de configuration
 
 2. Depuis l'interface de [Exoscale](https://exoscale.com), créez un compte et récupérer la clé et le secret permettant d'utiliser l'API.
 
-3. Dans le répertoire *Installation/kubeadm/provisionning/Exoscale*, créez le folder *.terraform/plugins/(darwin|linux|windows)_amd64/* et placez y le provider Exoscale téléchargé depuis [https://github.com/exoscale/terraform-provider-exoscale/releases](https://github.com/exoscale/terraform-provider-exoscale/releases).
+3. Créez un couple clé privée / clé publique et upoadez la depuis l'interface web
+
+4. Dans le répertoire *Installation/kubeadm/provisionning/Exoscale*, créez le folder *.terraform/plugins/(darwin|linux|windows)_amd64/* et placez y le provider Exoscale téléchargé depuis [https://github.com/exoscale/terraform-provider-exoscale/releases](https://github.com/exoscale/terraform-provider-exoscale/releases).
 
 ### Création des machines virtuelles
 

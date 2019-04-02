@@ -33,7 +33,7 @@ resource "template_file" "node_ansible" {
 
 resource "template_dir" "inventory" {
   source_dir = "${path.module}/templates"
-  destination_dir = "../../configuration/inventories/EXO-tf"
+  destination_dir = "../../configuration/inventories/Exoscale"
 
   vars {
     nodes = "${join("\n",template_file.node_ansible.*.rendered)}"

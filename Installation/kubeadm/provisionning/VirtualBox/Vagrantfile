@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |v|
+      v.memory = 2048
+      v.cpus = 2
+  end
+
+  nodes_number = 3
+  (1..nodes_number).each do |i|
+    hostname = "node-#{i}"
+    ip = "192.168.33.#{9+i}"
+    config.vm.define hostname do |node|
+      node.vm.hostname = hostname
+      node.vm.box = "ubuntu/bionic64"
+      node.vm.network "private_network", ip: ip
+    end
+  end
+
+  config.vm.provision "shell" do |s|
+    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    s.inline = <<-SHELL
+      echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+      echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
+
+      # kubelet requires swap off
+      swapoff -a
+      # keep swap off after reboot
+      sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+      # Use systemd as the default docker cgroup driver
+      sed -i '0,/ExecStart=/s//Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"\\n&/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    SHELL
+  end
+end
