@@ -1,0 +1,22 @@
+---
+- name: Kube - Ubuntu | Add an Apt signing key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Kube - Ubuntu | Add repository
+  become: true
+  shell:
+    add-apt-repository "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Kube - Ubuntu | Install required binaries
+  become: true
+  apt: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+  when: ansible_distribution == 'Ubuntu'

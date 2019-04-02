@@ -1,0 +1,15 @@
+---
+
+# Install Docker
+- hosts: all
+  roles:
+  - role: install-docker
+  tags:
+  - daemon
+
+# Install kubeadm
+- hosts: all
+  roles:
+  - role: install-kube-binaries
+  tags:
+  - kube
