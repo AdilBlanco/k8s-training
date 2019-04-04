@@ -74,7 +74,7 @@ $ kubectl run www-1 --image nginx:1.14-alpine --namespace development
 La commande suivante permet de créer le Deployment *www-2* dans le namespace *production*
 
 ```
-$ kubectl run www-1 --image nginx:1.14-alpine --namespace production
+$ kubectl run www-2 --image nginx:1.14-alpine --namespace production
 ```
 
 ### 4. Répartition des ressources
