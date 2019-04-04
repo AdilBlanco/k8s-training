@@ -77,7 +77,7 @@ nginx-ingress-controller-7c66d668b-p94wz   1/1       Running   0          15s
 La commande suivante liste les services existants
 
 ```
-$ kubectl get svc
+$ kubectl get svc -n vote
 NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 db           ClusterIP   10.99.192.60    <none>        5432/TCP         36m
 kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          16h
