@@ -6,7 +6,7 @@ Dans cette mise en pratique nous allons voir l'utilisation de l'objet ConfigMap 
 
 Nous allons configurer ce proxy de façon à ce que les requètes reçues sur le endpoint */whoami* soient forwardées sur un service nommé *whoami*, tournant également dans le cluster. Ce service expose le endpoint */* et renvoie simplement le nom du container qui a traité la requète.
 
-## 1. Création de l'application whoami
+## 2. Création de l'application whoami
 
 La spécification suivante définie un Pod, contenant un unique container basé sur l'image *lucj/whoami*, ainsi qu'un service de type *ClusterIP* dont le rôle est d'exposer ce Pod à l'intérieur du cluster.
 
@@ -55,7 +55,7 @@ NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)       
 service/whoami          ClusterIP   10.11.243.238   <none>        80/TCP           18s
 ```
 
-## 2. Création d'une ConfigMap
+## 3. Création d'une ConfigMap
 
 Nous allons utiliser la configuration ci-dessous pour le serveur nginx que nous mettrons en place dans la suite.
 
@@ -82,7 +82,7 @@ Après avoir copié cette configuration dans un fichier *nginx.conf*, lancez la 
 kubectl create configmap proxy-config --from-file=./nginx.conf
 ```
 
-## 3. Spécification du reverse-proxy
+## 4. Spécification du reverse-proxy
 
 La spécification suivante définie un Pod, contenant un unique container basé sur l'image *nginx*, ainsi qu'un service de type *NodePort* dont le rôle est d'exposer ce Pod à l'extérieur du cluster. C'est à ce service que l'on enverra une requête HTTP dans la suite.
 
@@ -142,7 +142,7 @@ service/proxy           NodePort    10.11.255.14    <none>        80:31600/TCP  
 service/whoami          ClusterIP   10.11.243.238   <none>        80/TCP           18m
 ```
 
-## 4. Test de l'application
+## 5. Test de l'application
 
 Depuis l'IP d'une des machines du cluster, nous pouvons alors envoyer une requête GET sur le endpoint */whoami* et voir que celle-ci est bien traitée par l'application *whoami*, elle renvoie *whoami*, le nom du container.
 
