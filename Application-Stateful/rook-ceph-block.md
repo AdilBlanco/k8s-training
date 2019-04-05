@@ -25,12 +25,13 @@ kubectl create -f cluster.yaml
 La spécification suivante définie une StorageClass permettant l'utilisation de stockage de type block dans le cluster Ceph.
 
 ```
-apiVersion: ceph.rook.io/v1beta1
-kind: Pool
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
 metadata:
   name: replicapool
   namespace: rook-ceph
 spec:
+  failureDomain: host
   replicated:
     size: 3
 ---
@@ -40,8 +41,10 @@ metadata:
    name: rook-ceph-block
 provisioner: ceph.rook.io/block
 parameters:
-  pool: replicapool
+  blockPool: replicapool
   clusterNamespace: rook-ceph
+  fstype: xfs
+reclaimPolicy: Retain
 ```
 
 Copiez le contenu dans le fichier sc-rook-ceph-block.yaml et créez la StorageClass avec la commande :
