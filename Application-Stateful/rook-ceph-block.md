@@ -6,6 +6,7 @@ Utilisez les commandes suivantes pour déployer le Rook Operator sur le cluster.
 
 ```
 git clone https://github.com/rook/rook.git
+git checkout release-0.9
 cd rook/cluster/examples/kubernetes/ceph
 kubectl create -f operator.yaml
 ```
