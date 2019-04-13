@@ -155,7 +155,34 @@ Une fois les VMs provisionnées, vous pouvez passer à l'étape de configuration
 
 3. Créez un couple clé privée / clé publique et upoadez la depuis l'interface web
 
-4. Dans le répertoire *Installation/kubeadm/provisionning/Exoscale*, créez le folder *.terraform/plugins/(darwin|linux|windows)_amd64/* et placez y le provider Exoscale téléchargé depuis [https://github.com/exoscale/terraform-provider-exoscale/releases](https://github.com/exoscale/terraform-provider-exoscale/releases).
+4. Depuis le répertoire *Installation/kubeadm/provisionning/Exoscale*, installez le provisionner *Exoscale*:
+
+- Si vous êtes sous macOS
+
+```
+$ mkdir -p .terraform/plugins/darwin_amd64/
+$ curl -LO https://github.com/exoscale/terraform-provider-exoscale/releases/download/v0.10.0/terraform-provider-exoscale_0.10.0_darwin_amd64.tar.gz
+$ tar -xvf terraform-provider-exoscale_0.10.0_darwin_amd64.tar.gz
+$ mv terraform-provider-exoscale_v0.10.0 .terraform/plugins/darwin_amd64/
+```
+
+- Si vous êtes sous Linux
+
+```
+$ mkdir -p .terraform/plugins/linux_amd64/
+$ curl -LO https://github.com/exoscale/terraform-provider-exoscale/releases/download/v0.10.0/terraform-provider-exoscale_0.10.0_linux_amd64.tar.gz
+$ tar -xvf terraform-provider-exoscale_0.10.0_linux_amd64.tar.gz
+$ mv terraform-provider-exoscale_v0.10.0 .terraform/plugins/linux_amd64/
+```
+
+- Si vous êtes sous Windows
+
+```
+$ mkdir -p .terraform/plugins/windows_amd64/
+$ curl -LO https://github.com/exoscale/terraform-provider-exoscale/releases/download/v0.10.0/terraform-provider-exoscale_0.10.0_windows_amd64.tar.gz
+$ tar -xvf terraform-provider-exoscale_0.10.0_windows_amd64.tar.gz
+$ mv terraform-provider-exoscale_v0.10.0 .terraform/plugins/windows_amd64/
+```
 
 ### Création des machines virtuelles
 

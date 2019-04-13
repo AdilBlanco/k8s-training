@@ -19,7 +19,7 @@ En fonction de votre environnement, vous trouverez les différentes options qui
 - si vous êtes sur macOS:
 
 ```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/darwin/amd64/kubectl
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/darwin/amd64/kubectl
 $ chmod +x ./kubectl
 $ sudo mv ./kubectl /usr/local/bin/kubectl
 ```
@@ -51,7 +51,7 @@ La dernière étape est l'installation de Minikube. Depuis le lien suivant https
 - si vous êtes sur macOS:
 
 ```
-$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.34.1/minikube-darwin-amd64
+$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-darwin-amd64
 $ chmod +x minikube
 $ sudo mv minikube /usr/local/bin/
 ```
@@ -59,7 +59,7 @@ $ sudo mv minikube /usr/local/bin/
 - si vous êtes sur Linux:
 
 ```
-$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.34.1/minikube-linux-amd64
+$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 $ chmod +x minikube
 $ sudo mv minikube /usr/local/bin/
 ```
@@ -67,7 +67,7 @@ $ sudo mv minikube /usr/local/bin/
 - si vous êtes sur Windows:
 
 ```
-$ curl -Lo minikube.exe https://storage.googleapis.com/minikube/releases/v0.34.1/minikube-windows-amd64
+$ curl -Lo minikube.exe https://storage.googleapis.com/minikube/releases/latest/minikube-windows-amd64
 ```
 
 Il faudra ensuite ajouter minikube.exe dans votre PATH.
@@ -82,7 +82,9 @@ Une fois que ces éléments sont installés, lancez minikube puis vérifiez qu
 $ minikube start
 ```
 
-puis listez les Pods
+Note: si vous avez les ressources nécessaires, vous pouvez allouer d'avantage de mémoire et de cpu avec, par exemple, la commande suivante: ```$ minikube start --memory=8192 --cpus=4```
+
+Listez ensuite les Pods
 
 ```
 $ kubectl get pods

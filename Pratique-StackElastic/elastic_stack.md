@@ -40,12 +40,15 @@ $ mkdir -p elastic/manifests
 La spécification suivante définit le Deployment de *elasticsearch*. Copiez celle-ci dans le fichier *manifests/deploy-elasticsearch.yaml*.
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: elasticsearch
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
   template:
     metadata:
       labels:
@@ -57,7 +60,15 @@ spec:
         env:
         - name: ES_JAVA_OPTS
           value: -Xms512m -Xmx512m
+      initContainers:
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
 ```
+
+Note: la spécification du Pod contient une clé supplémentaire, *initContainers*, sous laquelle est définie une liste de containers qui seront lancés avant le container applicatif (celui basé sur l'image *elasticsearch*). L'unique container de cette liste est utilisé pour mettre à jour un paramètre du Kernel afin de permettre à Elasticsearch de se lancer correctement.
 
 #### Specification du Service
 
@@ -85,12 +96,15 @@ spec:
 La spécificatin suivante définit le Deployment de *Kibana*. Copiez celle-ci dans le fichier *manifests/deploy-kibana.yaml*.
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kibana
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
   template:
     metadata:
       labels:
@@ -181,12 +195,15 @@ Il peut être découpé en 3 parties:
 La spécification suivante définit le Deployment de *Logstash*. Copiez celle-ci dans le fichier *manifests/deploy-logstash.yaml*.
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: logstash
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
   template:
     metadata:
       labels:
@@ -297,10 +314,9 @@ metadata:
 
 ## 4. Déploiement de l'application
 
-*Pré-requis*: afin que Elasticsearch puisse se lancer correctement, il faudra augmenter la mémoire virtuelle de la machine hôte en vous connectant en ssh et en lançant la commande ```sudo sysctl -w vm.max_map_count=262144```
+Note: afin que Elasticsearch puisse se lancer correctement, il est nécessaire d'augmenter la mémoire virtuelle de la machine hôte, ceci est effectué par le container d'init du Pod elasticsearch. Il est également possible de changer ce paramètre en ce connectant en ssh aux machines du cluster et en lançant la commande ```sudo sysctl -w vm.max_map_count=262144``` sur chacune d'entre elles.
 
-
-Toujours depuis un shell dans le répertoire *elastic*, lancer l'application avec la commande suivante:
+Depuis un shell dans le répertoire *elastic*, lancer l'application avec la commande suivante:
 
 ```
 $ kubectl create -f manifests/

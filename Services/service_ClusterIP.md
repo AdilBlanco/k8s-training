@@ -43,7 +43,7 @@ metadata:
 spec:
   containers:
   - name: debug
-    image: alpine
+    image: alpine:3.9
     command:
     - "sleep"
     - "10000"
@@ -57,7 +57,7 @@ Nous allons utiliser ce Pod pour accèder au Service *www* depuis l'intérieur d
 
 - Installer l'utilitaire *curl*
 
-le container *debug* du Pod du mêm nom est basé sur l'image *alpine* qui ne contient pas l'utilitaire *curl* par défaut. Il faut donc l'installer avec la commande suivante:
+le container *debug* du Pod du mêm nom est basé sur l'image *alpine:3.9* qui ne contient pas l'utilitaire *curl* par défaut. Il faut donc l'installer avec la commande suivante:
 
 ```
 / # apk update && apk add curl
@@ -150,7 +150,7 @@ metadata:
 spec:
   containers:
   - name: debug
-    image: alpine
+    image: alpine:3.9
     command:
     - "sleep"
     - "10000"

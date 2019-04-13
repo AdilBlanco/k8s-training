@@ -8,7 +8,6 @@ Créez le namespace *test* en utilisant la commande suivante:
 
 ```
 $ kubectl create namespace test
-namespace/test created
 ```
 
 ## Quota d'utilisation des ressources
@@ -28,15 +27,15 @@ spec:
     limits.memory: 2Gi
 ```
 
-Celui-ci défini une ressource de type *ResourceQuota* qui limitera l'utilisation de la mémoire et du cpu au sein du namespace auquel il sera associé:
+Celui-ci défini une ressource de type *ResourceQuota* qui limitera l'utilisation de la mémoire et du cpu dans le namespace associé. Au sein de celui-ci:
 
-- chaque container doit spécifier une request de cpu et de RAM, une limite de cpu et de RAM
-- l'ensemble des containers ne peut pas demander plus de 1GB de RAM
-- l'ensemble des containers ne peut pas utiliser plus de 2GB de RAM
-- l'ensemble des containers ne peut pas demander plus d'1 cpu
-- l'ensemble des containers ne peut pas utiliser plus de 2 cpus
+- chaque container devra spécifier des demandes et des limites pour la RAM et le cpu
+- l'ensemble des containers ne pourra pas demander plus de 1GB de RAM
+- l'ensemble des containers ne pourra pas utiliser plus de 2GB de RAM
+- l'ensemble des containers ne pourra pas demander plus d'1 cpu
+- l'ensemble des containers ne pourra pas utiliser plus de 2 cpus
 
-En utilisant la commande suivante, créez ce ResourceQuota et associé le au namespace *test*.
+En utilisant la commande suivante, créez cette nouvelle ressource en l'associant au namespace *test*.
 
 ```
 $ kubectl apply -f quota.yaml --namespace=test
@@ -55,7 +54,7 @@ metadata:
 spec:
   containers:
   - name: www
-    image: nginx
+    image: nginx:1.14-alpine
     resources:
       limits:
         memory: "800Mi"
@@ -65,7 +64,7 @@ spec:
         cpu: "400m"
 ```
 
-L'unique container de ce Pod définit des requests et des limits pour la RAM et le CPU.
+L'unique container de ce Pod définit des demandes et des limites pour la RAM et le CPU.
 
 Créez ce Pod avec la commande suivante:
 
@@ -83,7 +82,7 @@ quota-mem-cpu-demo   1/1     Running   0          11s
 
 ## Vérification de l'utilisation du quota
 
-Utilisez la commande suivante pour voir les ressources RAM et CPU utilisée
+Utilisez la commande suivante pour voir les ressources RAM et CPU utilisée au sein du namespace:
 
 ```
 $ kubectl get resourcequota quota --namespace=test --output=yaml
@@ -123,8 +122,7 @@ status:
     requests.memory: 600Mi
 ```
 
-Comme on s'y attendait, on peut voir sous la clé *used* que seules les requests et limits spécifiées dans le Pod sont listées.
-
+Sous la clé *used*, on peut voir que l'utilisation en RAM et cpu correspondent à celles spécifiées dabs le Pod qui vient d'être créé.
 
 ## Lancement d'un 2ème Pod
 
@@ -139,7 +137,7 @@ metadata:
 spec:
   containers:
   - name: db
-    image: redis
+    image: redis:alpine
     resources:
       limits:
         memory: "1Gi"
@@ -153,7 +151,20 @@ Créez ce Pod avec la commande suivante:
 
 ```
 $ kubectl apply -f pod-quota-2.yaml
+```
+
+Vous devriez obtenir un message semblable à celui ci-dessous
+
+```
 Error from server (Forbidden): error when creating "pod-quota-2.yaml": pods "quota-mem-cpu-2" is forbidden: exceeded quota: quota, requested: requests.memory=700Mi, used: requests.memory=600Mi, limited: requests.memory=1Gi
 ```
 
 Ce nouveau Pod ne peut pas être créé car il n'y a pas assez de ressources disponibles dans le namespace *test*
+
+## Cleanup
+
+Supprimez le namespace avec la commande suivante:
+
+```
+$ kubectl delete ns test
+```

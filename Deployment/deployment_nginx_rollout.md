@@ -20,9 +20,11 @@ Note: utilisez une seule fois la commande *kubectl* pour lister l'ensemble des r
 
 Mettez l'image nginx à jour avec la version 1.14-alpine
 
+Note: spécifiez également l'option *--record=true* à la fin de la commande afin de conserver l'historique de la mise à jour
+
 ### 4. Liste des ressources
 
-Une nouvelle fois, listes les ressource.
+Une nouvelle fois, listez les ressources.
 
 Que constatez vous ?
 
@@ -80,7 +82,7 @@ Le ReplicaSet assure que les 3 Pods sont actifs.
 La commande suivante permet de mettre à jour l'image avec la version *nginx:1.14-alpine*.
 
 ```
-$ kubectl set image deploy/www www=nginx:1.14-alpine
+$ kubectl set image deploy/www www=nginx:1.14-alpine --record=true
 deployment "www" image updated
 ```
 
