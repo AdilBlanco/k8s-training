@@ -59,7 +59,7 @@ production    Active    14m
 
 ### 3. Création de Deployments
 
-La commande suivante permet de créer le Deployment *www-1* dans le namespace par default
+La commande suivante permet de créer le Deployment *www-0* dans le namespace par default
 
 ```
 $ kubectl run www-0 --image nginx:1.14-alpine
