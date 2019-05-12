@@ -1,5 +1,8 @@
 # Minikube sur Exoscale
 
+
+Dans cet exercice.... TODO
+
 ## 1. Création d'un compte sur Exoscale
 
 Rendez-vous sur [Exoscale](https://exoscale.com) et créez un compte.
