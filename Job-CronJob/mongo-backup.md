@@ -2,21 +2,31 @@
 
 Dans cet exercice, vous allez créer un *Job* qui servira à faire le dump d'une base de données *mongo*. Vous le modifierez ensuite pour en faire un *CronJob* et faire en sorte de réaliser ce dump à interval régulier.
 
-Vous réaliserez cet exercice sur Minikube.
+Pour réaliser cet exercice, vous allez poser un label sur l'un des nodes de votre cluster et faire en sorte que chaque Pod soit déployé sur le node en question via la contrainte *nodeSelector*. Cela est nécessaire car vous allez utiliser un réprtoire de ce node pour échanger des données entre des Pods. Ce n'est pas un setup de production mais simplement une contrainte pour cet exercice.
 
 ## Exercice
 
-### 1. Création d'un Deployment Mongo
+### 1. Création d'un label
 
-Dans un fichier *mongo-pod.yaml*, définissez la spécification d'un Pod basé sur l'image *mongo:3.6*, puis créez ensuite ce Pod.
+Sur l'un de vos node, posez le label *tier=db*:
 
-### 2. Exposition de la base Mongo
+```
+$ kubectl label node NODE_NAME tier=db
+```
+
+### 2. Création d'un Deployment Mongo
+
+Dans un fichier *mongo-pod.yaml*, définissez la spécification d'un Pod basé sur l'image *mongo:3.6*. Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut. Créez ensuite ce Pod.
+
+### 3. Exposition de la base Mongo
 
 Dans un fichier *mongo-svc.yaml*, définissez la spécification d'un Service, de type *clusterIP*, afin d'exposer le Pod précédent à l'intérieur du cluster, puis créez ensuite ce Service.
 
-### 3. Définition d'un Job pour effectuer le dump de la base de données
+### 4. Définition d'un Job pour effectuer le dump de la base de données
 
-Dans un fichier *mongo-dump-job.yaml*, définissez le spécification d'un Job qui lance un Pod basé sur *mongo:3.6*.
+Dans un fichier *mongo-dump-job.yaml*, définissez le spécification d'un Job, qui lance un Pod basé sur *mongo:3.6*.
+
+Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
 
 Dans la spécification du Job, le Pod devra également définir un volume permettant de persister des données dans le répertoire */dump* du node. Vous utiliserez pour cela l'instruction *volumes* suivante:
 
@@ -45,20 +55,23 @@ Note: cette commande utilise le binaire *mongodump* qui est présent dans l'imag
 
 Lancez ensuite ce Job.
 
-### 4. Restauration du dump
+### 5. Restauration du dump
 
-Lancez un nouveau Pod basé sur Mongo et montant le répertoire */dump* du node dans le répertoire */dump* du container. (cela permettra au container d'avoir accès au dump créé précédemment).
+Définissez la spécification d'un nouveau Pod, nommé *test*, basé sur Mongo et montant le répertoire */dump* du node dans le répertoire */dump* du container (cela permettra au container d'avoir accès au dump créé précédemment).
 
-Lancez ensuite un shell interactif dans ce Pod et, après avoir vérifié que le fichier */dump/db.gz* est présent, réalisez la restauration du dump en utilisant la commande suivante:
+Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
+
+Créez ensuite ce Pod, puis lancez un shell interactif dans ce Pod et, après avoir vérifié que le fichier */dump/db.gz* est présent, réalisez la restauration du dump en utilisant la commande suivante:
 
 ```
 $ mongorestore --drop  --archive=/dump/db.gz --gzip
 ```  
 
-
-### 5. Définition d'un CronJob pour effectuer le dump de la base de données à intervalle régulier
+### 6. Définition d'un CronJob pour effectuer le dump de la base de données à intervalle régulier
 
 Dans un fichier *mongo-dump-cronjob.yaml*, définissez le spécification d'un CronJob qui lance un dump de mongo toutes les minutes.
+
+Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
 
 Afin de conserver les différents dump, vous ferez en sorte que le container du Pod lance la commande suivante qui utilise un timestamp dans le nom du fichier.
 
@@ -66,15 +79,17 @@ Afin de conserver les différents dump, vous ferez en sorte que le container du 
 /bin/bash -c mongodump --gzip --host db --archive=/dump/$(date +"%Y%m%dT%H%M%S")-db.gz
 ```
 
-Lancez ensuite ce CronJob puis, en vous connectant en ssh sur le node, vérifiez qu'un nouveau fichier de dump est créé chaque minute.
+Lancez ensuite ce CronJob.
 
-Note: il n'y a pas d'intérêt à réaliser un dump à cette fréquence, c'est simplement pour les besoins de cet exercice.
+### 7. Vérification des dump
+
+Depuis le Pod *test*, vérifiez les dumps créés sur le node.
 
 ---
 
 ## Correction
 
-### 1. Création d'un Deployment Mongo
+### 2. Création d'un Deployment Mongo
 
 La spécification suivante définit un Pod basé sur *mongo:3.6*.
 
@@ -86,6 +101,8 @@ metadata:
   labels:
     app: db
 spec:
+  nodeSelector:
+    tier: db
   containers:
   - name: mongo
     image: mongo:3.6
@@ -97,7 +114,7 @@ Copiez cette spécification dans *mongo-pod.yaml* et lancez ce Pod avec la comma
 $ kubectl apply -f mongo-pod.yaml
 ```
 
-### 2. Exposition de la base Mongo
+### 3. Exposition de la base Mongo
 
 La spécification suivante définit un Service de type *ClusterIP*. Ce service permet d'exposer le Pod précédent à l'intérieur du cluster.
 
@@ -122,7 +139,7 @@ $ kubectl apply -f mongo-svc.yaml
 ```
 
 
-### 3. Définition d'un Job pour effectuer le dump de la base de données
+### 4. Définition d'un Job pour effectuer le dump de la base de données
 
 La spécification suivante définit un Job qui effectue le dump de la base de données.
 
@@ -134,6 +151,8 @@ metadata:
 spec:
   template:
     spec:
+      nodeSelector:
+        tier: db
       restartPolicy: Never
       containers:
       - name: mongo
@@ -157,7 +176,7 @@ Copiez cette spécification dans *mongo-dump-job.yaml* et lancez ce Job avec la 
 $ kubectl apply -f mongo-dump-job.yaml
 ```
 
-### 4. Restauration du dump
+### 5. Restauration du dump
 
 La spécification suivante définit un Pod basé sur *mongo:3.6*. Par l'utilisation d'un volume, le contenu du répertoire */dump* du node est monté dans le répertoire du même nom dans le container.
 
@@ -167,6 +186,8 @@ kind: Pod
 metadata:
   name: test
 spec:
+  nodeSelector:
+    tier: db
   containers:
   - name: mongo
     image: mongo:3.6
@@ -186,7 +207,7 @@ Copiez cette spécification dans *mongo-pod-test.yaml* et lancez ce Pod avec la 
 $ kubectl apply -f mongo-pod-test.yaml
 ```
 
-La commande suivante permet de lancer un shell interactif dans le container *mongo* du Pod.
+La commande suivante permet de lancer un shell interactif dans le container *mongo* du Pod *test*.
 
 ```
 $ kubectl exec -ti test -- bash
@@ -207,7 +228,7 @@ $ mongorestore --drop  --archive=/dump/db.gz --gzip
 2019-02-22T13:16:44.532+0000	done
 ```
 
-### 5. Définition d'un CronJob pour effectuer le dump de la base de données à intervalle régulier
+### 6. Définition d'un CronJob pour effectuer le dump de la base de données à intervalle régulier
 
 La spécification suivante définit un CronJob qui effectue le dump de la base de données, accessible via le service nommé *db*, toutes les minutes.
 
@@ -222,6 +243,8 @@ spec:
     spec:
       template:
         spec:
+          nodeSelector:
+            tier: db
           containers:
           - name: mongo
             image: mongo:3.6
@@ -245,8 +268,19 @@ Copiez cette spécification dans *mongo-dump-cronjob.yaml* et lancez ce CronJob 
 $ kubectl apply -f mongo-dump-cronjob.yaml
 ```
 
-La commande suivante permet de vérifier la création des fichiers de dump sur le node Minikube:
+### 7. Vérification des dump
+
+Lancez un shell interactif dans le container du pod *test* afin d'observer les dumps créés.
 
 ```
-$ minikube ssh ls /dump
+$ kubectl exec test -- ls /dump
+20190417T144810-db.gz
+20190417T144909-db.gz
+20190417T145010-db.gz
+20190417T145110-db.gz
+20190417T145210-db.gz
+20190417T145310-db.gz
+20190417T145410-db.gz
+20190417T145510-db.gz
+db.gz
 ```
