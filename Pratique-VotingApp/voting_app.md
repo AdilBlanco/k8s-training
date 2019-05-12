@@ -21,13 +21,13 @@ Examinez chacun des fichiers de spécification, quelles sont les ressources en j
 
 Avec *kubectl* créer l'ensemble de ces ressources en une seule fois.
 
-Note: il vous faudra créer le namespace nommé "vote" au préalable avec la commande suivante:
+Note: il vous faudra au préalable créer le namespace nommé "vote" avec la commande suivante:
 
 ```
-kubectl create namespace vote
+$ kubectl create namespace vote
 ```
 
-Ceci est nécessaire car l'application sera lancée dans ce contexte d'isolation (nous reviendrons sur les namespaces dans un prochain chapitre).
+Ceci est nécessaire car toutes les ressources de l'application seront créées dans ce namespace.
 
 ### 3. Liste des ressources
 
@@ -66,10 +66,10 @@ deployment "worker" created
 
 ### 3. Liste des ressources
 
-La commande suivante permet de lister les Deployements, Pods et Services créés.
+La commande suivante permet de lister les Deployments, Pods et Services créés.
 
 ```
-$ kubectl get deplpy,pod,svc
+$ kubectl get deploy,pod,svc
 NAME            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 deploy/db       1         1         1            1           1m
 deploy/redis    1         1         1            1           1m
@@ -97,6 +97,6 @@ L'interface de vote est disponible sur le port *31000*
 
 ![vote](./images/vote1.png)
 
-L'interface de result est disponible sur le port *31001*
+L'interface de resultat est disponible sur le port *31001*
 
 ![result](./images/vote2.png)
