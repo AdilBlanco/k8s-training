@@ -3,7 +3,7 @@
 Cette stack est très souvent utilisée notamment pour la gestion centralisée des logs.
 
 Elle est composée de 3 logiciels:
-- Logstash qui permet d'ingérer / filtrer / formatter des données et de les envoyer à Elasticsearch
+- Logstash qui permet d'ingérer / filtrer / formater des données et de les envoyer à Elasticsearch
 - Elasticsearch, le moteur responsable de l'indexation des données
 - Kibana, l'application web permettant la visualisation et la manipulation des données
 
@@ -57,9 +57,6 @@ spec:
       containers:
       - image: elasticsearch:6.6.0
         name: elasticsearch
-        env:
-        - name: ES_JAVA_OPTS
-          value: -Xms512m -Xmx512m
       initContainers:
       - name: increase-vm-max-map
         image: busybox
@@ -93,7 +90,7 @@ spec:
 
 #### Spécification du Deployment
 
-La spécificatin suivante définit le Deployment de *Kibana*. Copiez celle-ci dans le fichier *manifests/deploy-kibana.yaml*.
+La spécification suivante définit le Deployment de *Kibana*. Copiez celle-ci dans le fichier *manifests/deploy-kibana.yaml*.
 
 ```
 apiVersion: apps/v1
