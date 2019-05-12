@@ -160,6 +160,6 @@ fluentd-cfgbn    1/1       Running   0          32s
 
 ## 4. Visualisation des logs
 
-Depuis l'interface de Grafana, vérifiez que de nouvelles entrées de logs sont reçues en permanence. Vous pourrez pour cela mettre en place le refresh automatique depuis l'interface de Kibana.
+Depuis l'interface de Kibana, vérifiez que de nouvelles entrées de logs sont reçues en permanence. Vous pourrez pour cela mettre en place le refresh automatique depuis l'interface.
 
 ![Kibana](./images/kibana-log-cluster.png)
