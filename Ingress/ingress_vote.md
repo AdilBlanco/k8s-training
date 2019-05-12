@@ -4,9 +4,13 @@
 
 Dans cet exercice, vous allez créer une ressource *Ingress* et l'utiliser pour router les requêtes vers les interfaces de vote et de result de la VotingApp.
 
-Cet exercice sera réalisé avec *minikube*.
+### 1. Installation d'un Ingress controller
 
-### 1. Lancement de la VotingApp
+Un Ingress controller est nécessaire afin de prendre en compte la ressource Ingress qui sera utilisée pour exposer les services à l'extérieur du cluster.
+
+Lancez un ingress controller basé sur nginx.
+
+### 2. Lancement de la VotingApp
 
 De la même façon que nous l'avons fait dans un exercice précécent, clonez puis lancer la Voting App avec les commandes suivantes:
 
@@ -17,12 +21,6 @@ $ kubectl create -f ./k8s-specifications
 ```
 
 Note: attention, il faudra créer le namespace *vote* au préalable, la VotingApp étant lancé dans ce namespace.
-
-### 2. Activation du add-on Ingress dans minikube
-
-Utilisez une commande `minikube ...` pour activer Ingress
-
-Vérifiez qu'un pod "nginx-ingress-controller" a été créé et est dans l'état *Running*.
 
 ### 3. Ports des Service vote et result
 
@@ -42,14 +40,7 @@ Créez la ressource précédente à l'aide de *kubectl*
 
 ### 6. Accès à l'application
 
-Dans le fichier */etc/hosts*, assurez-vous d'avoir défini les résolutions DNS des sous-domaines *vote.votingapp.com* et *result.votingapp.com* vers l'adresse IP de minikube.
-
-Par exemple, si l'IP de minikube (`minikube ip`) est *192.168.99.100*, vous devez ajouter les enregistrements suivants:
-
-```
-192.168.99.100  vote.votingapp.com
-192.168.99.100  result.votingapp.com
-```
+Dans le fichier */etc/hosts*, assurez-vous d'avoir défini les résolutions DNS des sous-domaines *vote.votingapp.com* et *result.votingapp.com* vers l'adresse d'une des machines de votre cluster.
 
 Vous pouvez maintenant voter depuis l'interface disponible sur *http://vote.votingapp.com* et visualiser les résultats sur l'interface disponible sur *http://result.votingapp.com*.
 
@@ -57,19 +48,25 @@ Vous pouvez maintenant voter depuis l'interface disponible sur *http://vote.voti
 
 ## Correction
 
-### 2. Activation du add-on Ingress dans minikube
+### 1. Installation d'un Ingress controller
 
-La commande suivante permet d'activer Ingress
+- Si vous utilisez *Minikube*, vous pouvez installer un Ingress controller basé sur *nginx* en temps que *addon* avec la commande suivante:
 
 ```
 $ minikube addons enable ingress
 ```
 
-On peut alors vérifier que le Ingress controller a bien été crée:
+- Si vous n'êtes pas sur *Minikube*, vous pouvez installer un Ingress controller avec la commande suivante:
 
 ```
-$ kubectl get po -n kube-system | grep nginx
-nginx-ingress-controller-7c66d668b-p94wz   1/1       Running   0          15s
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+```
+
+Après quelques secondes, vous devriez voir un Pod *nginx-ingress-controller* dans l'état running:
+
+```
+$ kubectl get po --all-namespaces | grep ingress
+ingress-nginx   nginx-ingress-controller-5694ccb578-m9wqx   1/1     Running   0          7m48s
 ```
 
 ### 3. Ports des Service vote et result
