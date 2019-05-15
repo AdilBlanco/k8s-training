@@ -68,7 +68,8 @@ $ helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
 
 ```
 $ minikube addons enable ingress
-```
+```
+
 
 ### Vérification
 
