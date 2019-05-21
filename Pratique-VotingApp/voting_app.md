@@ -69,7 +69,7 @@ deployment "worker" created
 La commande suivante permet de lister les Deployments, Pods et Services créés.
 
 ```
-$ kubectl get deploy,pod,svc
+$ kubectl get deploy,pod,svc -n vote
 NAME            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 deploy/db       1         1         1            1           1m
 deploy/redis    1         1         1            1           1m

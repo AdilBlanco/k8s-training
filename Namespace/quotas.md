@@ -1,6 +1,6 @@
 # Limitation des ressources dans un namespace
 
-Dans cet exercice, nous allons créer un namespace et ajouter des quotas afin limiter les ressources pouvant être utilisées dans celui-ci.
+Dans cet exercice, nous allons créer un namespace et ajouter des quotas afin de limiter les ressources pouvant être utilisées dans celui-ci.
 
 ## Création d'un namespace
 

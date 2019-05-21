@@ -64,7 +64,9 @@ Si votre cluster est déployé chez un cloud provider, utilisez la commande suiv
 $ helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
 ```
 
-2ème cas: si vous êtes sur minikube, vous pouvez installer un Ingress Controller via un addon avec la commande suivante:
+- 2ème cas
+
+Si vous êtes sur minikube, vous pouvez installer un Ingress Controller via un addon avec la commande suivante:
 
 ```
 $ minikube addons enable ingress

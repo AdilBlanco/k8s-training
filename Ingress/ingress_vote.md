@@ -8,7 +8,7 @@ Dans cet exercice, vous allez créer une ressource *Ingress* et l'utiliser pour 
 
 Un Ingress controller est nécessaire afin de prendre en compte la ressource Ingress qui sera utilisée pour exposer les services à l'extérieur du cluster.
 
-Lancez un ingress controller basé sur nginx.
+Lancez un ingress controller basé sur nginx en suivant les étapes relatives à votre environnement: https://kubernetes.github.io/ingress-nginx/deploy/
 
 ### 2. Lancement de la VotingApp
 
@@ -17,6 +17,7 @@ De la même façon que nous l'avons fait dans un exercice précécent, clonez pu
 ```
 $ git clone https://github.com/dockersamples/example-voting-app
 $ cd example-voting-app
+$ kubectl create ns vote
 $ kubectl create -f ./k8s-specifications
 ```
 
@@ -40,7 +41,9 @@ Créez la ressource précédente à l'aide de *kubectl*
 
 ### 6. Accès à l'application
 
-Dans le fichier */etc/hosts*, assurez-vous d'avoir défini les résolutions DNS des sous-domaines *vote.votingapp.com* et *result.votingapp.com* vers l'adresse d'une des machines de votre cluster.
+Dans le fichier */etc/hosts*, assurez-vous d'avoir défini les résolutions DNS des sous-domaines *vote.votingapp.com* et *result.votingapp.com*. Ceux-ci devront pointer vers:
+- l'adresse IP d'une des machines de votre cluster si le Ingress Controller est exposé via un Service de type NodePort
+- sur l'adresse IP du LoadBalancer si le Ingress Controller est exposé via un Service de type LoadBalancer
 
 Vous pouvez maintenant voter depuis l'interface disponible sur *http://vote.votingapp.com* et visualiser les résultats sur l'interface disponible sur *http://result.votingapp.com*.
 
@@ -60,6 +63,22 @@ $ minikube addons enable ingress
 
 ```
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+```
+
+Il faudra ensuite exposer cet Ingress controller via un Service, de type NodePort, ou bien LoadBalancer (si vous utilisez l'infrastructure d'un cloud provider le permettant)
+
+NodePort:
+
+```
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/baremetal/service-nodeport.yaml
+
+```
+
+LoadBalancer:
+
+```
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/cloud-generic.yaml
+
 ```
 
 Après quelques secondes, vous devriez voir un Pod *nginx-ingress-controller* dans l'état running:

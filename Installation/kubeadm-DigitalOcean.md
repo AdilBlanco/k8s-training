@@ -124,8 +124,7 @@ root@node-X:~# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | a
 root@node-X:~# cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-root@node-X:~# apt-get update
-root@node-X:~# apt-get install -y kubelet kubeadm
+root@node-X:~# apt-get update && apt-get install -y kubelet kubeadm
 ```
 
 ## Initialisation du cluster
@@ -154,7 +153,6 @@ Afin de pouvoir dialoguer avec le cluster que vous venez de mettre en place, vi 
 
 ```
 $ scp root@IP_NODE_01:/etc/kubernetes/admin.conf do-kube-config
-$ sudo chown $(id -u):$(id -g) do-kube-config
 $ export KUBECONFIG=do-kube-config
 ```
 

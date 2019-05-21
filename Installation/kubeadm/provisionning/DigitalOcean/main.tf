@@ -10,6 +10,7 @@ resource "digitalocean_droplet" "node" {
   name = "node-${count.index+1}"
   region = "${var.region}"
   size = "${var.size}"
+  ssh_keys = ["${var.ssh_key}"]
 }
 output "node" {
   value = "${digitalocean_droplet.node.*.ipv4_address}"

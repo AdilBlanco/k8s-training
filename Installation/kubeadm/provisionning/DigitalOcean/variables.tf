@@ -1,4 +1,5 @@
 variable "token" {}
+variable "ssh_key" {}
 
 variable "image" {
   default = "ubuntu-18-04-x64"
