@@ -70,7 +70,8 @@ Si vous êtes sur minikube, vous pouvez installer un Ingress Controller via un a
 
 ```
 $ minikube addons enable ingress
-```
+```
+
 
 ### Vérification
 
