@@ -154,8 +154,8 @@ Forwarding from 127.0.0.1:8888 -> 80
 Depuis la machine locale, on peut alors envoyer une rquête POST sur l'API:
 
 ```
-curl -H 'Content-Type: application/json' -XPOST -d '{"from":"me", "msg":"hey"}' http://localhost:8888/messages
-{"from":"me","msg":"hey","at":"2018-04-03T12:45:07.688Z","_id":"5ac37753dfe0ee000f9b65e0"}
+curl -H 'Content-Type: application/json' -XPOST -d '{"from":"YOUR_NAME", "msg":"hey"}' http://localhost:8888/messages
+{"from":"YOUR_NAME","msg":"hey","at":"2018-04-03T12:45:07.688Z","_id":"5ac37753dfe0ee000f9b65e0"}
 ```
 
 ### 5. Utilisation du Secret dans un volume
