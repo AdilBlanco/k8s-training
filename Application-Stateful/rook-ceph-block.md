@@ -38,8 +38,6 @@ rook-discover-6zssx                   1/1     Running   0          3m56s
 Pré-requis:
 - si vous utilisez Minikube, il faudra au préalable modifier la valeur de *dataDirHostPath* et la setter à */data/rook* dans le fichier cluster.yaml
 
-
-NECESSAIRE ????
 - si vous utilisez le cloud provider *DigitalOcean*, il faudra remplacer *bluestore* par *filestore* dans la clé *storeType* dans le fichier cluster.yaml
 ```
 storage:
