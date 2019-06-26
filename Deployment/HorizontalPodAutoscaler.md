@@ -69,6 +69,22 @@ Créez ensuite ce Service avec la commande suivante:
 $ kubectl apply -f svc.yaml
 ```
 
+## Metrics server
+
+Afin de pouvoir récupérer les metrics des containers, il est nécessaire de déployer le process *metrics-server* avec la commande suivante:
+
+```
+$ git clone https://github.com/kubernetes-incubator/metrics-server.git
+$ cd metrics-server
+$ kubectl apply -f deploy/1.8+/
+```
+
+Note: si vous utilisez Minikube, le lancement du *metrics-server* utilisez la commande suivante:
+
+```
+$ miunikube addons enable metrics-server
+```
+
 ## Création de la ressource HorizontalPodAutoscaler
 
 Nous allons maintenant définir un *HorizontalPodAutoscaler* qui sera en charge de modifier le nombre de réplicas du Deployment si celui-ci utilise plus de 20% du CPU qui lui est alloué.
