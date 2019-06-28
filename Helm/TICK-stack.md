@@ -70,7 +70,7 @@ Si vous êtes sur minikube, vous pouvez installer un Ingress Controller via un a
 
 ```
 $ minikube addons enable ingress
-```
+```
 
 ### Vérification
 
@@ -272,7 +272,7 @@ tick_chart/
 
 En utilisant la commande suivante, lancez l'application maintenant packagée dans un chart Helm:
 
-```
+```
 $ helm install --name tick ./tick_chart
 ```
 
