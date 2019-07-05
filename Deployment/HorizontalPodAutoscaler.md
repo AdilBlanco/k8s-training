@@ -82,7 +82,7 @@ $ kubectl apply -f deploy/1.8+/
 Note: si vous utilisez Minikube, le lancement du *metrics-server* utilisez la commande suivante:
 
 ```
-$ miunikube addons enable metrics-server
+$ minikube addons enable metrics-server
 ```
 
 ## Création de la ressource HorizontalPodAutoscaler
@@ -129,10 +129,16 @@ Utilisez la commande suivante pour envoyer des requètes en continu sur le servi
 $ while true;do curl -s NODE_IP:30100 > /dev/null; done
 ```
 
+Note: vous pouvez également utiliser l'utilitaire [Apache Bench](http://httpd.apache.org/docs/current/programs/ab.html) pour envoyer des requêtes sur le service, par exemple avec la commande suivante:
+
+```
+$ ab -n 100000 -c 50 http://NODE_IP:30100/
+```
+
 Depuis un autre terminal, observez l'évolution de la consommation du CPU et l'augmentation du nombre de réplicas (cela peux prendre quelques minutes)
 
 ```
-$ kubectl get hpa
+$ kubectl get -w hpa
 NAME   REFERENCE        TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
 www    Deployment/www   48%/20%   1         10        3          5m24s
 ```

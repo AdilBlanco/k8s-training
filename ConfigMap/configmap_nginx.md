@@ -15,7 +15,7 @@ La spécification suivante définie un Pod, contenant un unique container basé 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: whoami
+  name: poddy
   labels:
     app: whoami
 spec:
@@ -144,11 +144,10 @@ service/whoami          ClusterIP   10.11.243.238   <none>        80/TCP        
 
 ## 5. Test de l'application
 
-Depuis l'IP d'une des machines du cluster, nous pouvons alors envoyer une requête GET sur le endpoint */whoami* et voir que celle-ci est bien traitée par l'application *whoami*, elle renvoie *whoami*, le nom du container.
+Depuis l'IP d'une des machines du cluster, nous pouvons alors envoyer une requête GET sur le endpoint */whoami* et voir que celle-ci est bien traitée par l'application *whoami*, elle renvoie *poddy*, le nom du Pod.
 
 ```
 $ curl HOST_IP:31600/whoami
-whoami
 ```
 
 ## En résumé

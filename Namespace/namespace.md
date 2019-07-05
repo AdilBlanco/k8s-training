@@ -63,8 +63,8 @@ La commande suivante permet de créer le Deployment *www-0* dans le namespace pa
 
 ```
 $ kubectl run www-0 --image nginx:1.14-alpine
-
 ```
+
 La commande suivante permet de créer le Deployment *www-1* dans le namespace *development*
 
 ```

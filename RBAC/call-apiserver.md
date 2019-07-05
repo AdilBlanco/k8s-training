@@ -138,7 +138,7 @@ puis créez le Pod avec la commande suivante:
 $ kubectl apply -f pod-default.yaml
 ```
 
-Nous allez maintenant lancer un shell dans le container *alpine* du Pod que vous venez de créer puis installer curl afin de pouvoir envoyer des requêtes HTTP à l'API Server.
+Vous allez maintenant lancer un shell dans le container *alpine* du Pod que vous venez de créer puis installer curl afin de pouvoir envoyer des requêtes HTTP à l'API Server.
 
 ```
 $ kubectl exec -ti pod-default -- sh

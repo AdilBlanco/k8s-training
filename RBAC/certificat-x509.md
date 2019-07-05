@@ -169,7 +169,7 @@ $ kubectl create ns development
 
 Rappel: le schéma suivant indique les différentes ressources qui interviennent lors de la mise en place de règles RBAC
 
-![RBACT](./images/rbac.png)
+![RBAC](./images/rbac.png)
 
 
 Vous allez maintenant définir un role qui servira à donner les droits de gestions des ressources de type *Pod*, *Service* et *Deployment*. Pour ces 2 groupes, nous définissons une liste de ressources et les actions qui doivent être authorisées sur celles-ci.
