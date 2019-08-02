@@ -70,7 +70,7 @@ Si vous êtes sur minikube, vous pouvez installer un Ingress Controller via un a
 
 ```
 $ minikube addons enable ingress
-```
+```
 
 ### Vérification
 
@@ -416,7 +416,7 @@ telegraf    ClusterIP  10.108.132.178  <none>       8186/TCP  6m37s
 ==> v1beta1/Ingress
 NAME  HOSTS                                  ADDRESS    PORTS  AGE
 tick  telegraf.tick.com,chronograf.tick.com  10.0.2.15  80     6m37s
-```
+```
 
 Vérifiez ensuite que les Pods sont bien basés sur les nouvelles versions des images.
 
