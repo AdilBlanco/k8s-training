@@ -418,6 +418,7 @@ NAME  HOSTS                                  ADDRESS    PORTS  AGE
 tick  telegraf.tick.com,chronograf.tick.com  10.0.2.15  80     6m37s
 ```
 
+
 Vérifiez ensuite que les Pods sont bien basés sur les nouvelles versions des images.
 
 Nous avons vu ici un exemple simple de l'utilisation du templating, l'important étant de comprendre son fonctionnement. Lorsque vous allez packager votre propre application dans un Chart Helm, vous allez généralement commencer par utiliser le templating pour des champs simples avant d'avancer dans une utilisation plus poussée.
