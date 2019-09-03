@@ -18,7 +18,7 @@ Créez un fichier yaml *wordpress_pod.yaml* définissant un Pod ayant les propri
   - basé sur l'image *mysql:5.7*
   - définissant la variable d'environnement *MYSQL_ROOT_PASSWORD* avec pour valeur *mysqlpwd* (cf note)
 
-Note: chaque container peut définir une clé *env*, celui contenant une liste de paires name / value
+Note: chaque container peut définir une clé *env*, celle-ci contenant une liste de variables d'environnement sous la forme de paires clé / valeur
 
 ### 2. Lancement du Pod
 
@@ -32,7 +32,7 @@ Au bout de quelques secondes, il devrait être dans l'état *Running* (le temps 
 
 ### 4. Accès à l'application
 
-Forwardez le port *80* du container *wordpress* sur le port *8080* de la machine hôte.
+Forwardez le port *8080* de la machine hôte sur le port *80* du container *wordpress*.
 
 Lancez un navigateur sur http://localhost:8080
 
@@ -136,7 +136,7 @@ wp        2/2       Running   0          2m
 
 ### 4. Accès à l'application
 
-Le container *wordpress* tournant sur le port *80*, la commande suivante permet de forwarder ce port sur le port *8080* de l'hôte.
+la commande suivante permet de forwarder le port *8080* de la machine hôte sur le port *80* du container *wordpress*. 
 
 ```
 $ kubectl port-forward wp 8080:80

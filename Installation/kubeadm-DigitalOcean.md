@@ -14,7 +14,7 @@ En fonction de votre environnement, vous trouverez les différentes options qui
 - si vous êtes sur macOS:
 
 ```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/darwin/amd64/kubectl
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
 $ chmod +x ./kubectl
 $ sudo mv ./kubectl /usr/local/bin/kubectl
 ```
@@ -22,7 +22,7 @@ $ sudo mv ./kubectl /usr/local/bin/kubectl
 - si vous êtes sur Linux
 
 ```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kubectl
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 $ chmod +x ./kubectl
 $ sudo mv ./kubectl /usr/local/bin/kubectl
 ```
@@ -30,7 +30,7 @@ $ sudo mv ./kubectl /usr/local/bin/kubectl
 - si vous êtes sur Windows
 
 ```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/windows/amd64/kubectl.exe
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe
 ```
 
 note: si vous n'avez pas l'utilitaire curl vous pouvez télécharger kubectl v1.14.0 depuis ce https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/windows/amd64/kubectl.exe.
@@ -101,50 +101,46 @@ Sur chaque machine, nous allons installer les éléments suivants:
 - le binaire *kubeadm* pour la création du cluster
 - le binaire *kubelet* pour la supervision des containers
 
-Pour chaque VM, connectez vous en ssh et effectuez les opérations suivantes:
+Pour chaque VM, effectuer les opérations suivantes:
+- installation du daemon Docker
+- installation de kubelet
+- installation de kubeadm
 
-- Connection en ssh
-
-Assurez-vous que la clé utilisée par les nodes (celle sélectionnée durant l'étape de création) est présente dans la liste de vos identités. Si ce n'est pas le cas, ajoutez la via la commande `ssh-add PATH_TO_KEY`.
-
-```
-$ ssh root@NODE_IP
-```
-
-- Installation du daemon Docker avec la commande suivante:
+Pour cela, vous pouvez utiliser la commande suivante (en ayant au préalable positionné les variables d'environnement NODE01, NODE02, NODE03 avec les IP des nodes respectifs)
 
 ```
-root@node-X:~# curl https://get.docker.com | sh
-```
-
-- Installation de kubelet et kubeadm
-
-```
-root@node-X:~# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-root@node-X:~# cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
+for IP in $NODE01 $NODE02 $NODE03; do
+ssh -o "StrictHostKeyChecking=no" root@$IP << EOF /bin/bash
+  curl https://get.docker.com | sh
+  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+  apt-get update && apt-get install -y kubelet kubeadm
 EOF
-root@node-X:~# apt-get update && apt-get install -y kubelet kubeadm
+done
 ```
 
 ## Initialisation du cluster
 
-Sur le *node-01*, lancez la commande suivante:
+Lancer la commance suivante afin d'initialiser le cluster, à l'aide de *kubeadm*, depuis *node-01*:
 
 ```
-root@node-01:~# kubeadm init
+$ ssh root@$NODE01 kubeadm init
 ````
+
+La mise en place de l'ensemble des composants du master prendra quelques minutes. A la fin vous obtiendrez la commande à lancez depuis les autres VMs pour les ajouter au cluster.
 
 ## Ajout de nodes
 
-La mise en place de l'ensemble des composants du master prendra quelques minutes. A la fin vous obtiendrez la commande à lancez depuis les autres VMs pour les ajouter au cluster.
-Copiez cette commande et lancez la depuis *node-02* et *node-03*.
-
-Exemple de commande lancée depuis le node-02:
+Vous pouvez copier/coller cette commande de "join", ou bien la récupérer avec la commande suivante:
 
 ```
-root@node-02:~# kubeadm join 206.189.17.156:6443 --token 0rzo36.ejhv5w1q7ta75a8s \
-    --discovery-token-ca-cert-hash sha256:00cf9139f5d64f8c8afe87558b191923daf2094a104b6561b7d63db863caf589
+$ JOIN_CMD=$(ssh root@$NODE01 kubeadm token create --print-join-command)
+```
+
+puis la lancer sur les nodes *node-02* et *node-03* afin de les ajouter au cluster:
+
+```
+$ for IP in $NODE02 $NODE03; do ssh root@$IP $JOIN_CMD; done
 ```
 
 ## Récupération du context
@@ -152,7 +148,7 @@ root@node-02:~# kubeadm join 206.189.17.156:6443 --token 0rzo36.ejhv5w1q7ta75a8s
 Afin de pouvoir dialoguer avec le cluster que vous venez de mettre en place, vi le binaire *kubectl* que vous avez installé sur votre machine locale, il est nécessaire de récupérer le fichier de configuration du cluster. Utilisez pour cela les commandes suivantes depuis votre machine locale:
 
 ```
-$ scp root@IP_NODE_01:/etc/kubernetes/admin.conf do-kube-config
+$ scp root@$NODE01:/etc/kubernetes/admin.conf do-kube-config
 $ export KUBECONFIG=do-kube-config
 ```
 
@@ -161,9 +157,9 @@ Listez alors les nodes du cluster, ils apparaitront avec le status *NotReady*.
 ```
 $ kubectl get nodes
 NAME      STATUS     ROLES    AGE     VERSION
-node-01   NotReady   master   5m16s   v1.14.1
-node-02   NotReady   <none>   3m      v1.14.1
-node-03   NotReady   <none>   10s     v1.14.1
+node-01   NotReady   master   2m57s   v1.15.3
+node-02   NotReady   <none>   33s     v1.15.3
+node-03   NotReady   <none>   29s     v1.15.3
 ```
 
 ## Installation d'un addons pour le networking entre les Pods
@@ -182,10 +178,10 @@ Maintenant que la solution de netorking a été installée, les nodes sont dans 
 
 ```
 $ kubectl get nodes
-NAME      STATUS   ROLES    AGE     VERSION
-node-01   Ready    master   6m1s    v1.14.1
-node-02   Ready    <none>   3m45s   v1.14.1
-node-03   Ready    <none>   55s     v1.14.1
+NAME      STATUS   ROLES    AGE   VERSION
+node-01   Ready    master   4m    v1.15.3
+node-02   Ready    <none>   3m    v1.15.3
+node-03   Ready    <none>   3m    v1.15.3
 ```
 
 Le cluster est prêt à être utilisé.

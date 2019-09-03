@@ -25,7 +25,7 @@ Il n'y a pas de ressources User ou Group à l'interieur d'un cluster Kubernetes,
 
 ## Quelques hypothèses et suppositions
 
-- Daivd, membre de l'équipe *development* a besoin d'avoir un accès à votre cluster
+- David, membre de l'équipe *development* a besoin d'avoir un accès à votre cluster
 
 - Votre cluster sera utilisé par plusieurs équipes / clients (approche multi-tenants). Les applications de chaque tenant devront être isolées, vous créerez alors un namespace *development* dédié à l'équipe de David
 
@@ -42,7 +42,7 @@ Note: certaines instructions devront être réalisées en tant qu'admin du clust
 Créez un répertoire *config/david* dans lequel vous allez générer une clé privée:
 
 ```
-$ mkdir config/david && cd config/david
+$ mkdir -p config/david && cd config/david
 $ openssl genrsa -out david.key 4096
 ```
 

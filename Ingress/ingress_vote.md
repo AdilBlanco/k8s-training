@@ -62,7 +62,7 @@ $ minikube addons enable ingress
 - Si vous n'êtes pas sur *Minikube*, vous pouvez installer un Ingress controller avec la commande suivante:
 
 ```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
 ```
 
 Il faudra ensuite exposer cet Ingress controller via un Service, de type NodePort, ou bien LoadBalancer (si vous utilisez l'infrastructure d'un cloud provider le permettant)
@@ -77,8 +77,7 @@ $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/ma
 LoadBalancer:
 
 ```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/cloud-generic.yaml
-
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
 ```
 
 Après quelques secondes, vous devriez voir un Pod *nginx-ingress-controller* dans l'état running:
