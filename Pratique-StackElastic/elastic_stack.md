@@ -353,7 +353,7 @@ Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu
 Récupérez en local le fichier nginx.log avec la commande suivante :
 
 ```
-curl -s -o nginx.log https://gist.githubusercontent.com/lucj/83769b6a74dd29c918498d022442f2a0/raw
+curl -s -o nginx.log https://gist.githubusercontent.com/lucj/0602e8f8ef18f949677248048365fc6b/raw
 ```
 
 Ce fichier contient 500 entrées de logs au format Apache. Si l'on considère une l'entrée suivante:
