@@ -4,6 +4,6 @@ if [ "$IP" = "" ];then
   exit 1
 fi
 
-curl -s -o nginx.log https://gist.githubusercontent.com/lucj/83769b6a74dd29c918498d022442f2a0/raw
+curl -s -o nginx.log https://gist.githubusercontent.com/lucj/0602e8f8ef18f949677248048365fc6b/raw
 
 while read -r line; do curl -s -XPUT -d "$line" http://$IP:31500; done < ./nginx.log

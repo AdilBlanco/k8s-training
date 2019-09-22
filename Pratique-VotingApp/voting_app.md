@@ -1,55 +1,27 @@
-# Deploiement de la VotingApp
+## Deploiement de la VotingApp
 
-## Exercice
+Dans cet exercice vous allez déployer la Voting App, une application de vote très souvent utilisée pour les démos et présentation. Cette application suit une architecture microservices, elle est très simple mais permet cependant d'illustrer de nombreux concepts notamment en ce qui concerne l'orchestration.
 
-Dans cet exercice vous allez déployer la Voting App, une application de vote très souvent utilisée pour les démos et présentation
+## 1. Récupération du projet
 
-### 1. Récupération du projet
-
-Cloner le repository avec la commande suivante
+Dans un nouveau répertoire, clonez le repository avec la commande suivante:
 
 ```
 $ git clone https://github.com/dockersamples/example-voting-app
 $ cd example-voting-app
 ```
 
-### 2. Création des ressources
+## 2. Création des ressources
 
-Dans le répertoire *k8s-specifications* se trouvent l'ensemble des spécifications des ressources.
+Dans le répertoire *k8s-specifications* se trouvent l'ensemble des spécifications des ressources utilisées par la Voting App. Pour chaque micro-service de l'application, il y a un Deployment et un Service. Seul le micro-service *worker* n'a pas de Service associé, c'est le seul micro-service qui n'est pas exposé dans le cluster (aucun microservice ne l'appelle).
 
-Examinez chacun des fichiers de spécification, quelles sont les ressources en jeu pour chaque micro-service ?
-
-Avec *kubectl* créer l'ensemble de ces ressources en une seule fois.
-
-Note: il vous faudra au préalable créer le namespace nommé "vote" avec la commande suivante:
+Nous commençons par créer le namespace nommé *vote* avec la commande suivante, ceci est nécessaire car toutes les ressources de l'application seront créées dans ce namespace :
 
 ```
 $ kubectl create namespace vote
 ```
 
-Ceci est nécessaire car toutes les ressources de l'application seront créées dans ce namespace.
-
-### 3. Liste des ressources
-
-Listez les différentes ressources créées.
-
-### 4. Accès à l'application
-
-Lancez un navigateur sur l'interface de vote.
-
-Note: l'IP est celle de minikube, le port est défini dans la spécification du Service *vote*
-
-Sélectionnez une option et visualisez le résultat dans l'interface *result*.
-
----
-
-## Correction
-
-### 2. Création des ressources
-
-Pour chaque micro-service de l'application, il y a un Deployment et un Service. Seul le micro-service *worker* n'a pas de Service associé, c'est le seul micro-service qui n'est pas exposé dans le cluster.
-
-La commande suivante permet de créer l'ensemble des ressources:
+La commande suivante permet de créer l'ensemble des ressources de l'application:
 
 ```
 $ kubectl create -f ./k8s-specifications
@@ -64,9 +36,9 @@ service "vote" created
 deployment "worker" created
 ```
 
-### 3. Liste des ressources
+## 3. Liste des ressources
 
-La commande suivante permet de lister les Deployments, Pods et Services créés.
+Avec la commande suivate, assurez-vous que toutes les ressources ont été créées correctement:
 
 ```
 $ kubectl get deploy,pod,svc -n vote
@@ -91,12 +63,24 @@ svc/result       NodePort    10.107.254.26   <none>        5001:31001/TCP   1m
 svc/vote         NodePort    10.99.171.171   <none>        5000:31000/TCP   1m
 ```
 
-### 4. Accès à l'application
+## 4. Accès à l'application
 
-L'interface de vote est disponible sur le port *31000*
+L'interface de vote est disponible sur le port *31000* de n'importe quelle machine du cluster:
 
 ![vote](./images/vote1.png)
 
-L'interface de resultat est disponible sur le port *31001*
+De même, l'interface de resultat est disponible sur le port *31001* de n'importe quelle machine du cluster:
 
 ![result](./images/vote2.png)
+
+Note: si vous utilisez Minikube, les interfaces de vote et de result sont disponibles respectivement sur *http://MINIKUPE_IP:31000* et *http://MINIKUPE_IP:31001*, l'IP de Miniikube peut être obtenue avec la commande ```minikube ip```
+
+Sélectionnez une option et visualisez le résultat dans l'interface *result*.
+
+## 5. Cleanup
+
+La commande suivante permet de supprimer le namespace *vote*, cela supprimera l'ensemble des ressources qu'il contient:
+
+```
+$ kubectl delete ns vote
+```

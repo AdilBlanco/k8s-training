@@ -300,12 +300,12 @@ data:
     }
 kind: ConfigMap
 metadata:
-  creationTimestamp: 2019-02-15T07:50:27Z
+  creationTimestamp: "2019-09-06T17:39:54Z"
   name: logstash-config
   namespace: default
-  resourceVersion: "235376"
+  resourceVersion: "7353"
   selfLink: /api/v1/namespaces/default/configmaps/logstash-config
-  uid: 5bffb702-30f6-11e9-afd3-080027c25ba0
+  uid: ec61380a-b394-4ca6-bc52-15c851d6510e
 ```
 
 
@@ -316,7 +316,7 @@ Note: afin que Elasticsearch puisse se lancer correctement, il est nécessaire d
 Depuis un shell dans le répertoire *elastic*, lancer l'application avec la commande suivante:
 
 ```
-$ kubectl create -f manifests/
+$ kubectl apply -f manifests/
 deployment "elasticsearch" created
 deployment "kibana" created
 deployment "logstash" created
@@ -329,21 +329,23 @@ On peut alors vérifier que les différents Deployments, Pods et Services ont bi
 
 ```
 $ kubectl get svc,deploy,pod
-NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-service/elasticsearch   ClusterIP   10.99.4.254     <none>        9200/TCP         17m
-service/kibana          NodePort    10.110.18.233   <none>        5601:31501/TCP   17m
-service/kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP          32m
-service/logstash        NodePort    10.106.67.42    <none>        8080:31500/TCP   17m
+NAME                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+service/elasticsearch   ClusterIP   10.245.221.158   <none>        9200/TCP         2m25s
+service/kibana          NodePort    10.245.241.64    <none>        5601:31501/TCP   2m25s
+service/kubernetes      ClusterIP   10.245.0.1       <none>        443/TCP          88m
+service/logstash        NodePort    10.245.56.41     <none>        8080:31500/TCP   2m25s
 
-NAME                                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deployment.extensions/elasticsearch   1         1         1            1           17m
-deployment.extensions/kibana          1         1         1            1           17m
-deployment.extensions/logstash        1         1         1            1           17m
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.extensions/elasticsearch   1/1     1            1           2m25s
+deployment.extensions/kibana          1/1     1            1           2m25s
+deployment.extensions/logstash        1/1     1            1           2m25s
+deployment.extensions/toto            1/1     1            1           17m
 
-NAME                                 READY     STATUS    RESTARTS   AGE
-pod/elasticsearch-795747659c-zw8xs   1/1       Running   5          17m
-pod/kibana-5968484c9f-gvl4h          1/1       Running   0          17m
-pod/logstash-7b9fbcbc7f-p84ld        1/1       Running   0          17m
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/elasticsearch-577ff589c5-cvrgl   1/1     Running   0          2m25s
+pod/kibana-756d67774f-mnp8n          1/1     Running   0          2m25s
+pod/logstash-779b98c567-42fhz        1/1     Running   0          2m25s
+pod/toto-5d49b866d5-ln5gb            1/1     Running   0          17m
 ```
 
 ## 5. Test de la stack Elastic
@@ -353,49 +355,43 @@ Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu
 Récupérez en local le fichier nginx.log avec la commande suivante :
 
 ```
-curl -s -o nginx.log https://gist.githubusercontent.com/lucj/83769b6a74dd29c918498d022442f2a0/raw
+curl -s -o nginx.log https://gist.githubusercontent.com/lucj/0602e8f8ef18f949677248048365fc6b/raw
 ```
 
 Ce fichier contient 500 entrées de logs au format Apache. Si l'on considère une l'entrée suivante:
 
 ```
-46.218.112.178 - - [28/Nov/2018:15:40:04 +0000] "GET /api/object/5996fc0f4c06fb000f83b7 HTTP/1.1" 200 501 "https://mydomain.net/map" "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0" "-"
+46.218.112.178 - - [01/Sep/2019:14:45:19 +0000] "GET /api/object/5996fc0f4c06fb000f83b7 HTTP/1.1" 200 501 "https://mydomain.net/map" "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0" "-"
 ```
 
 On peut en extraire différentes information:
-- reçue le 28 novembre 2018
+- reçue le 01 septembre 2019
 - de type GET
 - elle appele l'URL https://mydomain.net/api/object/5996fc0f4c06fb000f83b7
 - l'IP d'origine est 46.218.112.178
 - le navigateur est Firefox
 
-Assurez-vous tout d'abord que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a finit de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante:
+Assurez-vous tout d'abord que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a finit de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
 
 ![Kibana](./images/kibana-1.png)
 
-Vous pouvez alors utiliser la commande suivante pour envoyer chaque ligne contenue dans ce fichier à *Logstash*:
+Vous pouvez alors utiliser la commande suivante pour envoyer chaque ligne contenue dans ce fichier à *Logstash* (assurez vous de remplacer *HOST* par l'adresse IP de l'une des machines du cluster):
 
 ```
 while read -r line; do curl -s -XPUT -d "$line" http://HOST:31500; done < ./nginx.log
 ```
 
-Note: assurez vous de remplacer *HOST* par l'adresse IP de l'une des machines du cluster que vous utilisez.
-
-Une fois le script terminé, l'interface de *Kibana* est disponible sur le port *31501* et il est donc possible de l'utiliser pour visualiser et analyser les entrées de logs.
-
-Dans un premier temps il faut créer un index en suivant les instructions suivantes:
+Une fois le script terminé, aller dnas l'onglet *Discover* de l'interface de *Kibana*. Dans un premier temps il faut créer un index en suivant les instructions suivantes:
 
 ![Kibana](./images/kibana-index-1.png)
 
 ![Kibana](./images/kibana-index-2.png)
 
-Vous pourrez ensuite visualiser les logs en cliquant sur *Discover* et en sélectionnant une période assez large (par exemple 90 days, les logs datant de Nov 2018).
+Vous pourrez ensuite visualiser les logs en cliquant sur *Discover* et en sélectionnant une période englobant les premiers jours de septembre 2019 (date des logs)
 
 ![Kibana](./images/kibana-log-nginx-1.png)
 
-Différents champs peuvent être ajoutés, par exemple le code du pays d'ou provint la requête et le status code de celle-ci.
-
-![Kibana](./images/kibana-log-nginx-2.png)
+Vous pouvez ensuite ajouter différents champs, comme par exemple le code du pays d'ou provient la requête et le status code de celle-ci.
 
 ## Résumé
 

@@ -12,10 +12,10 @@ Créez un fichier *www_pod.yaml* définissant un Pod ayant les propriétés suiv
 
 ### 2. Lancement du Pod
 
-La commande suivante permet de créer le Pod
+Créer le Pod avec la commande suivante:
 
 ```
-$ kubectl create -f www_pod.yaml
+$ kubectl apply -f www_pod.yaml
 ```
 
 ### 3. Définition d'un service de type NodePort
@@ -40,6 +40,10 @@ Si vous utilisez **minikube**, vous n'avez qu'un seul node et l'URL sera de la f
 
 ![Service NodePort](./images/service_NodePort.png)
 
+### 6. Cleanup
+
+Supprimez l'ensemble des ressources créés dans cet exercice
+
 ---
 
 
@@ -47,7 +51,7 @@ Si vous utilisez **minikube**, vous n'avez qu'un seul node et l'URL sera de la f
 
 ### 1. Création du Pod
 
-La spécification du Pod est la suivante
+La spécification du Pod est la suivante:
 
 ```
 apiVersion: v1
@@ -64,10 +68,10 @@ spec:
 
 ### 2. Lancement du Pod
 
-La commande suivante permet de créer le Pod
+La commande suivante permet de créer le Pod:
 
 ```
-$ kubectl create -f www_pod.yaml
+$ kubectl apply -f www_pod.yaml
 ```
 
 ### 3. Définition d'un Service de type NodePort
@@ -96,6 +100,15 @@ spec:
 La commande suivante permet de lancer le Service:
 
 ```
-$ kubectl create -f www_service_NodePort.yaml
+$ kubectl apply -f www_service_NodePort.yaml
 service "www-np" created
+```
+
+### 6. Cleanup
+
+Les ressources peuvent être supprimées avec les commandes suivantes:
+
+```
+$ kubectl delete po/www
+$ kubectl delete svc/www-np
 ```

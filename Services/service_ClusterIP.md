@@ -15,7 +15,7 @@ Créez un fichier *www_pod.yaml* définissant un Pod ayant les propriétés suiv
 La commande suivante permet de créer le Pod
 
 ```
-$ kubectl create -f www_pod.yaml
+$ kubectl apply -f www_pod.yaml
 ```
 
 ### 3. Définition d'un service de type ClusterIP
@@ -80,6 +80,10 @@ Notez l'existence d'une entrée dans *Endpoints*, celle-ci correspond à l'IP du
 
 Note: si plusiseurs Pods avaient le label *app: www*, il y aurait une entrée Endpoint pour chacun d'entre eux.
 
+### 8. Cleanup
+
+Supprimez l'ensemble des ressources créés dans cet exercice
+
 ---
 
 ## Correction
@@ -106,7 +110,7 @@ spec:
 La commande suivante permet de créer le Pod
 
 ```
-$ kubectl create -f www_pod.yaml
+$ kubectl apply -f www_pod.yaml
 ```
 
 ### 3. Définition d'un Service de type ClusterIP
@@ -134,7 +138,7 @@ spec:
 La commande suivante permet de lancer le Service:
 
 ```
-$ kubectl create -f www_service_clusterIP.yaml
+$ kubectl apply -f www_service_clusterIP.yaml
 ```
 
 ### 5. Accès au Service depuis le cluster
@@ -160,7 +164,7 @@ EOF
 - La commande suivante permet de lancer le Pod
 
 ```
-$ kubectl create -f debug_pod.yaml
+$ kubectl apply -f debug_pod.yaml
 ```
 
 - La commande suivante permet de lancer un shell *sh* intéractif dans le container *debug* du Pod
@@ -245,7 +249,7 @@ Note: comme nous l'avions vu pour les Pods, les commandes suivantes sont équiva
 - kubectl get svc www
 - kubectl get svc/www
 
-### 6. Détails du service
+### 7. Détails du service
 
 La commande suivante permet d'avoir les détails du service **www**
 
@@ -263,4 +267,14 @@ TargetPort:        80/TCP
 Endpoints:         172.17.0.10:80
 Session Affinity:  None
 Events:            <none>
+```
+
+### 8. Cleanup
+
+Les ressources peuvent être supprimées avec les commandes suivantes:
+
+```
+$ kubectl delete po/www
+$ kubectl delete svc/www
+$ kubectl delete po/debug
 ```

@@ -28,7 +28,7 @@ spec:
         app: www
     spec:
       containers:
-        - image: nginx:1.14-alpine
+        - image: nginx:1.16-alpine
           name: www
           ports:
             - containerPort: 80
@@ -69,20 +69,58 @@ Créez ensuite ce Service avec la commande suivante:
 $ kubectl apply -f svc.yaml
 ```
 
-## Metrics server
+## Installation du Metrics server
 
-Afin de pouvoir récupérer les metrics des containers, il est nécessaire de déployer le process *metrics-server* avec la commande suivante:
+Avant de créer la ressource *HorizontalPodAutoscaler*, nous avons besoin de mettre en place le *metrics-server* qui sera en charge de récupérer les metrics de consommation des Pods (CPU / mémoire) des Pods. Ces metrics seront ensuite utilisées par le *HorizontalPodAutoscaler* pour augmenter ou diminuer automatiquement le nombre de Pods du Deployment.
+
+- Si vous utilisez Minikube
+
+le lancement du *metrics-server* peut se faire simplement avec la commande suivante:
+
+```
+$ minikube addons enable metrics-server
+```
+
+- Si vous n'utilisez pas Minikube
+
+il est nécessaire de déployer le process *metrics-server* à partir du repository GitHub que vous pouvez cloner avec la commande suivante:
 
 ```
 $ git clone https://github.com/kubernetes-incubator/metrics-server.git
 $ cd metrics-server
+```
+
+Attention, à cause de l'issue https://github.com/kubernetes-incubator/metrics-server/issues/131, il faudra ensuite modifier le fichier *deploy/1.8+/metrics-server-deployment.yaml* en définissant la clé *command* et les 3 élements qui suivent:
+
+```
+...
+      containers:
+      - name: metrics-server
+        image: k8s.gcr.io/metrics-server-amd64:v0.3.4
+        command:
+        - /metrics-server
+        - --kubelet-insecure-tls
+        - --kubelet-preferred-address-types=InternalIP
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+```
+
+Vous pourrez ensuite créer l'ensemble des ressources avec la commande suivante:
+
+```
 $ kubectl apply -f deploy/1.8+/
 ```
 
-Note: si vous utilisez Minikube, le lancement du *metrics-server* utilisez la commande suivante:
+Au bout de quelques dizaines de secondes, le metrics-server commencera à collecter des metrics. Vous pouvez le vérifier avec la commande suivante qui récupère la consommation CPU et mémoire des nodes:
 
 ```
-$ minikube addons enable metrics-server
+$ kubectl top nodes
+NAME           CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+workers-bmp2   60m          3%     746Mi           24%
+workers-bmpp   52m          2%     899Mi           28%
+workers-bmps   58m          2%     821Mi           26%
 ```
 
 ## Création de la ressource HorizontalPodAutoscaler
@@ -144,3 +182,18 @@ www    Deployment/www   48%/20%   1         10        3          5m24s
 ```
 
 Arrêtez l'envoi de requêtes et observez que le nombre de réplicas revient à la normale.
+
+## Cleanup
+
+Supprimez le *Deployment* et le *HorizontalPodAutoscaler* avec les commandes suivantes:
+
+```
+$ kubectl apply -f deploy.yaml
+$ kubectl apply -f hpa.yaml
+```
+
+Placez-vous dans le répertoire *metrics-server* et supprimez les ressources associées avec la commande suivante:
+
+```
+$ kubectl delete -f deploy/1.8+/
+```

@@ -6,7 +6,7 @@ Dans cet exercice, vous allez créer un Deployment et effectuer un rolling updat
 
 A l'aide de la commande `kubectl run`, créez un Deployment avec les propriétés suivantes:
 - nom: *www*
-- 3 replicas d'un Pod avec un container basé sur nginx:1.12
+- 3 replicas d'un Pod avec un container basé sur nginx:1.14
 
 Spécifiez l'option *--record=true* à la fin de la commande afin de conserver l'historique des commandes de mises à jour du Deployment.
 
@@ -18,7 +18,7 @@ Note: utilisez une seule fois la commande *kubectl* pour lister l'ensemble des r
 
 ### 3. Mise à jour de l'image
 
-Mettez l'image nginx à jour avec la version 1.14-alpine
+Mettez l'image nginx à jour avec la version 1.16
 
 Note: spécifiez également l'option *--record=true* à la fin de la commande afin de conserver l'historique de la mise à jour
 
@@ -34,6 +34,10 @@ Listez les mises à jour (= révisions) du Deployment.
 
 Note: utilisez la commande `kubectl rollout...`
 
+### 6. Cleanup
+
+Supprimez le Deployment *www*
+
 ---
 
 ## Correction
@@ -43,7 +47,7 @@ Note: utilisez la commande `kubectl rollout...`
 Le Deployment peut être lancé avec la commande suivante:
 
 ```
-$ kubectl run www --image nginx:1.12 --replicas 3 --record=true
+$ kubectl run www --image nginx:1.14 --replicas 3 --record=true
 deployment "www" created
 ```
 
@@ -79,14 +83,14 @@ Le ReplicaSet assure que les 3 Pods sont actifs.
 
 ### 3. Mise à jour de l'image
 
-La commande suivante permet de mettre à jour l'image avec la version *nginx:1.14-alpine*.
+La commande suivante permet de mettre à jour l'image avec la version *nginx:1.16*.
 
 ```
-$ kubectl set image deploy/www www=nginx:1.14-alpine --record=true
+$ kubectl set image deploy/www www=nginx:1.16 --record=true
 deployment "www" image updated
 ```
 
-Note: lorsque nous avons créé le Deployment avec la commande `kubectl run`, nous n'avons pas utilisé de spécification détaillée et n'avons donc pas donné un nom au container du Pod. Cependant, le nom *www* que nous avons donné au Deployment a automatiquement été utilisé pour le nom du container. C'est donc le nom de ce container qui est utilisé dans la partie `www=nginx:1.14-alpine` de la commande ci dessus.
+Note: lorsque nous avons créé le Deployment avec la commande `kubectl run`, nous n'avons pas utilisé de spécification détaillée et n'avons donc pas donné un nom au container du Pod. Cependant, le nom *www* que nous avons donné au Deployment a automatiquement été utilisé pour le nom du container. C'est donc le nom de ce container qui est utilisé dans la partie `www=nginx:1.16` de la commande ci dessus.
 
 ### 4. Liste des ressources
 
@@ -108,8 +112,8 @@ po/www-6b5dfc4699-xwqxq   1/1       Running   0          19s
 ```
 
 Nous pouvons voir ici qu'il y a maintenant 2 ReplicaSet:
-- un pour la gestion des Pods utilisant l'image *nginx:1.12*. Il n'est plus actif, comme le montre la valeur *0* des champs *DESIRED*, *CURRENT* et *READY* relatifs aux Pods gérés par le ReplicaSet
-- un second qui a été créé lors de la mise à jour de l'image, il gère 3 Pods, chacun ayant un container basé sur l'image *nginx:1.14-alpine*
+- un pour la gestion des Pods utilisant l'image *nginx:1.14*. Il n'est plus actif, comme le montre la valeur *0* des champs *DESIRED*, *CURRENT* et *READY* relatifs aux Pods gérés par le ReplicaSet
+- un second qui a été créé lors de la mise à jour de l'image, il gère 3 Pods, chacun ayant un container basé sur l'image *nginx:1.16*
 
 ### 5. Historique des mises à jour
 
@@ -119,6 +123,14 @@ La commande suivante permet de voir les différentes mises à jour du Deployment
 $ kubectl rollout history deploy/www
 deployments "www"
 REVISION  CHANGE-CAUSE
-1         kubectl run www --image=nginx:1.12 --replicas=3 --record=true
-2         kubectl set image deploy/www www=nginx:1.14-alpine
+1         kubectl run www --image=nginx:1.14 --replicas=3 --record=true
+2         kubectl set image deploy/www www=nginx:1.16
+```
+
+### 6. Cleanup
+
+Le Deployment et les ressources associées (ReplicaSet et Pods) peuvent être supprimées avec la commande suivante:
+
+```
+$ kubectl delete deploy www
 ```

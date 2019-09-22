@@ -25,7 +25,7 @@ Par exemple, certaines applications peuvent avoir besoin de connaitre:
 - les pods qui tournent dans le cluster ou dans un namespace particulier
 - ...
 
-Pour communiquer avec le serveur API, un pod utilise un  ServiceAccount contenant un token d'authentification. Des Roles (par exemple: le droit de lister tous les pods dans un namespace) ou des ClusterRoles (par exemple, le droit de lire toutes les ressources de type Secret du cluster) peuvent ensuite être liées à ce ServiceAccount respectivement avec les ressources RoleBinding et ClusterRoleBinding, afin le ServiceAccount soit autorisé à effectuer ces actions.
+Pour communiquer avec le serveur API, un pod utilise un  ServiceAccount contenant un token d'authentification. Des Roles (par exemple: le droit de lister tous les pods dans un namespace) ou des ClusterRoles (par exemple, le droit de lire toutes les ressources de type Secret du cluster) peuvent ensuite être liées à ce ServiceAccount respectivement avec les ressources RoleBinding et ClusterRoleBinding, afin que le ServiceAccount soit autorisé à effectuer ces actions.
 
 *Depuis l'extérieur du cluster*: il est possible d'accéder à l'API Server en utilisant le endpoint HTTP spécifié dans le fichier de configuration ($HOME/.kube/config par défaut). Par exemple, si vous utilisez un Kubernetes managé sur DigitalOcean, le endpoint ressemblera à https://b703a4fd-0d56-4802-a354-ba2c2a767a77.k8s.ondigitalocean.com.
 
@@ -97,7 +97,13 @@ metadata:
 type: kubernetes.io/service-account-token
 ```
 
-Le token est le codage en base64 d'un [JWT Token](https://jwt.io/introduction/). En utilisant un utilitaire en ligne de commande ou une version en ligne comme [https://jwt.io](https://jwt.io/), on peut facilement décoder le token et voir le payload qu'il contient.
+Le token est le codage en base64 d'un [JWT Token](https://jwt.io/introduction/). En décodant ce token :
+
+```
+$ kubectl get secret default-token-dffkj -o jsonpath='{ .data.token}' | base64 --decode
+```
+
+puis en utilisant un utilitaire en ligne de commande ou une version en ligne comme [https://jwt.io](https://jwt.io/), on peut facilement décoder le token et voir le payload qu'il contient.
 
 En utilisant l'une de ces approches, vous obtiendrez un résultat semblable de celui ci-dessous:
 

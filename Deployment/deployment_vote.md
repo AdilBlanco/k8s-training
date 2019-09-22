@@ -18,7 +18,7 @@ Utilisez *kubectl* pour créer le Deployment
 
 ### 3. Status du Deployment
 
-A l'aide de *kubectl*, examinez le status du Deployment **vote**.
+A l'aide de *kubectl*, examinez le status du Deployment *vote*.
 
 A partir de ces informations, que pouvez-vous dire par rapport au nombre de Pods gérés par ce Deployment ?
 
@@ -45,6 +45,10 @@ Une fois le service créé, vous pourrez accéder à l'interface de vote sur *ht
 Attention: cette interface n'est pas branchée à un backend, il n'est pas encore possible de voter, si vous cliquez sur l'un des choix, vous obtiendrez une erreur. Nous reviendrons sur l'application de vote dans sa totalité très bientôt.
 
 ![Interface de vote](./images/deployment_vote.png)
+
+### 6. Cleanup
+
+Supprimez le Deployment ainsi que le Service créés précedemment.
 
 ---
 
@@ -78,10 +82,10 @@ spec:
 
 ### 2. Création du Deployment
 
-La commande suivante permet de lancer le Deployment
+La commande suivante permet de créer le Deployment
 
 ```
-$ kubectl create -f vote_deployment.yaml
+$ kubectl apply -f vote_deployment.yaml
 ```
 
 ### 3. Status du Deployment
@@ -112,7 +116,7 @@ On voit que les 3 Pods relatifs au Deployment *vote* sont listés. Ils sont tous
 
 ### 5. Exposition des Pods du Deployment
 
-Dans un fichier *vote_service.yaml* nous créons la spécification suivante:
+Dans un fichier *vote_service.yaml* nous définissons la spécification suivante:
 
 ```
 apiVersion: v1
@@ -129,9 +133,18 @@ spec:
     nodePort: 31001
 ```
 
-On la lance ensuite avec la commande:
+On crée ensuite le Service avec la commande:
 
 ```
-$ kubectl create -f vote_service.yaml
+$ kubectl apply -f vote_service.yaml
 service "vote" created
+```
+
+### 6. Cleanup
+
+Utilisez les commandes suivantes pour supprimer le Deployment et le Service:
+
+```
+$ kubectl delete deploy/vote
+$ kubectl delete svc/vote
 ```

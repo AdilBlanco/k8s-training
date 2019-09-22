@@ -2,7 +2,7 @@
 
 Dans cette mise en pratique, nous allons utiliser *Rook* afin de déployer un stockage objet basé sur *Minio*
 
-Note: cet exemple est réalisé sur Minikube mais vous pouvez suivre ces instructions sur votre propre cluster Kubernetes
+Note: cet exemple est réalisé sur *Minikube* mais vous pouvez suivre ces instructions sur votre propre cluster Kubernetes
 
 ## Récupération du projet
 
@@ -107,6 +107,8 @@ standard
 ```
 
 Dans *Minikube*, cette *StorageClass* est utilisée par défaut. Elle permet de créer du stockage sur le filesystème de la machine hôte et de le mettre à disposition des Pods qui sont déployés.
+
+Note: si vous utilisez un cluster autre que Minikube, vous aurez une StorageClass nommée différemment et reposant sur une solution de stockage différente (utilisant un autre stockage que le système de fichier de la machine hôte)
 
 ```
 $ kubectl get sc standard -o jsonpath='{.provisioner}'
