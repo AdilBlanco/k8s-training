@@ -1,12 +1,6 @@
-## Kubernetes Operator
+## Objectif
 
-Le concept d'Operator Kubernetes a été introduit fin 2016 par CoreOS. On peut définir un opérateur comme étant un processus (qui tourne dans un pod) qui utilise des ressources Kubernetes personnalisées (des ressources qui n'existent pas par défaut dans Kubernetes) et qui communique avec l'API Server pour automatiser la gestion d'applications complexes. Par application complexe, on peut par exemple penser à un cluster de base de données.
-
-À la mi-2018, RedHat et la communauté Kubernetes ont publié Operator Framework (https://github.com/operator-framework/operator-sdk) afin de simplifier le développement de nouveaux opérateurs utilisant le langage de programmation Go. De nombreux opérateurs ont été créés en utilisant ce framework, comme on peut le voir sur https://github.com/operator-framework/awesome-operators:
-
-![Awesome Operators](./images/awesome-operators.png)
-
-Si l'on ne parle pas couramment le Go, Zalando a publié un framework permettant de créer des opérateurs en utilisant le langage Python. Dans cet exercice nous allons créer un Operator simple avec ce framework. L'important ici n'est pas tant le langage utilisé pour le développer mais plutôt de comprendre le fonctionnement d'un Operator en général et les différents composants et ressources qui peuvent intervenir.
+Dans cet exercice nous allons créer un Operator simple avec le framework Kopf de ZalandoTech.
 
 ## Kubernetes Operator Pythonic Framework
 
