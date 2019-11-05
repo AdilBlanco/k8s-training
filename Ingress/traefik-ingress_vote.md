@@ -69,7 +69,7 @@ $ kubectl apply -f rbac.yaml
 
 ### b. Lancement du Ingress Controller
 
-Vous pouvez installer un Trafik Ingress Controller en utilisant la spécification suivante:
+Vous pouvez installer un Traefik Ingress Controller en utilisant la spécification suivante:
 
 ```
 kind: Deployment
@@ -93,7 +93,7 @@ spec:
       serviceAccountName: traefik-ingress-controller
       terminationGracePeriodSeconds: 60
       containers:
-      - image: traefik
+      - image: traefik:1.7
         name: traefik-ingress-lb
         ports:
         - name: http
