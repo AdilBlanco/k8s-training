@@ -188,8 +188,8 @@ Arrêtez l'envoi de requêtes et observez que le nombre de réplicas revient à 
 Supprimez le *Deployment* et le *HorizontalPodAutoscaler* avec les commandes suivantes:
 
 ```
-$ kubectl apply -f deploy.yaml
-$ kubectl apply -f hpa.yaml
+$ kubectl delete -f deploy.yaml
+$ kubectl delete -f hpa.yaml
 ```
 
 Placez-vous dans le répertoire *metrics-server* et supprimez les ressources associées avec la commande suivante:

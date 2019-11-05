@@ -122,7 +122,7 @@ status:
     requests.memory: 600Mi
 ```
 
-Sous la clé *used*, on peut voir que l'utilisation en RAM et cpu correspondent à celles spécifiées dabs le Pod qui vient d'être créé.
+Sous la clé *used*, on peut voir que l'utilisation en RAM et cpu correspondent à celles spécifiées dans le Pod qui vient d'être créé.
 
 ## Lancement d'un 2ème Pod
 

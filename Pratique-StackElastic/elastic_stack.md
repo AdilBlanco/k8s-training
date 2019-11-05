@@ -339,13 +339,11 @@ NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.extensions/elasticsearch   1/1     1            1           2m25s
 deployment.extensions/kibana          1/1     1            1           2m25s
 deployment.extensions/logstash        1/1     1            1           2m25s
-deployment.extensions/toto            1/1     1            1           17m
 
 NAME                                 READY   STATUS    RESTARTS   AGE
 pod/elasticsearch-577ff589c5-cvrgl   1/1     Running   0          2m25s
 pod/kibana-756d67774f-mnp8n          1/1     Running   0          2m25s
 pod/logstash-779b98c567-42fhz        1/1     Running   0          2m25s
-pod/toto-5d49b866d5-ln5gb            1/1     Running   0          17m
 ```
 
 ## 5. Test de la stack Elastic
