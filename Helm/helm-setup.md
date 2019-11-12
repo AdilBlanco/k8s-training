@@ -8,6 +8,8 @@ Téléchargez le client *helm* depuis la page de releases suivante:
 
 [https://github.com/helm/helm/releases](https://github.com/helm/helm/releases)
 
+Copiez ensuite le binaire *helm* dans votre *PATH*.
+
 ## 2. Initialisation du daemon
 
 Afin de lancez le daemon *tiller* avec des droits d'administration, nous allons créer un *ServiceAccount* et lui donner les droits de *cluster-admin* via un *ClusterRoleBinding*

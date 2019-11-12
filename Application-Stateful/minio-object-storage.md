@@ -120,7 +120,7 @@ k8s.io/minikube-hostpath
 Lors de l'étape précédente, le service *minio-service* a été créé.
 
 ```
-$ $ kubectl get svc -n rook-minio
+$ kubectl get svc -n rook-minio
 NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
 minio-my-store   NodePort    10.107.81.88   <none>        9000:32512/TCP   23m
 my-store         ClusterIP   None           <none>        9000/TCP         23m
@@ -138,6 +138,14 @@ Vous pouvez ensuite créer des *Buckets* et uploader des objets, ceux-ci seront 
 ![minio](./images/minio-2.png)
 
 ![minio](./images/minio-3.png)
+
+## Cleanup
+
+Supprrimez l'object store avec la commande suivante:
+
+```
+$ kubectl delete -f object-store.yaml
+```
 
 ## En résumé
 

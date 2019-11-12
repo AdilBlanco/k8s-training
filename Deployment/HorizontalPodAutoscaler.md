@@ -86,25 +86,8 @@ $ minikube addons enable metrics-server
 il est nécessaire de déployer le process *metrics-server* à partir du repository GitHub que vous pouvez cloner avec la commande suivante:
 
 ```
-$ git clone https://github.com/kubernetes-incubator/metrics-server.git
+$ git clone git@github.com:kubernetes-sigs/metrics-server.git
 $ cd metrics-server
-```
-
-Attention, à cause de l'issue https://github.com/kubernetes-incubator/metrics-server/issues/131, il faudra ensuite modifier le fichier *deploy/1.8+/metrics-server-deployment.yaml* en définissant la clé *command* et les 3 élements qui suivent:
-
-```
-...
-      containers:
-      - name: metrics-server
-        image: k8s.gcr.io/metrics-server-amd64:v0.3.4
-        command:
-        - /metrics-server
-        - --kubelet-insecure-tls
-        - --kubelet-preferred-address-types=InternalIP
-        imagePullPolicy: Always
-        volumeMounts:
-        - name: tmp-dir
-          mountPath: /tmp
 ```
 
 Vous pourrez ensuite créer l'ensemble des ressources avec la commande suivante:
@@ -125,7 +108,7 @@ workers-bmps   58m          2%     821Mi           26%
 
 ## Création de la ressource HorizontalPodAutoscaler
 
-Nous allons maintenant définir un *HorizontalPodAutoscaler* qui sera en charge de modifier le nombre de réplicas du Deployment si celui-ci utilise plus de 20% du CPU qui lui est alloué.
+Nous allons maintenant définir un *HorizontalPodAutoscaler* qui sera en charge de modifier le nombre de réplicas du Deployment si celui-ci utilise plus de 10% du CPU qui lui est alloué (10% est une valeur très faible choisit simplement pour cet exemple, dans un contexte de production, cette valeur sera beaucoup plus élevée).
 
 Dans le fichier *hpa.yaml*, copiez le contenu suivant:
 
@@ -141,7 +124,7 @@ spec:
     name: www
   minReplicas: 1
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 20
+  targetCPUUtilizationPercentage: 10
 ```
 
 
@@ -161,13 +144,7 @@ www    Deployment/www   <unknown>/20%   1         10        1          13s
 
 ## Test
 
-Utilisez la commande suivante pour envoyer des requètes en continu sur le service, en remplaçant *NODE_IP* par l'adresse IP de l'une des machines de votre cluster.
-
-```
-$ while true;do curl -s NODE_IP:30100 > /dev/null; done
-```
-
-Note: vous pouvez également utiliser l'utilitaire [Apache Bench](http://httpd.apache.org/docs/current/programs/ab.html) pour envoyer des requêtes sur le service, par exemple avec la commande suivante:
+Installer [Apache Bench](http://httpd.apache.org/docs/current/programs/ab.html) puis utilisez le pour envoyer des requêtes sur le service, par exemple avec la commande suivante (en remplaçant *NODE_IP* par l'adresse IP de l'une des machines de votre cluster):
 
 ```
 $ ab -n 100000 -c 50 http://NODE_IP:30100/
