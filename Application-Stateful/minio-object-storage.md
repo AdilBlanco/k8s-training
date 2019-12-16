@@ -141,7 +141,7 @@ Vous pouvez ensuite créer des *Buckets* et uploader des objets, ceux-ci seront 
 
 ## Cleanup
 
-Supprrimez l'object store avec la commande suivante:
+Supprimez l'object store avec la commande suivante:
 
 ```
 $ kubectl delete -f object-store.yaml
