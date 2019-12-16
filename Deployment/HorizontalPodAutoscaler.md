@@ -90,7 +90,7 @@ $ git clone https://github.com/kubernetes-sigs/metrics-server.git
 $ cd metrics-server
 ```
 
-A cause d'une issue GitHub, modifiez le fichier *deploy/1.8+/metrics-server-deployment.yaml* de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
+Note: en raison d'une issue sur GitHub, il est nécessaire de modifier le fichier *deploy/1.8+/metrics-server-deployment.yaml* de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
 
 ```
 ...

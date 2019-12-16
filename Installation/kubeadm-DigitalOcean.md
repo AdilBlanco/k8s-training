@@ -30,7 +30,7 @@ $ sudo mv ./kubectl /usr/local/bin/kubectl
 - si vous êtes sur Windows
 
 ```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/windows/amd64/kubectl.exe
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe
 ```
 
 note: si vous n'avez pas l'utilitaire curl vous pouvez télécharger kubectl v1.17.0 depuis ce https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/windows/amd64/kubectl.exe.
