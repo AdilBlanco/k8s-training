@@ -86,8 +86,26 @@ $ minikube addons enable metrics-server
 il est nécessaire de déployer le process *metrics-server* à partir du repository GitHub que vous pouvez cloner avec la commande suivante:
 
 ```
-$ git clone git@github.com:kubernetes-sigs/metrics-server.git
+$ git clone https://github.com/kubernetes-sigs/metrics-server.git
 $ cd metrics-server
+```
+
+A cause d'une issue GitHub, modifiez le fichier *deploy/1.8+/metrics-server-deployment.yaml* de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
+
+```
+...
+      - name: metrics-server
+        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
+        command:
+          - /metrics-server
+          - --logtostderr
+          - --kubelet-insecure-tls=true
+          - --kubelet-preferred-address-types=InternalIP
+          - --v=2
+        args:
+          - --cert-dir=/tmp
+          - --secure-port=4443
+...
 ```
 
 Vous pourrez ensuite créer l'ensemble des ressources avec la commande suivante:
