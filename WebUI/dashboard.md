@@ -104,9 +104,8 @@ kind: Deployment
 metadata:
   name: db
   labels:
-    app:db
+    app: db
 spec:
-  replica: 1
   selector:
     matchLabels:
       app: db
@@ -114,12 +113,12 @@ spec:
     metadata:
       labels:
         app: db
-    containers:
-    - name: mongo
-      image: mongo:4.0
-      ports:
-      - containerPort: 27017
-        name: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:4.0
+        ports:
+        - containerPort: 27017
 ```
 
 ![Dashboard Login](./images/dashboard-5.png)
