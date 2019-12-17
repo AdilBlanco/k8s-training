@@ -21,7 +21,7 @@ $ minikube dashboard
 Si vous n'êtes pas sur Minikube, il vous faut créer le Deployment qui lancera le dashboard dans un Pod. Vous pouvez le faire avec la commande suivante:
 
 ```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta1/aio/deploy/recommended.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
 ```
 
 Afin d'accéder à l'interface, vous allez lancer le *proxy* Kubernetes:

@@ -311,9 +311,9 @@ metadata:
 
 ## 4. Déploiement de l'application
 
-Note: afin que Elasticsearch puisse se lancer correctement, il est nécessaire d'augmenter la mémoire virtuelle de la machine hôte, ceci est effectué par le container d'init du Pod elasticsearch. Il est également possible de changer ce paramètre en ce connectant en ssh aux machines du cluster et en lançant la commande ```sudo sysctl -w vm.max_map_count=262144``` sur chacune d'entre elles.
+Note: afin que Elasticsearch puisse se lancer correctement, il est nécessaire d'augmenter la mémoire virtuelle de la machine hôte, ceci est effectué par le container d'init du Pod elasticsearch. Il est également possible de changer ce paramètre en se connectant en ssh aux machines du cluster et en lançant la commande ```sudo sysctl -w vm.max_map_count=262144``` sur chacune d'entre elles.
 
-Depuis un shell dans le répertoire *elastic*, lancer l'application avec la commande suivante:
+Depuis un shell dans le répertoire *elastic*, lancez l'application avec la commande suivante:
 
 ```
 $ kubectl apply -f manifests/
