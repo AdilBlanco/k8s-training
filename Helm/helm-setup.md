@@ -1,60 +1,22 @@
-# Mise en place de HELM
+## Mise en place de HELM
 
-Afin de pouvoir installer des applications packagées dans le format définit par HELM, vous allez installer le client *helm* en local et initialiser le daemon *tiller* qui tournera dans un Pod dans votre cluster.
-
-## 1. Installation du client
-
-Téléchargez le client *helm* depuis la page de releases suivante:
+Afin de pouvoir installer des applications packagées dans le format définit par *Helm*, vous allez installer le client *helm* en local/. Pour cela, téléchargez le client *helm* depuis la page de releases suivante:
 
 [https://github.com/helm/helm/releases](https://github.com/helm/helm/releases)
 
 Copiez ensuite le binaire *helm* dans votre *PATH*.
 
-## 2. Initialisation du daemon
+Note: dans la version 2 de Helm, il était nécessaire de déployer un composant côté serveur, celui-ci étant responsable de la création de ressources. Helm 3 ne nécessite plus ce composant, seul le client est nécessaire, les ressources étant créés avec les droits définis dans le context utilisé.
 
-Afin de lancez le daemon *tiller* avec des droits d'administration, nous allons créer un *ServiceAccount* et lui donner les droits de *cluster-admin* via un *ClusterRoleBinding*
-
-Copiez la spécification ci-dessous dans un fichier *rbac.yaml*
+Vérifiez que le client est correctement installé:
 
 ```
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tiller
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: tiller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: tiller
-    namespace: kube-system
+$ helm version
+version.BuildInfo{Version:"v3.0.1", GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean", GoVersion:"go1.13.4"}
 ```
 
-puis créez ces différentes ressources:
+Installez ensuite le repository officiel contenant les charts stable, aucun reposity n'étant configuré par défaut:
 
 ```
-$ kubectl apply -f rbac.yaml
+$ helm repo add stable https://kubernetes-charts.storage.googleapis.com
 ```
-
-Vous pouvez ensuite lancez *tiller* en lui donnant les droits du ServiceAccount créé précédemment:
-
-```
-$ helm init --service-account tiller
-```
-
-Vérifiez que le Pod relatif au daemon *tiller* a bien été lancé.
-
-```
-$ kubectl get po -n kube-system -l name=tiller
-NAME                             READY   STATUS    RESTARTS   AGE
-tiller-deploy-5f4fc5bcc6-d4z62   1/1     Running   0          3m32s
-```
-
-Dans les exercices qui suivent, vous utiliserez *helm* pour déployer des applications et packager vos propres applications.
