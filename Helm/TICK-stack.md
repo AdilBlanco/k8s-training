@@ -58,7 +58,7 @@ Un Ingress controller est nécessaire afin de prendre en compte la ressource Ing
 
 - 1er cas
 
-Si votre cluster est déployé chez un cloud provider, utilisez la commande suivante afin de l'installer avec helm:
+Si votre cluster est déployé chez un cloud provider, utilisez la commande suivante afin de l'installer avec helm (assurez-vous d'avoir installer le client Helm 3 sur votre machine locale au préalable):
 
 ```
 $ helm install my-nginx stable/nginx-ingress  --set rbac.create=true

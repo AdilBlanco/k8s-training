@@ -1,51 +1,31 @@
-# Installation de minikube
-
 Nous utiliserons souvent Minikube dans les démos et les exercices. Minikube est un packaging tout-en-un de Kubernetes qui tourne dans une machine virtuelle. Nous détaillons ci-dessous la procédure d'installation avec VirtualBox.
 
 Note: si vous êtes sur Windows et que vous utilisez déjà l'hyperviseur HyperV, il faudra le désactiver pour que Minikube puisse lancer une VM sur VirtualBox. Une autre option serait de lancer minikube directement avec l'hyperviseur HyperV et non pas sur VirtualBox.
 
-## 1. Installation de VirtualBox
+## 1. Installation d'un hyperviseur
 
-Depuis le lien suivant, sélectionnez le binaire VirtualBox en fonction du système d'exploitation que vous utilisez: https://www.virtualbox.org/wiki/Downloads
+Installez un hyperviseur sur votre machine locale. En fonction de l'OS, différents hyperviseurs sont supportés:
 
-Il vous suffira ensuite de suivre les instructions pour procéder à l'installation.
+- si vous êtes sur macOS, vous pouvez installer l'un des hyperviseurs suivants:
 
-## 2. Installation de Kubectl
+  * VirtualBox (https://www.virtualbox.org/wiki/Downloads)
+  * VMware Fusion (https://www.vmware.com/products/fusion)
+  * HyperKit (https://github.com/moby/hyperkit)
 
-Le binaire kubectl est l'outil indispensable pour communiquer avec un cluster Kubernetes depuis la ligne de commande. Son installation est très bien documentée dans la documentation officielle que vous pouvez retrouver via le lien suivant: https://kubernetes.io/docs/tasks/tools/install-kubectl/
+- si vous êtes sur Linux, vous pouvez installer l'un des hyperviseurs suivants:
 
-En fonction de votre environnement, vous trouverez les différentes options qui vous permettront d'installer kubectl
+  * VirtualBox (https://www.virtualbox.org/wiki/Downloads)
+  * KVM (http://www.linux-kvm.org/)
 
-- si vous êtes sur macOS:
+  Note: Minikube supporte également une option --vm-driver=none qui exécute les composants Kubernetes sur la machine hôte et non dans une VM. L’utilisation de ce pilote nécessite Docker et un environnement Linux mais pas d'hyperviseur.
 
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
-$ chmod +x ./kubectl
-$ sudo mv ./kubectl /usr/local/bin/kubectl
-```
+- si vous êtes sur Windows, vous pouvez installer l'un des hyperviseurs suivants:
 
-- si vous êtes sur Linux
+  * VirtualBox (https://www.virtualbox.org/wiki/Downloads)
+  * Hyper-V (https://msdn.microsoft.com/en-us/virtualization/hyperv_on_windows/quick_start/walkthrough_install)
 
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 
-$ chmod +x ./kubectl
-$ sudo mv ./kubectl /usr/local/bin/kubectl
-```
-
-- si vous êtes sur Windows
-
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe
-```
-
-note: si vous n'avez pas l'utilitaire curl vous pouvez télécharger kubectl v1.14.0 depuis ce https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/windows/amd64/kubectl.exe.
-
-Afin d'avoir les utilitaires comme curl, je vous conseille d'utiliser Git for Windows (https://gitforwindows.org), vous aurez alors Git Bash, un shell très proche de celui que l'on trouve dans un environnement Linux.
-
-Il vous faudra ensuite mettre kubectl.exe dans le PATH.
-
-## 3. Installation de Minikube
+## 2. Installation de Minikube
 
 La dernière étape est l'installation de Minikube. Depuis le lien suivant https://github.com/kubernetes/minikube/releases, vous trouverez la dernière release de Minikube et la procédure d'installation en fonction de votre environnement. 
 
@@ -73,7 +53,7 @@ $ curl -Lo minikube.exe https://storage.googleapis.com/minikube/releases/latest/
 
 Il faudra ensuite ajouter minikube.exe dans votre PATH.
 
-## 4. Vérification
+## 3. Vérification
 
 Une fois que ces éléments sont installés, lancez minikube puis vérifiez que kubectl parvient à se connecter au cluster. Pour cette dernière étape on peut par exemple essayer de lister les Pods qui tournent (nous reviendrons sur cette notion de Pods très prochainement).
 
@@ -82,8 +62,6 @@ Une fois que ces éléments sont installés, lancez minikube puis vérifiez qu
 ```
 $ minikube start
 ```
-
-Note: si vous avez les ressources nécessaires, vous pouvez allouer d'avantage de mémoire et de cpu avec, par exemple, la commande suivante: ```$ minikube start --memory=8192 --cpus=4```
 
 Listez ensuite les Pods
 
@@ -104,6 +82,5 @@ puis listez les Pods
 $ ./kubectl.exe get pods
 No resources found.
 ```
-
 
 Note: le résultat obtenu par la dernière commande ("No resources found.") est correct et montre que kubectl a bien réussi à se connecter au cluster Kubernetes, il n'a cependant pas trouvé de Pod actifs car nous n'en n'avons pas encore lancé.
