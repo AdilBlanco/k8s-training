@@ -21,7 +21,7 @@ Un Operator définit généralement ses propres ressources Kubernetes sur lesque
 A l'aide de la commande ci-dessous, créez une *CustomResourceDefinition* définissant une ressource nommée *Database*, cette dernière définit un champ *Type* de type *string*.
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f - <<EOF
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -229,7 +229,7 @@ $ docker image push lucj/op-db:latest
 L'Operator que nous sommes en train de développer aura besoin des droits lui permettant de créer des ressources de type *Pod* et *Service*. Nous allons commencer par créer un *ServiceAccount* que nous utiliserons pour cet Operator:
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f - <<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -240,7 +240,7 @@ EOF
 puis nous associons ce *ServiceAccount* au role *cluster-admin*
 
 ```
-$ cat <<EOF > kubectl apply -f -
+$ kubectl apply -f - <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -263,7 +263,7 @@ Attention: le *Role* *cluster-admin* donne, aux Pods qui l'utilisent, tous les d
 Nous deployons maintenant l'Operator avec la commande suivante:
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -299,7 +299,7 @@ pod/op-5f578856fd-cmkv2   1/1     Running   0          5m54s
 Pour vérifier que notre Operator fonctionne correctement, nous allons créer une ressource *Database* avec la commande suivante:
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f - <<EOF
 apiVersion: zalando.org/v1
 kind: Database
 metadata:

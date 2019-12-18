@@ -273,7 +273,7 @@ tick_chart/
 En utilisant la commande suivante, lancez l'application maintenant packagée dans un chart Helm:
 
 ```
-$ helm install --name tick ./tick_chart
+$ helm install tick ./tick_chart
 ```
 
 Vous devriez obtenir un résultat comme le suivant:
@@ -336,16 +336,15 @@ L'intérêt d'une aplication packagée dans un Chart Helm est de faciliter sa di
 
 Dans cet exercice, nous allons faire en sorte de rendre dynamique les tags des différentes images. Pour cela, commencez par modifier le fichier *tick_chart/values.yaml* de façon à ce qu'il ait le contenu suivant afin d'utiliser la déclinaison *alpine* du tag de chaque image.
 
-
 ```
 telegraf:
-  tag: 1.10-alpine
+  tag: 1.13-alpine
 chronograf:
   tag: 1.7-alpine
 kapacitor:
   tag: 1.5-alpine
 influxdb:
-  tag: 1.7-alpine
+  tag: 1.5-alpine
 ```
 
 Ensuite, pour chaque fichier de Deployment présent dans *tick_chart/templates*, remplacer le tag de l'image par {{ .Values.COMPOSANT.tag }}, ou COMPOSANT est influxdb, telegraf, chronograf ou kapacitor. Par exemple, le fichier de Deployment de Influxdb sera modifié de la façon suivante:

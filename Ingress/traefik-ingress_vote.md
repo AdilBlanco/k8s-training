@@ -324,7 +324,7 @@ $ minikube addons disable ingress
 -  si vous n'êtes pas sur Minikube, utilisez les commandes suivantes pour supprimer le Deployment et le Service associé:
 
 ```
-$ kubectl delete delopy traefik-ingress-controller -n kube-system
+$ kubectl delete deploy traefik-ingress-controller -n kube-system
 $ kubectl delete svc traefik-ingress-service -n kube-system
 ```
 

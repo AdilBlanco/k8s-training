@@ -11,7 +11,7 @@ Utilisez les commandes suivantes pour récupérez le projet *rook*. Vous utilise
 ```
 $ git clone https://github.com/rook/rook.git
 $ cd rook
-$ git checkout release-1.1
+$ git checkout release-1.2
 $ cd cluster/examples/kubernetes/minio
 ```
 

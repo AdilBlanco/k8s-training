@@ -189,7 +189,7 @@ La spécification suivante définit le Deployment permettant de lancer le Contro
 
 ```
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   namespace: default
   name: traefik
@@ -263,7 +263,7 @@ spec:
   ports:
     - protocol: TCP
       name: web
-      port: 8000
+      port: 80
     - protocol: TCP
       name: admin
       port: 8080
@@ -300,7 +300,7 @@ spec:
   ports:
     - protocol: TCP
       name: web
-      port: 8000
+      port: 80
       nodePort: 32000
     - protocol: TCP
       name: admin

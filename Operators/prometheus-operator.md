@@ -13,34 +13,23 @@ Le schéma suivant met en évident les intéractions entre les différentes ress
 ## Récupération du projet
 
 ```
-$ git clone git@github.com:coreos/kube-prometheus.git
+$ git clone https://github.com/coreos/kube-prometheus.git
 $ cd kube-prometheus
 ```
 
 ## Création des ressources
 
-Utilisez la commande suivante pour créer l'ensemble des ressources présentes dans le répertoire **manifests**.
+Utilisez la commande suivante pour créer l'ensemble des ressources présentes dans le répertoire *manifests*.
 
 ```
-$ kubectl apply -f manifests/
-```
-
-Lancez les commandes suivantes afin de vous assurer que les ressources ont été correctement créées.
-
-```
-$ until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+$ kubectl create -f manifests/setup
 $ until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
-```
-
-Il est parfois nécessaire de lancer la création de manifest une seconde fois (workaround pour éviter une race condition)
-
-```
-$ kubectl apply -f manifests/
+$ kubectl create -f manifests/
 ```
 
 Différentes ressources sont créées, parmi celles-ci:
 
-- le namespace Monitoring dans lequel l'ensemble des ressoures suivantes seront déployées
+- le namespace *monitoring* dans lequel l'ensemble des ressoures suivantes seront déployées
 - des CustomResourceDefinitions (ou CRDs) qui permettent de définir des nouvelles resources dans Kubernetes, c'est à dire des ressources qui n'existent pas par défaut. Ces CRDs seront notamment utilisées par l'Operateur Prometheus
 - des ressources relatives à la mise en place de l'authentification et de l'autorisation (RBAC) telles que des Roles, RoleBindings, ClusterRole, ClusterRoleBindings ainsi que des ServiceAccounts
 - des Deployments et Service pour la mise en place des différents éléments de la stack (l'Operator Prometheus, le server Prometheus, AlertManager, Grafana, ...)
@@ -161,5 +150,5 @@ AlertManager permet de gérer les alertes envoyées par les différents composan
 Utilisez la commande suivante pour supprimer l'ensemble des ressources créées précédemment.
 
 ```
-$ kubectl delete -f manifests/
+$ kubectl delete --ignore-not-found=true -f manifests/ -f manifests/setup
 ```

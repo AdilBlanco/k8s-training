@@ -73,7 +73,7 @@ La spécification suivante définit un DaemonSet utilisé pour assurer qu'un Pod
 Note: *fluentd* est similaire à *logstash* en terme de fonctionnalités, il permet notamment d'ingérer des logs, de les parser, de les enrichir et d'envoyer le résultat sur des solutions tierces.
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: fluentd
@@ -83,6 +83,9 @@ metadata:
     version: v1
     kubernetes.io/cluster-service: "true"
 spec:
+  selector:
+    matchLabels:
+      k8s-app: fluentd-logging
   template:
     metadata:
       labels:
@@ -90,7 +93,6 @@ spec:
         version: v1
         kubernetes.io/cluster-service: "true"
     spec:
-      serviceAccount: fluentd
       serviceAccountName: fluentd
       tolerations:
       - key: node-role.kubernetes.io/master
