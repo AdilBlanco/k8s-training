@@ -44,7 +44,7 @@ Il faut ensuite exposer ce Pod à l'aide d'un Service:
 - si vous êtes sur un cloud provider qui supporte les services de type LoadBalancer, vous pouvez utiliser la commande suivante:
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f -<<EOF
 kind: Service
 apiVersion: v1
 metadata:
@@ -77,7 +77,7 @@ $ kubectl get svc ingress-nginx -n ingress-nginx
 - sinon, vous pouvez utiliser un Service de type *NodePort* avec la commande suivante:
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f -<<EOF
 apiVersion: v1
 kind: Service
 metadata:
@@ -141,7 +141,7 @@ Note: nous pouvons également obtenir ces informations depuis les fichiers de sp
 Créez, dans le fichier *vote_ingress.yaml*, la spécification suivante:
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: voting-domain
@@ -171,7 +171,7 @@ Celle-ci définit une ressource Ingress contenant 2 *rules*:
 Créez cette ressource à l'aide de la commande suivante:
 
 ```
-$ kubectl create -f vote_ingress.yaml
+$ kubectl apply -f vote_ingress.yaml
 ```
 
 ## 6. Accès à l'application

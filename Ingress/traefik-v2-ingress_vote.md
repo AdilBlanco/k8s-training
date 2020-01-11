@@ -318,7 +318,7 @@ Sauvegardez celle-ci dans le fichier *traefik-svc.yaml* et créez la ressource a
 $ kubectl apply -f traefik-svc.yaml
 ```
 
-### d. Accès à l'interface web de Traefik
+### e. Accès à l'interface web de Traefik
 
 L'interface web de Traefik est accessible via le Service crée précédemment. En fonction du type de Service créé, il faudra utiliser:
 - soit l'IP du LoadBalancer suivie du port 8080
