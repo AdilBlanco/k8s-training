@@ -4,15 +4,12 @@ MicroK8s est un outil axé sur la simplicité et l'expérience développeur. Il 
 
 ![Kelsey](./images/local/microk8s-1.png)
 
-Sur Windows, MacOS ou Linux, MicroK8s peut facilement être installé dans une machine virtuelle. Nous utiliserons [Multipass](https://multipass.run) un outils très pratique qui permet de lancer facilement des machines virtuelles Ubuntu sur Mac, Linux, ou Windows. En fonction de l'OS, Multipass pourra utiliser un hypervieur parmi Hyper-V, HyperKit, KVM, ou VirtualBox de manière native afin d'optimiser le temps de démarrage.
+Sur Windows, MacOS ou Linux, MicroK8s peut facilement être installé dans une machine virtuelle. Nous utiliserons [Multipass](https://multipass.run) un outils très pratique qui permet de lancer facilement des machines virtuelles Ubuntu sur Mac, Linux, ou Windows.
 
-### 1. Installation de Multipass
+Note: l'installation de Multipass et l'illustration des différentes commandes ont été détaillées dans un exercice précédent, n'hésitez pas à vous reporter.
 
-Vous trouverez sur le site [https://multipass.run](https://multipass.run) la procédure d'installation de Multipass en fonction de votre OS ainsi que les commandes de bases (nous utiliserons certaines d'entre elles dans la suite).
 
-![Multipass](./images/local/multipass.png)
-
-### 2. Création d'une VM Ubuntu
+### 1. Création d'une VM Ubuntu
 
 Utilisez la commande suivante pour créer une VM Ubuntu 18.04 avec Multipass, cela ne prendra que quelques dizaines de secondes:
 
@@ -20,7 +17,7 @@ Utilisez la commande suivante pour créer une VM Ubuntu 18.04 avec Multipass, ce
 $ multipass launch --name microk8s --mem 4G
 ```
 
-### 3. Installation de microk8s dans la VM
+### 2. Installation de microk8s dans la VM
 
 Utilisez la commande suivante pour lancer l'installation de microk8s dans la VM que vous venez de provisionner:
 
@@ -28,7 +25,7 @@ Utilisez la commande suivante pour lancer l'installation de microk8s dans la VM 
 $ multipass exec microk8s -- sudo snap install microk8s --classic
 ```
 
-### 4. Fichier de configuration
+### 3. Fichier de configuration
 
 Récupérez, sur votre machine locale, le fichier de configuration généré par microk8s:
 
@@ -36,13 +33,13 @@ Récupérez, sur votre machine locale, le fichier de configuration généré par
 $ multipass exec microk8s -- sudo microk8s.config > microk8s.yaml
 ```
 
-Utilisez ensuite la commande suivante afin de setter la variable d'environnement KUBECONFIG de façon à ce qu'elle pointe vers le path absolu du fichier de configuration récupéré précédemment:
+Utilisez ensuite la commande suivante afin de positionner la variable d'environnement KUBECONFIG de façon à ce qu'elle pointe vers le path absolu du fichier de configuration:
 
 ```
 $ export KUBECONFIG=$PWD/microk8s.yaml
 ```
 
-### 5. Test
+### 4. Test
 
 Le cluster est maintenant prêt à être utilisé:
 

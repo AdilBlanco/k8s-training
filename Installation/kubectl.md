@@ -1,10 +1,10 @@
 ## Installation de Kubectl
 
-Sur la machine locale, il est nécessaire d'installer le binaire kubectl. C'est l'outil indispensable pour communiquer avec un cluster Kubernetes depuis la ligne de commande. Son installation est très bien documentée dans la documentation officielle que vous pouvez retrouver via le lien suivant: https://kubernetes.io/docs/tasks/tools/install-kubectl/
+Sur la machine locale, il est nécessaire d'installer le binaire kubectl. C'est l'outil indispensable pour communiquer avec un cluster Kubernetes depuis la ligne de commande.
 
-En fonction de votre environnement, vous trouverez les différentes options qui vous permettront d'installer kubectl
+Son installation est très simple:
 
-- si vous êtes sur macOS:
+- si vous êtes sur macOS, utilisez les commandes suivantes pour récupérer le binaire
 
 ```
 $ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
@@ -12,7 +12,7 @@ $ chmod +x ./kubectl
 $ sudo mv ./kubectl /usr/local/bin/kubectl
 ```
 
-- si vous êtes sur Linux
+- si vous êtes sur Linux, utilisez les commandes suivantes:
 
 ```
 $ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -20,7 +20,7 @@ $ chmod +x ./kubectl
 $ sudo mv ./kubectl /usr/local/bin/kubectl
 ```
 
-- si vous êtes sur Windows
+- si vous êtes sur Windows, récupérez le binaire avec la commande suivante
 
 ```
 $ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/windows/amd64/kubectl.exe

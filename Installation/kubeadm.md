@@ -21,6 +21,11 @@ Pour la mise en place d'un cluster avec kubeadm, il est nécessaire d'avoir une 
 
 Dans cet exemple nous considérerons 3 machines virtuelles basées sur Ubuntu 18.04, sur lesquelles nous avons un accès ssh via une clé d'authentification. Ces machines sont nommées node1, node2 et node3.
 
+Afin de suivre cet exercice, vous pouvez créer des machines virtuelles en local, par exemple en utilisant [Multipass](https://multipass.run), ou bien sur l'infrastructure d'un cloud provider.
+
+> Attention:
+Si vous souhaitez créer vos machines virtuelles sur l'infrastructure d'un cloud provider (Google Compute Engine, Amazon AWS, Packet, Rackspace, DigitalOcean, Civo, Scaleway, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques heures cependant).
+
 ## Kubectl
 
 Assurez-vous d'avoir installé *kubectl* sur votre machine locale (cf exercice précédent). Ce binaire permet de communiquer avec un cluster Kubernetes depuis la ligne de commande.
@@ -42,7 +47,9 @@ Sur chaque machine, nous allons installer les éléments suivants:
 - le binaire *kubeadm* pour la création du cluster
 - le binaire *kubelet* pour la supervision des containers
 
-Pour cela, vous pouvez utiliser la commande suivante (en ayant au préalable positionné les variables d'environnement IP1, IP2, IP3 avec les IP des nodes respectifs). Dans l'exemple envisagé ici, nous avons accès root via une clé ssh.
+Pour cela, vous pouvez utiliser la commande suivante (en ayant au préalable positionné les variables d'environnement IP1, IP2, IP3 avec les IP des nodes respectifs).
+
+Note: dans l'exemple envisagé ici, nous avons accès root via une clé ssh, il vous faudra cependant changer légèrement le script ci-dessous si vous utilisé un autre utilisteur.
 
 ```
 for IP in $IP1 $IP2 $IP3; do

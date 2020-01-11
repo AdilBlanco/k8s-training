@@ -1,4 +1,9 @@
-K3s est une distribution Kubernetes très light (5 ‘s’ de moins que dans k8s :) ). C'est une distribution certifiée, très adaptée pour l'IoT, l'Edge computing, ...
+K3d est un outils, qui permet de déplopyer un cluster k3s de façon à ce que chacun des nodes du cluster tourne dans un container Docker.
+
+
+
+
+
 
 Sur Windows, MacOS ou Linux, K3s peut facilement être installé dans une machine virtuelle. Nous utiliserons ici [Multipass](https://multipass.run) un outils très pratique qui permet de lancer facilement des machines virtuelles Ubuntu sur Mac, Linux, ou Windows.
 
