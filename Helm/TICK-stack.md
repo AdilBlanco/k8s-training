@@ -50,8 +50,6 @@ $ tree .
 
 ## 3. Installation d'un Ingress controller
 
-Pré-requis: assurez-vous que vous avez le daemon *tiller* est bien lancé sur le cluster
-
 ### Mise en place
 
 Un Ingress controller est nécessaire afin de prendre en compte la ressource Ingress qui est utilisée pour exposer les services à l'extérieur du cluster.
