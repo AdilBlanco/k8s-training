@@ -41,7 +41,7 @@ Il nous faut ensuite un token d'authentification pour pouvoir se logguer sur l'i
 La commande suivante permet de créér un ServiceAccount nommé *admin-user*
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f -<<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -55,7 +55,7 @@ EOF
 La commande suivante permet d'associer ce ServiceAccount avec le ClusterRole *cluster-admin* en créant un *ClusterRoleBinding*
 
 ```
-$ cat <<EOF | kubectl apply -f -
+$ kubectl apply -f -<<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
