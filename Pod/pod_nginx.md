@@ -8,7 +8,7 @@ Dans cet exercice, vous allez créer une spécification pour votre premier Pod e
 
 Créez un fichier yaml *www_pod.yaml* définissant un Pod ayant les propriétés suivantes:
 - nom du Pod: *www*
-- image du container: *nginx:1.14-alpine*
+- image du container: *nginx:1.16-alpine*
 - nom du container: *nginx*
 
 ### 2. Lancement du Pod
@@ -49,7 +49,7 @@ metadata:
 spec:
   containers:
   - name: nginx
-    image: nginx:1.14-alpine
+    image: nginx:1.16-alpine
 ```
 
 ### 2. Lancement du Pod
@@ -100,7 +100,7 @@ IP:           172.17.0.4
 Containers:
   nginx:
     Container ID:   docker://3cfa8cbd0fd34121ff46fca592f327057ea9ac727f443c15d77b620fb886ac64
-    Image:          nginx:1.12.2
+    Image:          nginx:1.16-alpine
     Image ID:       docker-pullable://nginx@sha256:547ea435d7d719b1a18b33e1a859b3ba0c81348d2f86d1d99ca1ba9c1422663e
     Port:           <none>
     State:          Running
@@ -128,7 +128,7 @@ Events:
   ----    ------                 ----  ----               -------
   Normal  Scheduled              4m    default-scheduler  Successfully assigned www to minikube
   Normal  SuccessfulMountVolume  4m    kubelet, minikube  MountVolume.SetUp succeeded for volume "default-token-brp4l"
-  Normal  Pulled                 4m    kubelet, minikube  Container image "nginx:1.12.2" already present on machine
+  Normal  Pulled                 4m    kubelet, minikube  Container image "nginx:1.16-alpine" already present on machine
   Normal  Created                4m    kubelet, minikube  Created container
   Normal  Started                4m    kubelet, minikube  Started container
 ```
@@ -157,7 +157,7 @@ metadata:
   uid: f5280b3b-359c-11e8-80f1-080027f0e385
 spec:
   containers:
-  - image: nginx:1.12.2
+  - image: nginx:1.16-alpine
     imagePullPolicy: IfNotPresent
     name: nginx
     resources: {}
@@ -196,7 +196,7 @@ status:
     type: PodScheduled
   containerStatuses:
   - containerID: docker://3cfa8cbd0fd34121ff46fca592f327057ea9ac727f443c15d77b620fb886ac64
-    image: nginx:1.12.2
+    image: nginx:1.16-alpine
     imageID: docker-pullable://nginx@sha256:547ea435d7d719b1a18b33e1a859b3ba0c81348d2f86d1d99ca1ba9c1422663e
     lastState: {}
     name: nginx
