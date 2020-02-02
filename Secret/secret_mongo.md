@@ -6,7 +6,7 @@ Dans cet exercice nous allons voir l'utilisation d'un Secret pour se connecter �
 
 ### 1. Le context
 
-L'image *lucj/messages:1.0* contient une application simple qui permet, via des requêtes HTTP, de créer des messages ou de lister les messages existant.
+L'image *lucj/messages:1.0* contient une application simple qui écoute sur le port 80 et permet, via des requêtes HTTP, de créer des messages ou de lister les messages existant.
 
 Ces messages sont sauvegardés dans une base de données *MongoDB* dont l'URL de connexion doit être fournie à l'application de façon à ce que celle-ci puisse s'y connecter. On peut lui fournir via une variable d'environnement MONGODB_URL ou via un fichier texte accessible depuis */run/secrets/MONGODB_URL*.
 
@@ -41,7 +41,7 @@ Définissez un Pod nommé *api-env* dont l'unique container a la spécification 
 - image: *lucj/messages:1.0*
 - une variable d'environnement *MONGODB_URL* ayant la valeur liée à la clé *mongo_url* du Secret *mongo* créé précédemment
 
-Créez le Pod et vérifier que vous pouvez créer un message avec la commande suivante (vous pourrez utiliser `kubectl port-forward` pour exposer l'application du Pod)
+Créez le Pod et vérifier que vous pouvez créer un message avec la commande suivante (vous pourrez utiliser `kubectl port-forward` pour exposer l'application du Pod, l'unique container de celui-ci écoute sur le port 80)
 
 ```
 curl -H 'Content-Type: application/json' -XPOST -d '{"from":"me", "msg":"hello"}' http://IP:PORT/messages
@@ -199,9 +199,14 @@ Forwarding from 127.0.0.1:8889 -> 80
 ...
 ```
 
-Depuis la machine locale, on peut alors envoyer une rquête POST sur l'API:
+Depuis la machine locale, on peut alors envoyer une requête POST sur l'API:
 
 ```
 $ curl -H 'Content-Type: application/json' -XPOST -d '{"from":"me", "msg":"hola"}' http://localhost:8889/messages
+```
+
+Si tout s'est bien passé, nous obtenons une réponse ayant le format suivant:
+
+```
 {"from":"me","msg":"hola","at":"2018-04-03T13:05:11.408Z","_id":"5ac37c07bace38000f9b09e2"}
 ```

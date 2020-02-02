@@ -488,15 +488,15 @@ Depuis le menu *Operations > Kubernetes* de l'interface GitLab, selectionnez *Ad
 
 Afin d'intégrer, dans le projet GitLab, le cluster *k3s* que vous avez mis en place précédemment, vous allez suivre les étapes ci-dessous:
 
-- installez *jq* sur votre machine locale. *jq* est un utilitaire très pratique (et très utilisé) pour manipuler les structures json, il peut être intallé depuis [jq](https://stedolan.github.io/jq/download/).
+- installez *jq* sur votre machine locale. *jq* est un utilitaire très pratique (et très utilisé) pour manipuler les structures json, il peut être installé depuis [jq](https://stedolan.github.io/jq/download/).
 
 - ensuite, depuis le terminal dans lequel vous avez défini la variable d'environnement *KUBECONFIG*, executez la commande suivante:
 
 ```
-$ curl -sSL https://static.techwhale.io/kubeconfig.sh | sh
+$ curl -sSL https://files.techwhale.io/kubeconfig.sh | sh
 ```
 
-You obtiendrez les informations nécessaires pour l'intégration de votre cluster Kubernetes dans votre projet GitLab:
+Vous obtiendrez les informations nécessaires pour l'intégration de votre cluster Kubernetes dans votre projet GitLab:
 - le nom du cluster (vous êtes libre de changer celui-ci si vous le souhaitez)
 - l'URL de l'API Server
 - l'authorité de certification du cluster

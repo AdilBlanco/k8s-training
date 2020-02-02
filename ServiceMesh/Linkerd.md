@@ -5,7 +5,7 @@ Pour faire cet exercice, il vous suffit d'avoir accès à un cluster Kubernetes.
 Si vous souhaitez créer un cluster local rapidement, vous pouvez installer Multipass ([https://multipass.run](https://multipass.run)) et lancer les commandes suivantes afin de déployer un cluster k3s (cela ne prendra que quelques minutes):
 
 ```
-$ curl -sfL https://static.techwhale.io/mpk3s.sh -o mpk3s.sh
+$ curl -sfL https://files.techwhale.io/mpk3s.sh -o mpk3s.sh
 $ ./mpk3s.sh
 ```
 

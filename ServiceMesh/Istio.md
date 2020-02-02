@@ -1,8 +1,8 @@
 ## Pré-requis
 
--  un cluster Kubernetes. Pour illustrer cet exercice, nous utiliserons un cluster géré par le cloud provider [DigitalOcean](https://digitalocean.com).
+Pour faire cet exercice, il vous suffit d'avoir accès à un cluster Kubernetes.
 
-- le binaire *kubectl* configuré pour communiquer avec ce cluster
+Les manipulations seront faites sur un cluster géré par le cloud provider [DigitalOcean](https://digitalocean.com) mais vous êtes libre d'utiliser le cloud provider de votre choix ou bien d'installer un cluster en local.
 
 ## Téléchargement
 

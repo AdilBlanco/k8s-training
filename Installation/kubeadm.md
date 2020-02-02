@@ -19,12 +19,14 @@ Pour la mise en place d'un cluster avec kubeadm, il est nécessaire d'avoir une 
 - 2 GB RAM minimum par machine
 - 2 CPUs minimum par machine
 
-Dans cet exemple nous considérerons 3 machines virtuelles basées sur Ubuntu 18.04, sur lesquelles nous avons un accès ssh via une clé d'authentification. Ces machines sont nommées node1, node2 et node3.
+Dans cet exemple nous considérons 3 machines virtuelles basées sur Ubuntu 18.04, sur lesquelles nous avons un accès ssh via une clé d'authentification. Ces machines sont nommées node1, node2 et node3.
 
-Afin de suivre cet exercice, vous pouvez créer des machines virtuelles en local, par exemple en utilisant [Multipass](https://multipass.run), ou bien sur l'infrastructure d'un cloud provider.
+Afin de suivre cet exercice, vous pouvez créer des machines virtuelles:
+-  en local par exemple en utilisant [Multipass](https://multipass.run)
+-  ou bien sur l'infrastructure d'un cloud provider
 
 > Attention:
-Si vous souhaitez créer vos machines virtuelles sur l'infrastructure d'un cloud provider (Google Compute Engine, Amazon AWS, Packet, Rackspace, DigitalOcean, Civo, Scaleway, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques heures cependant).
+Si vous souhaitez créer vos machines virtuelles sur l'infrastructure d'un cloud provider (Google Compute Engine, Amazon AWS, Packet, Rackspace, DigitalOcean, Civo, Scaleway, OVH, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques heures cependant).
 
 ## Kubectl
 
@@ -49,7 +51,9 @@ Sur chaque machine, nous allons installer les éléments suivants:
 
 Pour cela, vous pouvez utiliser la commande suivante (en ayant au préalable positionné les variables d'environnement IP1, IP2, IP3 avec les IP des nodes respectifs).
 
-Note: dans l'exemple envisagé ici, nous avons accès root via une clé ssh, il vous faudra cependant changer légèrement le script ci-dessous si vous utilisé un autre utilisteur.
+Note:
+- dans l'exemple envisagé ici, nous avons accès root via une clé ssh, il vous faudra cependant changer légèrement le script ci-dessous si vous utilisez un autre utilisteur
+- il est possible d'installer une version précédente de Kubernetes au lieu de la dernière en date. Il faudra pour cela remplacer la dernière ligne de la commande précédente: ```apt-get update && apt-get install -y kubelet kubeadm``` par ```apt-get update && apt-get install -y kubelet=VERSION kubeadm=VERSION``` où VERSION est la version de Kubernetes que vous souhaitez installer (par exemple: 1.16.4)
 
 ```
 for IP in $IP1 $IP2 $IP3; do
@@ -92,7 +96,7 @@ Afin de pouvoir dialoguer avec le cluster que vous venez de mettre en place, vi 
 
 ```
 $ scp root@$IP1:/etc/kubernetes/admin.conf do-kube-config
-$ export KUBECONFIG=do-kube-config
+$ export KUBECONFIG=$PWD/do-kube-config
 ```
 
 Listez alors les nodes du cluster, ils apparaitront avec le status *NotReady*.
