@@ -493,7 +493,9 @@ Afin d'intégrer, dans le projet GitLab, le cluster *k3s* que vous avez mis en p
 - ensuite, depuis le terminal dans lequel vous avez défini la variable d'environnement *KUBECONFIG*, executez la commande suivante:
 
 ```
-$ curl -sSL https://files.techwhale.io/kubeconfig.sh | sh
+$ curl -sSL https://files.techwhale.io/kubeconfig.sh -o kubeconfig.sh
+$ chmod +x kubeconfig.sh
+$ ./kubeconfig.sh
 ```
 
 Vous obtiendrez les informations nécessaires pour l'intégration de votre cluster Kubernetes dans votre projet GitLab:
