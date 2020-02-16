@@ -117,7 +117,7 @@ def create_fn(body, spec, **kwargs):
 
 @kopf.on.delete('zalando.org', 'v1', 'databases')
 def delete(body, **kwargs):
-    msg = f"Database {body['metadata']['name'])} and its Pod / Service children deleted"
+    msg = f"Database {body['metadata']['name']} and its Pod / Service children deleted"
     return {'message': msg}
 ```
 
@@ -206,7 +206,7 @@ L'Operator est un process qui tournera dans un Pod. Il faut donc que l'on le pac
 ```
 FROM python:3.7
 COPY handlers.py /handlers.py
-RUN pip install kopf
+RUN pip install kopf kubernetes
 CMD kopf run --standalone /handlers.py
 ```
 
