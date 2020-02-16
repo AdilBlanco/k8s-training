@@ -24,7 +24,7 @@ Listez les Deployments et Pods présents sur le système (l'option `--all-namesp
 
 ### 5. Suppression
 
-Supprimez les namespaces *development* et *production*
+Supprimez les namespaces *development* et *production* ainsi que le deployment www-0 créé dans le namespace *default*.
 
 Listez une nouvelle fois les Deployments et Pods présents sur le système. Que constatez-vous ?
 
@@ -97,12 +97,14 @@ production    po/www-2-57676d6dcc-vczc2                  1/1       Running   0  
 
 ### 5. Suppression
 
-La commande suivante permet de supprimer les namespaces
+Les commandes suivantes permettent de supprimer les namespaces et le deployment www-0.
 
 ```
 $ kubectl delete ns/development ns/production
 namespace "development" deleted
 namespace "production" deleted
+
+$ kubectl delete deploy www-0
 ```
 
 Si nous listons les Deployments et Pods, nous pouvons voir que seuls ceux qui ont été créées dans le namespace *default* sont présents. Les ressources présentes dans les namespaces *development* et *production* ont été supprimées avec la suppression du namespace.
