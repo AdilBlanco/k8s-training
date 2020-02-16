@@ -157,7 +157,7 @@ func main() {
 - Dockerfile
 
 ```
-FROM golang:1.12.-alpine as build
+FROM golang:1.12-alpine as build
 WORKDIR /app
 COPY main.go .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
@@ -367,12 +367,21 @@ Une fois la pipeline terminée, vous pourrez voir qu'un nouveau déploiement est
 
 Celui-ci ne fait pas grand chose car nous n'avons pas encore défini les étapes nécessaires afin de déployer l'image qui a été créée. Dans la prochaine étape, vous allez déployer votre serveur sur un cluster Kubernetes.
 
+---
+
 ### 3. Intégrez un cluster Kubernetes au repository GitLab
 
-> Attention:
-pour faire cet exercice dans sa totalité, il est nécessaire de créer une VM accessible depuis internet. Pour l'ensemble des cloud providers (Google Compute Engine, Amazon AWS, Packet, Rackspace, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques heures cependant). Si vous ne souhaitez pas réaliser la manipulation jiusqu'au bout, n'hésitez pas à suivre cet exercice sans l'appliquer, l'essentiel étant de comprendre le flow global.
+#### 3.1. Mise en place d'un cluster
 
-#### 3.1. Mise en place d'une Machine virtuelle
+#### 1er cas
+
+Si vous avez accès déjà accès à un cluster existant accessible via internet, vous pouvez passer à la section 3.2 qui suit.
+
+#### 2ème cas
+
+Vous n'avez pas encore de cluster, la procédure si dessous vous permettra de mettre en place un cluster k3s très facilement.
+
+##### Mise en place d'une Machine virtuelle
 
 Si vous faites cet exercice dans le cadre d'un workshop ou d'un training les éléments suivants vous seront donnés:
 - l'adresse IP d'une machine virtuelle créée sur un cloud provider
@@ -383,20 +392,18 @@ Dans le cas contraire, si vous ne faite pas cet exercice dans le cas d'un worksh
 Lancez un shell sur cette machine virtuelle (en remplaçant le chemin d'accès de la clé privée ainsi que l'adresse IP de votre machine)
 
 ```
-$ ssh -i PATH_TO_PRIVATE_KEY root@NODE_IP_ADDRESS
+$ ssh -i PATH_TO_PRIVATE_KEY USERNAME@NODE_IP_ADDRESS
 ```
 
-#### 3.2. Mise en place d'un cluster K3s
+##### Installation de K3s
 
-Vous allez maintenant installer [k3s.io](https://k3s.io), une distribution Kubernetes trèe light créée par [Rancher](https://rancher.com/)
-
-Depuis le shell précédent, lancez la commande suivante:
+Vous allez maintenant installer [k3s.io](https://k3s.io), une distribution Kubernetes trèe light créée par [Rancher](https://rancher.com/). Depuis le shell précédent, lancez la commande suivante:
 
 ```
 root@node1:~# curl -sfL https://get.k3s.io | sh -
 ```
 
-L'installation ne devrait prendre que quelques dizaines de secondes (!). Vérifiez ensuite la liste des nodes de votre cluster avec la commande suivante:
+L'installation ne devrait prendre que quelques dizaines de secondes. Vérifiez ensuite la liste des nodes de votre cluster avec la commande suivante:
 
 ```
 root@node1:~# kubectl get node
@@ -409,46 +416,7 @@ NAME      STATUS   ROLES    AGE   VERSION
 node1     Ready    master   17s   v1.16.3-k3s.2
 ```
 
-> *Note*: `kubectl` est le binaire indispensable pour communiquer avec un cluster Kubernetes, il est installé directement sur dans la machine virtuelle sur laquelle K3s a été installé. Dans la suite vous l'installerez sur votre machine locale
-
-Vous devriez obtenir un résultat proche du résultat suivant:
-
-```
-NAME     STATUS   ROLES    AGE   VERSION
-node1   Ready    master   19s   v1.16.3-k3s.2
-```
-
-Vous avez maintenant une cluster Kubernetes fonctionnel. Fermez la connection ssh avant de passer à la suite.
-
-#### 3.3. Configuration de la machine locale
-
-Pour communiquer avec le cluster depuis votre machine locale, il vous faut 2 choses:
-- le binaire `kubectl`
-- le fichier de configuration du cluster
-
-`kubectl` est un binaire qu'il faut télécharger et ajouter dans votre PATH.
-
-- si vous êtes sur macOS:
-
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
-$ chmod +x ./kubectl
-$ sudo mv ./kubectl /usr/local/bin/kubectl
-```
-
-- si vous êtes sur Linux
-
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-$ chmod +x ./kubectl
-$ sudo mv ./kubectl /usr/local/bin/kubectl
-```
-
-- si vous êtes sur Windows
-
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/windows/amd64/kubectl.exe
-```
+Vous avez maintenant une cluster K3s fonctionnel.
 
 Récupérez ensuite le fichier de configuration du cluster, celui-ci est présent dans `/etc/rancher/k3s/k3s.yaml` sur la machine distante:
 
@@ -478,7 +446,7 @@ NAME     STATUS   ROLES    AGE   VERSION
 node1   Ready    master   11m   v1.16.3-k3s.2
 ```
 
-### 3.4. Intégration du cluster avec votre repository GitLab
+### 3.2. Intégration du cluster avec votre repository GitLab
 
 Depuis le menu *Operations > Kubernetes* de l'interface GitLab, selectionnez *Add existing cluster*.
 
@@ -493,7 +461,7 @@ Afin d'intégrer, dans le projet GitLab, le cluster *k3s* que vous avez mis en p
 - ensuite, depuis le terminal dans lequel vous avez défini la variable d'environnement *KUBECONFIG*, executez la commande suivante:
 
 ```
-$ curl -sSL https://files.techwhale.io/kubeconfig.sh | sh
+$ curl -sSL https://files.techwhale.io/kubeconfig.sh | bash
 ```
 
 Vous obtiendrez les informations nécessaires pour l'intégration de votre cluster Kubernetes dans votre projet GitLab:
