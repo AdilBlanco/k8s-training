@@ -348,44 +348,31 @@ pod/logstash-779b98c567-42fhz        1/1     Running   0          2m25s
 
 ## 5. Test de la stack Elastic
 
-Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu, ligne par ligne, à Logstash. Ce dernier sera donc en charge de parser et enrichir ces données et de les envoyer à Elasticsearch.
+Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu dans Logstash, contenu qui sera filtré et envoyé à Elasticsearch.
 
-Récupérez en local le fichier nginx.log avec la commande suivante :
-
-```
-curl -s -o nginx.log https://gist.githubusercontent.com/lucj/0602e8f8ef18f949677248048365fc6b/raw
-```
-
-Ce fichier contient 500 entrées de logs au format Apache. Si l'on considère une l'entrée suivante:
+Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format NGinx. Le fichier nginx.log généré contient 1000 entrées de logs.
 
 ```
-46.218.112.178 - - [01/Sep/2019:14:45:19 +0000] "GET /api/object/5996fc0f4c06fb000f83b7 HTTP/1.1" 200 501 "https://mydomain.net/map" "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0" "-"
+$ docker run mingrammer/flog > nginx.log
 ```
 
-On peut en extraire différentes information:
-- reçue le 01 septembre 2019
-- de type GET
-- elle appele l'URL https://mydomain.net/api/object/5996fc0f4c06fb000f83b7
-- l'IP d'origine est 46.218.112.178
-- le navigateur est Firefox
-
-Assurez-vous tout d'abord que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a finit de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
+Assurez-vous que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a finit de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
 
 ![Kibana](./images/kibana-1.png)
 
-Vous pouvez alors utiliser la commande suivante pour envoyer chaque ligne contenue dans ce fichier à *Logstash* (assurez vous de remplacer *HOST* par l'adresse IP de l'une des machines du cluster):
+Utilisez ensuite la commande suivante pour envoyer chaque ligne à Logstash (assurez vous de remplacer *HOST* par l'adresse IP de l'une des machines du cluster):
 
 ```
 while read -r line; do curl -s -XPUT -d "$line" http://HOST:31500; done < ./nginx.log
 ```
 
-Une fois le script terminé, aller dnas l'onglet *Discover* de l'interface de *Kibana*. Dans un premier temps il faut créer un index en suivant les instructions suivantes:
+Une fois le script terminé, aller dans l'onglet *Discover* de l'interface de *Kibana*. Dans un premier temps il faut créer un index en suivant les instructions suivantes:
 
 ![Kibana](./images/kibana-index-1.png)
 
 ![Kibana](./images/kibana-index-2.png)
 
-Vous pourrez ensuite visualiser les logs en cliquant sur *Discover* et en sélectionnant une période englobant les premiers jours de septembre 2019 (date des logs)
+Vous pourrez ensuite visualiser les logs en cliquant sur *Discover*
 
 ![Kibana](./images/kibana-log-nginx-1.png)
 
