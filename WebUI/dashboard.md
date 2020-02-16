@@ -21,7 +21,7 @@ $ minikube dashboard
 Si vous n'êtes pas sur Minikube, il vous faut créer le Deployment qui lancera le dashboard dans un Pod. Vous pouvez le faire avec la commande suivante:
 
 ```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc3/aio/deploy/recommended.yaml
 ```
 
 Afin d'accéder à l'interface, vous allez lancer le *proxy* Kubernetes:
@@ -34,11 +34,13 @@ En passant par ce proxy, l'interface est disponible en utilisant l'adresse http:
 
 ![Dashboard Login](./images/dashboard-1.png)
 
-Il nous faut ensuite un token d'authentification pour pouvoir se logguer sur l'interface. Nous allons donc créer un ServiceAccount et lui donner les droits d'administration du cluster.
+Afin de pouvoir vous logger sur l'interface vous pouvez:
 
-- Création du *ServiceAccount*
+- uploader votre fichier kubeconfig.
 
-La commande suivante permet de créér un ServiceAccount nommé *admin-user*
+- ou bien créer un un token d'authentification. Pour illustrer cette seconde solution, nous allons:
+
+  * créer un ServiceAccount nommé *admin-user*
 
 ```
 $ kubectl apply -f -<<EOF
@@ -50,9 +52,7 @@ metadata:
 EOF
 ```
 
-- Création d'un *ClusterRoleBinding*
-
-La commande suivante permet d'associer ce ServiceAccount avec le ClusterRole *cluster-admin* en créant un *ClusterRoleBinding*
+  * créer un *ClusterRoleBinding* afin de donner les droits d'administration du cluster au ServiceAccount précédent
 
 ```
 $ kubectl apply -f -<<EOF
@@ -71,9 +71,7 @@ subjects:
 EOF
 ```
 
-- Récupération du token
-
-Utilisez la commande suivante pour récupérer le token associé au ServiceAccount créé précédemment:
+  * récupérer le token associé au ServiceAccount
 
 ```
 $ echo $(kubectl -n kube-system get secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') -o jsonpath='{.data.token}' | base64 --decode)
@@ -82,6 +80,7 @@ $ echo $(kubectl -n kube-system get secret $(kubectl -n kube-system get secret |
 Il suffit alors de copier ce token dans l'interface pour accéder au dashboard:
 
 ![Dashboard Login](./images/dashboard-2.png)
+
 
 Comme on peut le voir ici, le cluster utilisé dans cet exemple contient déjà plusieurs ressources. Les ressources du cluster que vous utilisez seront différentes.
 
