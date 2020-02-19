@@ -27,25 +27,22 @@ L'archive *manifests.zip* (en annexe) contient un répertoire *manifests* dans l
   - le service *telegraf* sera exposé via *telegraf.tick.com*
   - le service *chronograf* sera exposé via *chronograf.tick.com*
 
-Créez un répertoire *tick*, récupérez l'archive *manifests.zip*, placez la dans le répertoire *tick* puis dézippez la.
-Le répertoire *tick* contiendra alors les fichiers suivants:
+Créez un répertoire *tick*, récupérez l'archive *manifests.zip*, placez la dans le répertoire *tick* puis dézippez la. Le répertoire *tick* contiendra alors le répertoire *manifests* avec les fichiers suivants:
 
 ```
 $ cd tick
-$ tree .
-.
-├── manifests
-|  ├── configmap-telegraf.yaml
-│  ├── deploy-chronograf.yaml
-│  ├── deploy-influxdb.yaml
-│  ├── deploy-kapacitor.yaml
-│  ├── deploy-telegraf.yaml
-│  ├── ingress.yaml
-│  ├── service-chronograf.yaml
-│  ├── service-influxdb.yaml
-│  ├── service-kapacitor.yaml
-│  └── service-telegraf.yaml
-└── manifests.zip
+$ tree manifests
+manifests
+├── configmap-telegraf.yaml
+├── deploy-chronograf.yaml
+├── deploy-influxdb.yaml
+├── deploy-kapacitor.yaml
+├── deploy-telegraf.yaml
+├── ingress.yaml
+├── service-chronograf.yaml
+├── service-influxdb.yaml
+├── service-kapacitor.yaml
+└── service-telegraf.yaml
 ```
 
 ## 3. Installation d'un Ingress controller
@@ -56,10 +53,19 @@ Un Ingress controller est nécessaire afin de prendre en compte la ressource Ing
 
 - 1er cas
 
-Si votre cluster est déployé chez un cloud provider, utilisez la commande suivante afin de l'installer avec helm (assurez-vous d'avoir installer le client Helm 3 sur votre machine locale au préalable):
+Si votre cluster est déployé chez un cloud provider, utilisez la commande suivante afin de l'installer avec helm (avec la version 2 ou 3 en fonction de la version du client que vous avez installé sur votre machine locale):
+
+HELM 3:
 
 ```
-$ helm install my-nginx stable/nginx-ingress  --set rbac.create=true
+$ helm repo add stable https://kubernetes-charts.storage.googleapis.com
+$ helm install nginx-ingress stable/nginx-ingress
+```
+
+HELM 2:
+
+```
+$ helm install --name nginx-ingress nginx-stable/nginx-ingress
 ```
 
 - 2ème cas
@@ -76,8 +82,8 @@ Après quelques secondes, vous devriez voir le Pod *nginx-ingress-controller* da
 
 ```
 $ kubectl get po --all-namespaces | grep ingress
-NAME                                                READY  STATUS   RESTARTS  AGE
-my-nginx-nginx-ingress-controller-656698fdb8-s9c69  1/1    Running  0         78s
+default       nginx-ingress-controller-59ccb84d68-sg754        1/1     Running   0     33s
+default       nginx-ingress-default-backend-659bd647bd-8fqb9   1/1     Running   0     33s
 ```
 
 ## 4. Test de l'application
@@ -174,12 +180,13 @@ Dépuis un navigateur, vous pourrez accèder à l'interface de *chronograf* depu
 En utilisant le script *test.sh* (en annexe) vous allez générer des données fictives, simulant une distribution sinusoidale de la température, et les envoyer à la stack *tick* via le endpoint exposé par *Telegraf*. Copiez le fichier *test.sh* dans le répertoire *tick* et lancez la commande suivante:
 
 ```
+$ chmod +x test.sh
 $ ./test.sh
 ```
 
 Vous devriez alors obtenir une succession de status 204, indiquant que l'ensemble des requêtes ont été créées correctement.
 
-Vous pouvez alors visualiser les données en utilisant la query suivante depuis l'interface web de *Chronograf*:
+Vous pouvez alors visualiser les données en utilisant la query suivante depuis le menu *Explore* de l'interface web de *Chronograf*:
 
 ```
 select "value" from "test"."autogen"."temp"
@@ -247,7 +254,7 @@ $ echo > tick_chart/values.yaml
 Le répertoire *tick_chart* aura alors le contenu suivant:
 
 ```
-tree tick_chart/
+$ tree tick_chart/
 tick_chart/
 ├── Chart.yaml
 ├── charts
@@ -274,55 +281,29 @@ En utilisant la commande suivante, lancez l'application maintenant packagée dan
 $ helm install tick ./tick_chart
 ```
 
-Vous devriez obtenir un résultat comme le suivant:
+Vous devriez obtenir un résultat similaire au suivant:
 
 ```
-NAME:   tick
-
-LAST DEPLOYED: Wed Apr 24 19:47:08 2019
+NAME: tick
+LAST DEPLOYED: Wed Feb 19 08:12:23 2020
 NAMESPACE: default
-STATUS: DEPLOYED
-
-RESOURCES:
-==> v1/ConfigMap
-NAME             DATA  AGE
-telegraf-config  1     1s
-
-==> v1/Deployment
-NAME        READY  UP-TO-DATE  AVAILABLE  AGE
-chronograf  0/1    1           0          1s
-influxdb    0/1    1           0          1s
-kapacitor   0/1    1           0          1s
-telegraf    0/1    1           0          1s
-
-==> v1/Pod(related)
-NAME                        READY  STATUS             RESTARTS  AGE
-chronograf-8bfff754d-p45m4  0/1    ContainerCreating  0         1s
-influxdb-8b8df4bff-j6b9w    0/1    ContainerCreating  0         1s
-kapacitor-6d7bc6955c-55zsg  0/1    ContainerCreating  0         1s
-telegraf-85546c59b5-kdknd   0/1    ContainerCreating  0         1s
-
-==> v1/Service
-NAME        TYPE       CLUSTER-IP      EXTERNAL-IP  PORT(S)   AGE
-chronograf  ClusterIP  10.245.47.158   <none>       8888/TCP  1s
-influxdb    ClusterIP  10.245.72.185   <none>       8086/TCP  1s
-kapacitor   ClusterIP  10.245.229.112  <none>       9092/TCP  1s
-telegraf    ClusterIP  10.245.95.48    <none>       8186/TCP  1s
-
-==> v1beta1/Ingress
-NAME  HOSTS                                  ADDRESS  PORTS  AGE
-tick  telegraf.tick.com,chronograf.tick.com  80       1s
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 ```
 
-Vérifiez ensuite la liste des release (terminologie Helm) présentes:
+Note: si vous avez utilisé helm version 2, vous obtiendrez un résultat contenant quelques informations supplémentaires
+
+Vérifiez ensuite la liste des releases (terminologie Helm) présentes:
 
 ```
 $ helm ls
-NAME       REVISION   UPDATED                    STATUS     CHART                APP VERSION   NAMESPACE
-tick       1          Wed Apr 24 19:47:08 2019   DEPLOYED   tick_chart-0.1.0     1.0           default
+NAME         	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART               	APP VERSION
+nginx-ingress	default  	1       	2020-02-19 08:05:00.058407 +0100 CET	deployed	nginx-ingress-1.31.0	0.29.0
+tick         	default  	1       	2020-02-19 08:12:23.174983 +0100 CET	deployed	tick_chart-0.1.0    	1.16.0
 ```
 
-Note: si vous avez utilisé *Helm* pour déployer le Ingress Controller vous obtiendrez une liste contenant 2 2 releases.
+Note: si vous avez utilisé *Helm* pour déployer le Ingress Controller vous obtiendrez une liste contenant les 2 releases.
 
 ### Test de l'application
 
@@ -372,50 +353,20 @@ Toujours depuis le répertoire *tick*, vous pouvez alors mettre à jour la relea
 $ helm upgrade tick tick_chart --values tick_chart/values.yaml
 ```
 
-Vous devriez obtenir un résultat similaire à celui ci-dessous, dans lequel vous pourrez observer la création de nouveaux Pods pour chaque Deployment.
+Vous devriez obtenir un résultat similaire à celui ci-dessous:
 
 ```
 Release "tick" has been upgraded. Happy Helming!
-LAST DEPLOYED: Mon May  6 16:32:33 2019
+NAME: tick
+LAST DEPLOYED: Wed Feb 19 08:16:15 2020
 NAMESPACE: default
-STATUS: DEPLOYED
-
-RESOURCES:
-==> v1/ConfigMap
-NAME             DATA  AGE
-telegraf-config  1     6m37s
-
-==> v1/Deployment
-NAME        READY  UP-TO-DATE  AVAILABLE  AGE
-chronograf  1/1    1           1          6m37s
-influxdb    1/1    1           1          6m37s
-kapacitor   1/1    1           1          6m37s
-telegraf    1/1    1           1          6m37s
-
-==> v1/Pod(related)
-NAME                         READY  STATUS             RESTARTS  AGE
-chronograf-556b657cc-zsdxk   0/1    ContainerCreating  0         0s
-chronograf-6fccc5d4bc-kl62x  1/1    Running            0         6m37s
-influxdb-5788568b6-2l9c5     1/1    Running            0         6m37s
-influxdb-b655cc77d-n9x4f     0/1    ContainerCreating  0         0s
-kapacitor-5cc97f9dcb-d5hmh   0/1    ContainerCreating  0         0s
-kapacitor-5d845c48d4-vlhn4   1/1    Running            0         6m37s
-telegraf-7b9f76bb64-fd7tv    0/1    ContainerCreating  0         0s
-telegraf-855b58748d-6h6hw    1/1    Running            0         6m37s
-
-==> v1/Service
-NAME        TYPE       CLUSTER-IP      EXTERNAL-IP  PORT(S)   AGE
-chronograf  ClusterIP  10.105.104.111  <none>       8888/TCP  6m37s
-influxdb    ClusterIP  10.107.112.200  <none>       8086/TCP  6m37s
-kapacitor   ClusterIP  10.98.88.150    <none>       9092/TCP  6m37s
-telegraf    ClusterIP  10.108.132.178  <none>       8186/TCP  6m37s
-
-==> v1beta1/Ingress
-NAME  HOSTS                                  ADDRESS    PORTS  AGE
-tick  telegraf.tick.com,chronograf.tick.com  10.0.2.15  80     6m37s
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
 ```
 
+Note: si vous avez utilisé helm version 2, vous obtiendrez un résultat contenant quelques informations supplémentaires
 
 Vérifiez ensuite que les Pods sont bien basés sur les nouvelles versions des images.
 
-Nous avons vu ici un exemple simple de l'utilisation du templating, l'important étant de comprendre son fonctionnement. Lorsque vous allez packager votre propre application dans un Chart Helm, vous allez généralement commencer par utiliser le templating pour des champs simples avant d'avancer dans une utilisation plus poussée.
+Nous avons vu ici un exemple simple de l'utilisation du templating, l'important étant de comprendre son fonctionnement. Lorsque vous allez packager votre propre application dans un Chart Helm, vous allez généralement commencer par utiliser le templating pour des champs simples puis ajouter des éléments de templating de plus en plus complexes.

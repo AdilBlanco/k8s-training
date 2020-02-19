@@ -6,7 +6,7 @@ Note: cet exemple est réalisé sur *Minikube* mais vous pouvez suivre ces instr
 
 ## Récupération du projet
 
-Utilisez les commandes suivantes pour récupérez le projet *rook*. Vous utiliserez la release 1.1, dernière release stable en date.
+Utilisez les commandes suivantes pour récupérez le projet *rook*. Vous utiliserez la release 1.2, dernière release stable en date.
 
 ```
 $ git clone https://github.com/rook/rook.git

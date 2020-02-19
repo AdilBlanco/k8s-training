@@ -59,7 +59,7 @@ Un nouveau type de ressource existe maintenant dans le cluster. Nous allons déf
 
 ### Code de notre Operator
 
-Afin de déclencher des actions lors de la création ou de la suppression d'une ressource *Database*, nous allons utiliser le script python suivant, que nous sauvegarderons dans le fichier *handler.py*:
+Afin de déclencher des actions lors de la création ou de la suppression d'une ressource *Database*, nous allons utiliser le script python suivant, que nous sauvegarderons dans le fichier *handlers.py*:
 
 ```
 import kopf
