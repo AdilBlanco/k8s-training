@@ -300,7 +300,7 @@ spec:
   ports:
     - protocol: TCP
       name: web
-      port: 80
+      port: 8000
       nodePort: 32000
     - protocol: TCP
       name: admin
