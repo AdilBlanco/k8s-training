@@ -368,7 +368,7 @@ EOF
 ### Test de lecture
 
 Afin de vérifier que l'enregistrement précédent à bien été créé, nous allons procéder de la même façon et lancer un Pod dans lequel tourne un container basé sur l'image *mysql* et depuis ce Pod effectuer les actions suivantes:
-- connection au Service *mysql-client* (en charge de loadbalancer les requetes sur les slaves du cluster)
+- connection au Service *mysql-read* (en charge de loadbalancer les requêtes sur les slaves du cluster)
 - récupération des éléments de la table *message* dans la database *test*
 
 ```
