@@ -112,7 +112,7 @@ Notez ici que les ports 32000 et 32001 seront ouverts sur l'ensemble des machine
 Déployez la Voting App avec la commande suivante, celle-ci fait référence à une URL pointant vers un fichier définissant l'ensemble des ressources de la Voting App
 
 ```
-$ kubectl apply -f https://gitlab.com/snippets/1893427/raw
+$ kubectl apply -f https://files.techwhale.io/voting.yaml
 ```
 
 ## 3. Ports des Service vote et result
