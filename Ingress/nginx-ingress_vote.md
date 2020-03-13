@@ -120,7 +120,7 @@ $ kubectl apply -f https://files.techwhale.io/voting.yaml
 La commande suivante liste les services existants:
 
 ```
-$ kubectl get svc -n vote
+$ kubectl get svc
 NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 db           ClusterIP   10.99.192.60    <none>        5432/TCP         36m
 kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          16h
@@ -145,7 +145,6 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: voting-domain
-  namespace: vote
 spec:
   rules:
   - host: vote.votingapp.com
