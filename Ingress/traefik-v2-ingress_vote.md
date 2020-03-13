@@ -450,7 +450,7 @@ N'hésitez pas à parcourir la documentation pour avoir une vision globale des f
 
 ## 5. Cleanup
 
-Supprimez la Voting App et l'ensemble des ressources du namespace *vote* à l'aide de la commande suivante:
+Supprimez la Voting App à l'aide de la commande suivante:
 
 ```
 $ kubectl delete -f https://files.techwhale.io/voting.yaml
