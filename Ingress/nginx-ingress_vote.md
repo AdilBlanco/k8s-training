@@ -200,7 +200,7 @@ L'interface de result est disponible:
 Supprimez la Voting App à l'aide de la commande suivante:
 
 ```
-$ kubectl delete -f https://gitlab.com/snippets/1893427/raw
+$ kubectl delete -f https://files.techwhale.io/voting.yaml
 ```
 
 Vous pouvez également supprimer le Ingress Controller:
