@@ -112,7 +112,7 @@ Notez ici que les ports 32000 et 32001 seront ouverts sur l'ensemble des machine
 Déployez la Voting App avec la commande suivante, celle-ci fait référence à une URL pointant vers un fichier définissant l'ensemble des ressources de la Voting App
 
 ```
-$ kubectl apply -f https://gitlab.com/snippets/1893427/raw
+$ kubectl apply -f https://files.techwhale.io/voting.yaml
 ```
 
 ## 3. Ports des Service vote et result
@@ -120,7 +120,7 @@ $ kubectl apply -f https://gitlab.com/snippets/1893427/raw
 La commande suivante liste les services existants:
 
 ```
-$ kubectl get svc -n vote
+$ kubectl get svc
 NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 db           ClusterIP   10.99.192.60    <none>        5432/TCP         36m
 kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          16h
@@ -145,7 +145,6 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: voting-domain
-  namespace: vote
 spec:
   rules:
   - host: vote.votingapp.com
@@ -201,7 +200,7 @@ L'interface de result est disponible:
 Supprimez la Voting App à l'aide de la commande suivante:
 
 ```
-$ kubectl delete -f https://gitlab.com/snippets/1893427/raw
+$ kubectl delete -f https://files.techwhale.io/voting.yaml
 ```
 
 Vous pouvez également supprimer le Ingress Controller:

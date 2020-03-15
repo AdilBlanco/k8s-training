@@ -25,8 +25,8 @@ Créez un fichier *www_service_NodePort.yaml* définissant un service ayant les 
 - type: *NodePort*
 - un selector permettant le groupement des Pods ayant le label *app: www*.
 - forward des requètes vers le port *80* des Pods sous-jacents
-- exposition du port *80* dans le cluster
-- exposition du port *31000* sur le cluster
+- exposition du port *80* à l'intérieur du cluster
+- exposition du port *31000* sur chacun des nodes du cluster (pour un accès depuis l'extérieur)
 
 ### 4. Lancement du Service
 

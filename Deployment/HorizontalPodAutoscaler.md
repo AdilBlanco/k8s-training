@@ -90,7 +90,7 @@ $ git clone https://github.com/kubernetes-sigs/metrics-server.git
 $ cd metrics-server
 ```
 
-Note: en raison d'une issue sur GitHub, il est nécessaire de modifier le fichier *deploy/1.8+/metrics-server-deployment.yaml* de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
+Note: si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de modifier le fichier *deploy/kubernetes/metrics-server-deployment.yaml* de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
 
 ```
 ...
@@ -111,7 +111,7 @@ Note: en raison d'une issue sur GitHub, il est nécessaire de modifier le fichie
 Vous pourrez ensuite créer l'ensemble des ressources avec la commande suivante:
 
 ```
-$ kubectl apply -f deploy/1.8+/
+$ kubectl apply -f deploy/kubernetes/
 ```
 
 Au bout de quelques dizaines de secondes, le metrics-server commencera à collecter des metrics. Vous pouvez le vérifier avec la commande suivante qui récupère la consommation CPU et mémoire des nodes:
@@ -145,7 +145,6 @@ spec:
   targetCPUUtilizationPercentage: 10
 ```
 
-
 Créez ensuite cette ressource avec la commande suivante:
 
 ```
@@ -157,15 +156,19 @@ Vérifiez que l'HorizontalPodAutoscaler a été créé correctement:
 ```
 $ kubectl get hpa
 NAME   REFERENCE        TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-www    Deployment/www   <unknown>/20%   1         10        1          13s
+www    Deployment/www   <unknown>/10%   1         10        1          13s
 ```
 
 ## Test
 
-Installer [Apache Bench](http://httpd.apache.org/docs/current/programs/ab.html) puis utilisez le pour envoyer des requêtes sur le service, par exemple avec la commande suivante (en remplaçant *NODE_IP* par l'adresse IP de l'une des machines de votre cluster):
+Pour envoyer un grand nombre de requête sur le service, nous allons utiliser l'outils [Apache Bench](http://httpd.apache.org/docs/current/programs/ab.html).
+
+Utilisez la commande suivante en remplaçant *NODE_IP* par l'adresse IP de l'un des nodes de votre cluster (vous pouvez obtenir les IPs des nodes à l'aide de `$ kubectl get nodes -o wide`):
+
+Note: assurez vous d'avoir installer Docker sur votre machine au préalable
 
 ```
-$ ab -n 100000 -c 50 http://NODE_IP:30100/
+$ docker run lucj/ab -n 100000 -c 50 http://NODE_IP:30100/
 ```
 
 Depuis un autre terminal, observez l'évolution de la consommation du CPU et l'augmentation du nombre de réplicas (cela peux prendre quelques minutes)
@@ -173,10 +176,12 @@ Depuis un autre terminal, observez l'évolution de la consommation du CPU et l'a
 ```
 $ kubectl get -w hpa
 NAME   REFERENCE        TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-www    Deployment/www   48%/20%   1         10        3          5m24s
+www    Deployment/www   48%/10%   1         10        3          5m24s
 ```
 
-Arrêtez l'envoi de requêtes et observez que le nombre de réplicas revient à la normale.
+Note: l'option *-w* (watch)  met à jour régulièrement le résultat de la commande.
+
+Arrêtez l'envoi de requêtes et observez que le nombre de réplicas diminue. Cette phase sera cependant un peu plus longue que celle observée lors de l'augmentation du nombre de réplicas.
 
 ## Cleanup
 
@@ -190,5 +195,5 @@ $ kubectl delete -f hpa.yaml
 Placez-vous dans le répertoire *metrics-server* et supprimez les ressources associées avec la commande suivante:
 
 ```
-$ kubectl delete -f deploy/1.8+/
+$ kubectl delete -f deploy/kubernetes/
 ```

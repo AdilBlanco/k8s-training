@@ -264,6 +264,7 @@ spec:
     - protocol: TCP
       name: web
       port: 80
+      targetPort: 8000
     - protocol: TCP
       name: admin
       port: 8080
@@ -333,15 +334,15 @@ Pour le moment, aucun Frontend ni Backend ne sont définis car nous n'avons pas 
 Déployez la Voting App avec la commande suivante:
 
 ```
-$ kubectl apply -f https://gitlab.com/snippets/1893427/raw
+$ kubectl apply -f https://files.techwhale.io/voting.yaml
 ```
 
 Note: l'ensemble des ressources de la Voting App sont définies dans le fichier à l'emplacement spécifié
 
-Vérifiez que toutes les ressources ont été correctement créées (celles-ci appartiennent au namespace *vote*).
+Vérifiez que toutes les ressources ont été correctement créées.
 
 ```
-$ kubectl get all -n vote
+$ kubectl get all
 NAME                          READY   STATUS    RESTARTS   AGE
 pod/redis-c69c9b8f-kx6df      1/1     Running   0          41s
 pod/db-6bfb94bf6-v8d6b        1/1     Running   0          41s
@@ -384,7 +385,6 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: voting
-  namespace: vote
 spec:
   entryPoints:
     - web
@@ -450,10 +450,10 @@ N'hésitez pas à parcourir la documentation pour avoir une vision globale des f
 
 ## 5. Cleanup
 
-Supprimez la Voting App et l'ensemble des ressources du namespace *vote* à l'aide de la commande suivante:
+Supprimez la Voting App à l'aide de la commande suivante:
 
 ```
-$ kubectl delete ns vote
+$ kubectl delete -f https://files.techwhale.io/voting.yaml
 ```
 
 Vous pouvez également supprimer Traefik.

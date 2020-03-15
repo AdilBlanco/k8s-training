@@ -22,30 +22,33 @@ A l'aide de la commande ci-dessous, créez une *CustomResourceDefinition* défin
 
 ```
 $ kubectl apply -f - <<EOF
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: databases.zalando.org
 spec:
-  scope: Namespaced
   group: zalando.org
-  versions:
-    - name: v1
-      served: true
-      storage: true
+  scope: Namespaced
   names:
     kind: Database
     plural: databases
     singular: database
     shortNames:
-      - db
-      - dbs
-  additionalPrinterColumns:
-    - name: Type
-      type: string
-      priority: 0
-      JSONPath: .spec.type
-      description: The type of the database
+    - db
+    - dbs
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              type:
+                type: string
 EOF
 ```
 
@@ -260,7 +263,7 @@ Attention: le *Role* *cluster-admin* donne, aux Pods qui l'utilisent, tous les d
 
 ### Deployment de l'Operator
 
-Nous deployons maintenant l'Operator avec la commande suivante:
+Nous déployons maintenant l'Operator avec la commande suivante:
 
 ```
 $ kubectl apply -f - <<EOF
@@ -345,7 +348,7 @@ Nous pourrions également créer une ressource *Database* dont le champ *type* a
 
 ## En résumé
 
-Cet exercice présente sur un exemple simple le fonctionnement d'un *Operator* et j'espère qu'il permet de démistifier un peu ce concept. Les choses importantes à retenir:
+Cet exercice présente sur un exemple simple le fonctionnement d'un *Operator* et permet de démistifier un concept relativement avancé. Les choses importantes à retenir:
 - un *Operator* utilise généralement des ressources qui sont créées à partir de *CustomResourceDefinition*
 - un Operator contient toutes la logique d'administration d'une application
 - un Operator est un process qui tourne dans un *Pod*
