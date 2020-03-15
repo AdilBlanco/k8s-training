@@ -177,11 +177,20 @@ Dépuis un navigateur, vous pourrez accèder à l'interface de *chronograf* depu
 
 ### Envoi de données de test
 
-En utilisant le script *test.sh* (en annexe) vous allez générer des données fictives, simulant une distribution sinusoidale de la température, et les envoyer à la stack *tick* via le endpoint exposé par *Telegraf*. Copiez le fichier *test.sh* dans le répertoire *tick* et lancez la commande suivante:
+En utilisant le code suivant, vous allez générer des données fictives, simulant une distribution sinusoidale de la température, et les envoyer à la stack *tick* via le endpoint exposé par *Telegraf*.
+
+Note: assurez vous au préalable que Docker soit installé sur votre machine.
 
 ```
-$ chmod +x test.sh
-$ ./test.sh
+# Generate dummy data
+docker run lucj/genx:0.1 -type cos -duration 3d -min 10 -max 25 -step 1h > /tmp/data
+
+# Send data to telegraf
+cat /tmp/data | while read line; do
+  ts="$(echo $line | cut -d' ' -f1)000000000"
+  value=$(echo $line | cut -d' ' -f2)
+  curl -i -XPOST http://telegraf.tick.com/write --data-binary "temp value=${value} ${ts}"
+done
 ```
 
 Vous devriez alors obtenir une succession de status 204, indiquant que l'ensemble des requêtes ont été créées correctement.
@@ -307,7 +316,21 @@ Note: si vous avez utilisé *Helm* pour déployer le Ingress Controller vous obt
 
 ### Test de l'application
 
-De la même façon que précédemment, lancez le script *test.sh* afin d'envoyer des données dans la stack maintenant deployée sous la forme d'un chart Helm. Visualisez ensuite le résultat dans l'interface de *Chronograf*.
+De la même façon que précédemment, lancez les commandes suivantes afin d'envoyer des données dans la stack maintenant deployée sous la forme d'un chart Helm.
+
+```
+# Generate dummy data
+docker run lucj/genx:0.1 -type cos -duration 3d -min 10 -max 25 -step 1h > /tmp/data
+
+# Send data to telegraf
+cat /tmp/data | while read line; do
+  ts="$(echo $line | cut -d' ' -f1)000000000"
+  value=$(echo $line | cut -d' ' -f2)
+  curl -i -XPOST http://telegraf.tick.com/write --data-binary "temp value=${value} ${ts}"
+done
+```
+
+Visualisez ensuite le résultat dans l'interface de *Chronograf*.
 
 ### Utilisation du templating
 
