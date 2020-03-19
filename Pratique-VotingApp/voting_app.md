@@ -7,7 +7,7 @@ Dans cet exercice vous allez déployer la Voting App, une application de vote tr
 Dans un nouveau répertoire, clonez le repository avec la commande suivante:
 
 ```
-$ git clone https://github.com/dockersamples/example-voting-app
+$ git clone https://github.com/lucj/example-voting-app
 $ cd example-voting-app
 ```
 
@@ -24,7 +24,7 @@ $ kubectl create namespace vote
 La commande suivante permet de créer l'ensemble des ressources de l'application:
 
 ```
-$ kubectl create -f ./k8s-specifications
+$ kubectl apply -f ./k8s-specifications -n vote
 deployment "db" created
 service "db" created
 deployment "redis" created
@@ -38,7 +38,7 @@ deployment "worker" created
 
 ## 3. Liste des ressources
 
-Avec la commande suivate, assurez-vous que toutes les ressources ont été créées correctement:
+Avec la commande suivante, assurez-vous que toutes les ressources ont été créées correctement:
 
 ```
 $ kubectl get deploy,pod,svc -n vote
