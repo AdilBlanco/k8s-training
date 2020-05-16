@@ -8,7 +8,7 @@ Créez un fichier *www_pod.yaml* définissant un Pod ayant les propriétés suiv
 - nom: *www*
 - label associé au Pod: *app: www* (ce label est à spécifier dans les metadatas du Pod)
 - nom du container: *nginx*
-- image du container: *nginx:1.14-alpine*
+- image du container: *nginx:1.16-alpine*
 
 ### 2. Lancement du Pod
 
@@ -63,7 +63,7 @@ metadata:
 spec:
   containers:
   - name: nginx
-    image: nginx:1.14-alpine
+    image: nginx:1.16-alpine
 ```
 
 ### 2. Lancement du Pod
