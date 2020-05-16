@@ -136,7 +136,7 @@ La commande suivante permet d'installer les composants nécessaires pour la comm
 $ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 ```
 
-Note: il y a plusieurs solutions de networking qui peuvent être utilisées, la solution envisagées ici est Weave Net. L'article suivant donne une bonne comparaison des solutions les plus utilisées: [objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/](objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/)
+Note: il y a plusieurs solutions de networking qui peuvent être utilisées, la solution envisagées ici est Weave Net. L'article suivant donne une bonne comparaison des solutions les plus utilisées: [https://objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/](https://objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/)
 
 ## Vérification de l'état de santé des nodes
 
