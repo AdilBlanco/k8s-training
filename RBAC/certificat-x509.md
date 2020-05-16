@@ -293,7 +293,7 @@ $ export CLIENT_CERTIFICATE_DATA=$(kubectl get csr mycsr -o jsonpath='{.status.c
 
 - Authorité de certification du cluster
 ```
-$ export CLUSTER_CA=$(kubectl config view --raw -o json | jq -r '.clusters[] | select(.name == "'$(kubectl config current-context)'") | .cluster."certificate-authority-data"')
+$ export CLUSTER_CA=$(kubectl config view --minify --raw -o json | jq '.clusters[0].cluster["certificate-authority-data"]')
 ```
 
 Si vous êtes sur Minikube, la commande est légèrement différente:
@@ -305,7 +305,8 @@ $ export CLUSTER_CA=$(cat $HOME/.minikube/ca.crt | base64)
 - URL du server d'API du cluster
 
 ```
-$ export CLUSTER_ENDPOINT=$(kubectl config view --raw -o json | jq -r '.clusters[] | select(.name == "'$(kubectl config current-context)'") | .cluster."server"')
+$ export CLUSTER_ENDPOINT=$(kubectl config view --minify --raw -o json | jq '.clusters[0].cluster["server"]')
+
 ```
 
 Ces variables peuvent ensuite être substituées dans le fichier de template:
