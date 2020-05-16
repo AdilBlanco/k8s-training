@@ -11,10 +11,10 @@ Elle est composée de 3 logiciels:
 
 ## 1. But de cet exercice
 
-Dans cet exercice, vous allez lancer une stack Elastic et configurer Logstash de façon à ce:
-- qu'il puisse recevoir des entrées de log sur un endpoint HTTP
-- qu'il ajoute des informations de reverse-geocoding à chaque entrées reçue
-- qu'il envoye chaque enregistrement dans Elasticsearch
+Dans cet exercice, vous allez lancer une stack Elastic et configurer Logstash de façon à ce que ce dernier:
+- puisse recevoir des entrées de log sur un endpoint HTTP
+- ajoute des informations de reverse-geocoding à chaque entrées reçue
+- envoie chaque enregistrement dans Elasticsearch
 
 Vous enverrez ensuite des entrées de log à Logstash et les visualiserez dans l'interface de Kibana.
 
@@ -55,8 +55,13 @@ spec:
         app: elasticsearch
     spec:
       containers:
-      - image: elasticsearch:6.6.0
+      - image: elasticsearch:7.6.2
         name: elasticsearch
+        env:
+        - name: ES_JAVA_OPTS
+          value: -Xms512m -Xmx512m
+        - name: discovery.type
+          value: single-node
       initContainers:
       - name: increase-vm-max-map
         image: busybox
@@ -108,7 +113,7 @@ spec:
         app: kibana
     spec:
       containers:
-      - image: kibana:6.6.0
+      - image: kibana:7.6.2
         name: kibana
 ```
 
@@ -174,8 +179,7 @@ output {
 }
 ```
 
-Ce fichier peu sembler un peu compliqué, mais il ne l'est pas tant que ça :)
-Il peut être découpé en 3 parties:
+Ce fichier esst découpé en 3 parties:
 
 - *input*: permet de spécifier les données d'entrée. Nous spécifions ici que logstash peut recevoir des données via http
 
@@ -207,7 +211,7 @@ spec:
         app: logstash
     spec:
       containers:
-      - image: logstash:6.6.0
+      - image: logstash:7.6.2
         name: logstash
         volumeMounts:
         - mountPath: /config/logstash.conf
@@ -325,7 +329,7 @@ service "kibana" created
 service "logstash" created
 ```
 
-On peut alors vérifier que les différents Deployments, Pods et Services ont bien été créés et que les Pods ont le status *Running*. Cela peut prendre quelques dizaines de secondes car les images doivent être téléchargées depuis le Docker Hub.
+On peut alors vérifier que les différents Deployments, Pods et Services ont bien été créés et que les Pods ont le status *Running*. Cela peut prendre quelques dizaines de secondes car les images doivent d'abord être téléchargées depuis le Docker Hub.
 
 ```
 $ kubectl get svc,deploy,pod
@@ -353,10 +357,10 @@ Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu
 Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format NGinx. Le fichier nginx.log généré contient 1000 entrées de logs.
 
 ```
-$ docker run mingrammer/flog > nginx.log
+$ docker run mingrammer/flog -f apache_combined > nginx.log
 ```
 
-Assurez-vous que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a finit de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
+Assurez-vous que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a fini de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
 
 ![Kibana](./images/kibana-1.png)
 
@@ -380,4 +384,4 @@ Vous pouvez ensuite ajouter différents champs, comme par exemple le code du pay
 
 ## Résumé
 
-Il est relativement simple de mettre en place une stack Elastic sur un cluster Kubernetes (cela deviendrait un peu plus compliqué si l'on souhaitait configurer un cluster Elasticsearch). Nous verrons dans l'exercice suivant comment utiliser cette stack pour la gestion centralisée des logs (logs provenant du cluster + logs applicatif).
+Il est relativement simple de mettre en place une stack Elastic sur un cluster Kubernetes (cela deviendrait un peu plus compliqué si l'on souhaitait configurer un cluster Elasticsearch). Nous verrons dans l'exercice suivant comment utiliser cette stack pour la gestion centralisée des logs (logs provenant du cluster ainsi que les logs applicatifs).
