@@ -83,14 +83,13 @@ $ minikube addons enable metrics-server
 
 - Si vous n'utilisez pas Minikube
 
-il est nécessaire de déployer le process *metrics-server* à partir du repository GitHub que vous pouvez cloner avec la commande suivante:
+il est nécessaire de déployer le process *metrics-server* avec la commande suivante:
 
 ```
-$ git clone https://github.com/kubernetes-sigs/metrics-server.git
-$ cd metrics-server
+$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
 ```
 
-Note: si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de modifier le fichier *deploy/kubernetes/metrics-server-deployment.yaml* de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
+Note: si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de modifier le deployment de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
 
 ```
 ...
@@ -108,10 +107,10 @@ Note: si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de
 ...
 ```
 
-Vous pourrez ensuite créer l'ensemble des ressources avec la commande suivante:
+Vous pourrez ajouter cette clé *command* en  éditant le Deployment avec la commande suivante:
 
 ```
-$ kubectl apply -f deploy/kubernetes/
+$ kubectl edit deploy/metrics-server -n kube-system
 ```
 
 Au bout de quelques dizaines de secondes, le metrics-server commencera à collecter des metrics. Vous pouvez le vérifier avec la commande suivante qui récupère la consommation CPU et mémoire des nodes:
