@@ -23,10 +23,10 @@ $ sudo mv ./kubectl /usr/local/bin/kubectl
 - si vous êtes sur *Windows*, récupérez le binaire avec la commande suivante
 
 ```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/windows/amd64/kubectl.exe
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.3/bin/windows/amd64/kubectl.exe
 ```
 
-note: si vous n'avez pas l'utilitaire curl vous pouvez télécharger kubectl v1.17.0 depuis ce https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/windows/amd64/kubectl.exe.
+note: si vous n'avez pas l'utilitaire curl vous pouvez télécharger kubectl v1.18.3 depuis ce https://storage.googleapis.com/kubernetes-release/release/v1.18.3/bin/windows/amd64/kubectl.exe.
 
 Afin d'avoir les utilitaires comme curl, je vous conseille d'utiliser Git for Windows (https://gitforwindows.org), vous aurez alors Git Bash, un shell très proche de celui que l'on trouve dans un environnement Linux.
 

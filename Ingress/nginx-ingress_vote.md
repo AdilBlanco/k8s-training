@@ -4,108 +4,19 @@ Dans cet exercice, vous allez créer une ressource *Ingress* et l'utiliser pour 
 
 ## 1. Installation d'un Ingress Controller
 
-Un Ingress Controller est nécessaire afin de prendre en compte la ressource Ingress qui sera utilisée pour exposer les services à l'extérieur du cluster. C'est un reverse-proxy qui sera automatiquement configuré à l'aide des ressource Ingress.
+Un Ingress Controller est nécessaire afin de prendre en compte la ressource Ingress qui sera utilisée pour exposer les services à l'extérieur du cluster. C'est un reverse-proxy qui sera automatiquement configuré à l'aide des ressources Ingress.
 
 Dans cet exercice nous allons déployer un Ingress Controller basé sur Nginx mais il est possible d'utiliser un autre type d'Ingress Controller (*HAProxy*, *Traefik*, ...).
 
-### 1er cas: vous utilisez Minikube
+En utilisant la documentation officielle, installez le Ingress Controller qui correspond à votre environnement (https://kubernetes.github.io/ingress-nginx/deploy/)
 
-Vous pouvez installer un Ingress controller basé sur *nginx* en temps que *addon* avec la commande suivante:
-
-```
-$ minikube addons enable ingress
-```
-
-Vérifiez que le Pod du Ingress Controller tourne correctement:
+Assurez-vous que le controller fonctionne avec la commande suivante:
 
 ```
-$ kubectl get pods -n kube-system | grep ingress
-nginx-ingress-controller-5d9cf9c69f-hjgrj   1/1     Running   0          9m46s
+$ kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx --watch
 ```
 
-### 2ème cas: vous n'utilisez pas Minikube
-
-Vous pouvez installer un Nginx Ingress controller en lançant la commande suivante:
-
-```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
-```
-
-Vérifiez que le Pod du Ingress Controller tourne correctement:
-
-```
-$ kubectl get pods -n ingress-nginx
-NAME                                        READY   STATUS    RESTARTS   AGE
-nginx-ingress-controller-79f6884cf6-98bc5   1/1     Running   0          47s
-```
-
-Il faut ensuite exposer ce Pod à l'aide d'un Service:
-
-- si vous êtes sur un cloud provider qui supporte les services de type LoadBalancer, vous pouvez utiliser la commande suivante:
-
-```
-$ kubectl apply -f -<<EOF
-kind: Service
-apiVersion: v1
-metadata:
-  name: ingress-nginx
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  type: LoadBalancer
-  selector:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-  ports:
-    - name: http
-      port: 80
-      targetPort: http
-    - name: https
-      port: 443
-      targetPort: https
-EOF
-```
-
-Notez alors l'adresse IP externe associée à ce Service, vous en aurez besoin dans la suite de cet exercice. Vous pouvez la récupérez avec la commande suivante:
-
-```
-$ kubectl get svc ingress-nginx -n ingress-nginx
-```
-
-- sinon, vous pouvez utiliser un Service de type *NodePort* avec la commande suivante:
-
-```
-$ kubectl apply -f -<<EOF
-apiVersion: v1
-kind: Service
-metadata:
-  name: ingress-nginx
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  type: NodePort
-  ports:
-    - name: http
-      port: 80
-      targetPort: 80
-      nodePort: 32000
-      protocol: TCP
-    - name: https
-      port: 443
-      targetPort: 443
-      nodePort: 32001
-      protocol: TCP
-  selector:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-EOF
-```
-
-Notez ici que les ports 32000 et 32001 seront ouverts sur l'ensemble des machines du cluster. Ils redirigeront le traffic respectivement sur les ports 80 et 443 du Pod dans lequel tourne le Ingress Controller.
+Note: une fois que le pod est en Running, faites un Ctrl-C pour arrêter la commande et reprendre la main
 
 ## 2. Lancement de la VotingApp
 

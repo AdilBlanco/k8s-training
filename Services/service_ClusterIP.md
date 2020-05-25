@@ -8,7 +8,7 @@ Créez un fichier *www_pod.yaml* définissant un Pod ayant les propriétés suiv
 - nom: *www*
 - label associé au Pod: *app: www* (ce label est à spécifier dans les metadatas du Pod)
 - nom du container: *nginx*
-- image du container: *nginx:1.14-alpine*
+- image du container: *nginx:1.16-alpine*
 
 ### 2. Lancement du Pod
 
@@ -57,7 +57,7 @@ Nous allons utiliser ce Pod pour accèder au Service *www* depuis l'intérieur d
 
 - Installer l'utilitaire *curl*
 
-le container *debug* du Pod du mêm nom est basé sur l'image *alpine:3.9* qui ne contient pas l'utilitaire *curl* par défaut. Il faut donc l'installer avec la commande suivante:
+le container *debug* du Pod du même nom est basé sur l'image *alpine:3.9* qui ne contient pas l'utilitaire *curl* par défaut. Il faut donc l'installer avec la commande suivante:
 
 ```
 / # apk update && apk add curl
@@ -78,7 +78,7 @@ A l'aide de *kubectl describe*, listez les détails du service *www*
 
 Notez l'existence d'une entrée dans *Endpoints*, celle-ci correspond à l'IP du Pod qui est utilisé par le Service.
 
-Note: si plusiseurs Pods avaient le label *app: www*, il y aurait une entrée Endpoint pour chacun d'entre eux.
+Note: si plusieurs Pods avaient le label *app: www*, il y aurait une entrée Endpoint pour chacun d'entre eux.
 
 ### 8. Cleanup
 
@@ -102,7 +102,7 @@ metadata:
 spec:
   containers:
   - name: nginx
-    image: nginx:1.14-alpine
+    image: nginx:1.16-alpine
 ```
 
 ### 2. Lancement du Pod
@@ -172,6 +172,8 @@ $ kubectl apply -f debug_pod.yaml
 ```
 $ kubectl exec -ti debug -- sh
 ```
+
+Note: si vous êtes sur Windows, cette commande fonctionnera correctement sous Powershell. Il faudra cependant un utilitaire comme *winpty* pour obtenir un shell interactif sous Git Bash.
 
 - Le service *www* est directement accessible à l'intérieur du cluster (c'est à dire par les Pods tournant sur le cluster) par son nom:
 

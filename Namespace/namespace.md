@@ -12,19 +12,19 @@ Listez les namespaces présents
 
 ### 3. Création de Deployments
 
-Créer le Deployment *www-0* basé sur nginx:1.14-alpine dans le namespace par défaut
+Créer le Deployment *www-0* basé sur nginx:1.16-alpine dans le namespace par défaut
 
-Créer le Deployment *www-1* basé sur nginx:1.14-alpine dans le namespace *development*
+Créer le Deployment *www-1* basé sur nginx:1.16-alpine dans le namespace *development*
 
-Créer le Deployment *www-2* basé sur nginx:1.14-alpine dans le namespace *production*
+Créer le Deployment *www-2* basé sur nginx:1.16-alpine dans le namespace *production*
 
 ### 4. Répartition des ressources
 
-Listez les Deployments et Pods présents sur le système (l'option `--all-namespaces` permet de prendre en compte l'ensemble des namespaces)
+Listez les Deployments et Pods présents sur le système (l'option `--all-namespaces` ou `-A` permet de prendre en compte l'ensemble des namespaces)
 
 ### 5. Suppression
 
-Supprimez les namespaces *development* et *production* ainsi que le deployment www-0 créé dans le namespace *default*.
+Supprimez les namespaces *development* et *production* ainsi que le deployment *www-0* créé dans le namespace *default*.
 
 Listez une nouvelle fois les Deployments et Pods présents sur le système. Que constatez-vous ?
 
@@ -49,12 +49,13 @@ La commande suivante permet de lister les namespaces présents sur le système.
 
 ```
 $ kubectl get namespace
-NAME          STATUS    AGE
-default       Active    10d
-development   Active    14m
-kube-public   Active    10d
-kube-system   Active    10d
-production    Active    14m
+NAME              STATUS   AGE
+default           Active   37h
+development       Active   13s
+kube-node-lease   Active   37h
+kube-public       Active   37h
+kube-system       Active   37h
+production        Active   9s
 ```
 
 ### 3. Création de Deployments
@@ -62,19 +63,19 @@ production    Active    14m
 La commande suivante permet de créer le Deployment *www-0* dans le namespace par default
 
 ```
-$ kubectl run www-0 --image nginx:1.14-alpine
+$ kubectl create deploy www-0 --image nginx:1.16-alpine
 ```
 
 La commande suivante permet de créer le Deployment *www-1* dans le namespace *development*
 
 ```
-$ kubectl run www-1 --image nginx:1.14-alpine --namespace development
+$ kubectl create deploy www-1 --image nginx:1.16-alpine --namespace development
 ```
 
 La commande suivante permet de créer le Deployment *www-2* dans le namespace *production*
 
 ```
-$ kubectl run www-2 --image nginx:1.14-alpine --namespace production
+$ kubectl create deploy www-2 --image nginx:1.16-alpine --namespace production
 ```
 
 ### 4. Répartition des ressources
@@ -83,15 +84,15 @@ La commande suivante permet de lister l'ensemble des Deployments et Pods
 
 ```
 $ kubectl get deploy,po --all-namespaces
-NAMESPACE     NAME                          DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-default       deploy/www-0                  1         1         1            1           5m
-development   deploy/www-1                  1         1         1            1           11m
-production    deploy/www-2                  1         1         1            1           11m
+NAMESPACE       NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+default         deployment.apps/www-0                  1/1     1            1           3s
+development     deployment.apps/www-1                  1/1     1            1           3m31s
+production      deployment.apps/www-2                  1/1     1            1           3m11s
 
-NAMESPACE     NAME                                       READY     STATUS    RESTARTS   AGE
-default       po/www-0-7f4988bf4f-kgfm7                  1/1       Running   0          5m
-development   po/www-1-857988c875-5vzfb                  1/1       Running   0          11m
-production    po/www-2-57676d6dcc-vczc2                  1/1       Running   0          11m
+NAMESPACE       NAME                                        READY   STATUS    RESTARTS   AGE
+default         pod/www-0-fd6bbd97f-dn8vn                   1/1     Running   0          3s
+development     pod/www-1-5cd9d6665d-hz5l2                  1/1     Running   0          3m31s
+production      pod/www-2-67bcf7c57c-wgptl                  1/1     Running   0          3m11s
 ...
 ```
 

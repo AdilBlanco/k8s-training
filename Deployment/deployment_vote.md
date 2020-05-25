@@ -14,7 +14,7 @@ Créez un fichier *vote_deployment.yaml* définissant un Deployment ayant les pr
 
 ### 2. Création du Deployment
 
-Utilisez *kubectl* pour créer le Deployment
+Utilisez *kubectl apply* pour créer le Deployment
 
 ### 3. Status du Deployment
 
@@ -42,13 +42,15 @@ Note: n'hésitez pas à vous reporter à l'exercice sur les Services de type Nod
 
 Une fois le service créé, vous pourrez accéder à l'interface de vote sur *http://IP:31001* ou IP est l'adresse IP d'une machine du cluster Kubernetes.
 
+Note: vous pouvez récupérer les IPs des machines de votre cluster avec la commande `$ kubectl get nodes -o wide`
+
 Attention: cette interface n'est pas branchée à un backend, il n'est pas encore possible de voter, si vous cliquez sur l'un des choix, vous obtiendrez une erreur. Nous reviendrons sur l'application de vote dans sa totalité très bientôt.
 
 ![Interface de vote](./images/deployment_vote.png)
 
 ### 6. Cleanup
 
-Supprimez le Deployment ainsi que le Service créés précedemment.
+Supprimez le Deployment ainsi que le Service créés précédemment.
 
 ---
 
@@ -94,11 +96,9 @@ La commande suivante permet d'obtenir le status du Deployment
 
 ```
 $ kubectl get deploy
-NAME          DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-vote          3         3         3            0           7s
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+vote   3/3     3            3           10s
 ```
-
-On voit ici que sur les 3 replicas de Pods spécifiés (champ *DESIRED*), 3 sont actifs (champ *CURRENT*) et à jour (champ *UP-TO-DATE*).
 
 ### 4. Status des Pods associés
 
@@ -106,10 +106,10 @@ La commande suivante permet de lister les Pods qui tournent sur le cluster
 
 ```
 $ kubectl get po
-NAME                    READY     STATUS    RESTARTS   AGE
-vote-584c4c76db-2znvc   1/1       Running   0          3m
-vote-584c4c76db-d62l9   1/1       Running   0          3m
-vote-584c4c76db-rvjwj   1/1       Running   0          3m
+NAME                    READY   STATUS    RESTARTS   AGE
+vote-579dcf5f74-f4lhf   1/1     Running   0          67s
+vote-579dcf5f74-ffjx9   1/1     Running   0          67s
+vote-579dcf5f74-frhg7   1/1     Running   0          67s
 ```
 
 On voit que les 3 Pods relatifs au Deployment *vote* sont listés. Ils sont tous les 3 actifs.
@@ -137,7 +137,7 @@ On crée ensuite le Service avec la commande:
 
 ```
 $ kubectl apply -f vote_service.yaml
-service "vote" created
+service/vote created
 ```
 
 ### 6. Cleanup

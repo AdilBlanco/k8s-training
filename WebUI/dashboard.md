@@ -21,7 +21,7 @@ $ minikube dashboard
 Si vous n'êtes pas sur Minikube, il vous faut créer le Deployment qui lancera le dashboard dans un Pod. Vous pouvez le faire avec la commande suivante:
 
 ```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc3/aio/deploy/recommended.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml
 ```
 
 Afin d'accéder à l'interface, vous allez lancer le *proxy* Kubernetes:
@@ -38,7 +38,9 @@ Afin de pouvoir vous logger sur l'interface vous pouvez:
 
 - uploader votre fichier kubeconfig.
 
-- ou bien créer un un token d'authentification. Pour illustrer cette seconde solution, nous allons:
+- copier le token associé à l'utilisateur qui se trouve dans votre fichier *kubeconfig* (si ce token existe et que les droits cluster-admin lui sont associés)
+
+- ou bien créer un token d'authentification avec les droits d'administration. Pour illustrer cette seconde solution, nous allons:
 
   * créer un ServiceAccount nommé *admin-user*
 

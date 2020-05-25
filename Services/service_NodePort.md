@@ -4,33 +4,35 @@ Dans cet exercice, vous allez créer un Pod et l'exposer à l'extérieur du clus
 
 ### 1. Création d'un Pod
 
-Créez un fichier *www_pod.yaml* définissant un Pod ayant les propriétés suivantes:
-- nom: *www*
-- label associé au Pod: *app: www* (ce label est à spécifier dans les metadatas du Pod)
-- nom du container: *nginx*
-- image du container: *nginx:1.16-alpine*
+Note: si vous avez déja créé cette spécification de Pod dans un exercice précédent, vous pouvez passer à la question suivante.
+
+Créez un fichier *whoami.yaml* définissant un Pod ayant les propriétés suivantes:
+- nom: *whoami*
+- label associé au Pod: *app: whoami* (ce label est à spécifier dans les metadatas du Pod)
+- nom du container: *whoami*
+- image du container: *containous/whoami*
 
 ### 2. Lancement du Pod
 
 Créer le Pod avec la commande suivante:
 
 ```
-$ kubectl apply -f www_pod.yaml
+$ kubectl apply -f whoami.yaml
 ```
 
 ### 3. Définition d'un service de type NodePort
 
-Créez un fichier *www_service_NodePort.yaml* définissant un service ayant les caractéristiques suivantes:
-- nom: *www-np*
+Créez un fichier *whoami-np.yaml* définissant un service ayant les caractéristiques suivantes:
+- nom: *whoami-np*
 - type: *NodePort*
-- un selector permettant le groupement des Pods ayant le label *app: www*.
-- forward des requètes vers le port *80* des Pods sous-jacents
+- un selector permettant le groupement des Pods ayant le label *app: whoami*.
+- forward des requêtes vers le port *80* des Pods sous-jacents
 - exposition du port *80* à l'intérieur du cluster
 - exposition du port *31000* sur chacun des nodes du cluster (pour un accès depuis l'extérieur)
 
 ### 4. Lancement du Service
 
-A l'aide de *kubectl* créez le Service défini dans *www_service_NodePort.yaml*
+A l'aide de *kubectl* créez le Service défini dans *whoami-np.yaml*
 
 ### 5. Accès au Service depuis l'extérieur
 
@@ -57,13 +59,13 @@ La spécification du Pod est la suivante:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: www
+  name: whoami
   labels:
-    app: www
+    app: whoami
 spec:
   containers:
-  - name: nginx
-    image: nginx:1.16-alpine
+  - name: whoami
+    image: containous/whoami
 ```
 
 ### 2. Lancement du Pod
@@ -71,7 +73,7 @@ spec:
 La commande suivante permet de créer le Pod:
 
 ```
-$ kubectl apply -f www_pod.yaml
+$ kubectl apply -f whoami.yaml
 ```
 
 ### 3. Définition d'un Service de type NodePort
@@ -82,12 +84,12 @@ La spécification du Service demandé est la suivante:
 apiVersion: v1
 kind: Service
 metadata:
-  name: www-np
+  name: whoami-np
   labels:
-    app: www
+    app: whoami
 spec:
   selector:
-    app: www
+    app: whoami
   type: NodePort
   ports:
   - port: 80
@@ -100,8 +102,8 @@ spec:
 La commande suivante permet de lancer le Service:
 
 ```
-$ kubectl apply -f www_service_NodePort.yaml
-service "www-np" created
+$ kubectl apply -f whoami-np.yaml
+service "whoami-np" created
 ```
 
 ### 6. Cleanup
@@ -109,6 +111,6 @@ service "www-np" created
 Les ressources peuvent être supprimées avec les commandes suivantes:
 
 ```
-$ kubectl delete po/www
-$ kubectl delete svc/www-np
+$ kubectl delete po/whoami
+$ kubectl delete svc/whoami-np
 ```
