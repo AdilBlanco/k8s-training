@@ -71,7 +71,7 @@ $ kubectl apply -f svc.yaml
 
 ## Installation du Metrics server
 
-Avant de créer la ressource *HorizontalPodAutoscaler*, nous avons besoin de mettre en place le *metrics-server* qui sera en charge de récupérer les metrics de consommation des Pods (CPU / mémoire) des Pods. Ces metrics seront ensuite utilisées par le *HorizontalPodAutoscaler* pour augmenter ou diminuer automatiquement le nombre de Pods du Deployment.
+Avant de créer la ressource *HorizontalPodAutoscaler*, nous avons besoin de mettre en place le *metrics-server* qui sera en charge de récupérer les metrics de consommation des Pods (CPU / mémoire). Ces metrics seront ensuite utilisées par le *HorizontalPodAutoscaler* pour augmenter ou diminuer automatiquement le nombre de Pods du Deployment en fonction de la charge.
 
 - Si vous utilisez Minikube
 
@@ -125,7 +125,7 @@ workers-bmps   58m          2%     821Mi           26%
 
 ## Création de la ressource HorizontalPodAutoscaler
 
-Nous allons maintenant définir un *HorizontalPodAutoscaler* qui sera en charge de modifier le nombre de réplicas du Deployment si celui-ci utilise plus de 10% du CPU qui lui est alloué (10% est une valeur très faible choisit simplement pour cet exemple, dans un contexte de production, cette valeur sera beaucoup plus élevée).
+Nous allons maintenant définir un *HorizontalPodAutoscaler* qui sera en charge de modifier le nombre de réplicas du Deployment si celui-ci utilise plus de 10% du CPU qui lui est alloué (10% est une valeur très faible choisit simplement pour cet exemple, dans un contexte de production, cette valeur sera plus élevée).
 
 Dans le fichier *hpa.yaml*, copiez le contenu suivant:
 
