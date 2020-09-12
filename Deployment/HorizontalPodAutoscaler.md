@@ -89,7 +89,11 @@ il est nécessaire de déployer le process *metrics-server* avec la commande sui
 $ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
 ```
 
-Note: si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de modifier le deployment de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
+:fire: Quelques cas particuliers:
+
+### DigitalOcean
+
+Si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de modifier le deployment du metrics-server de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
 
 ```
 ...
@@ -107,13 +111,39 @@ Note: si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de
 ...
 ```
 
-Vous pourrez ajouter cette clé *command* en  éditant le Deployment avec la commande suivante:
+Vous pourrez ajouter cette clé *command* en éditant le Deployment avec la commande suivante:
 
 ```
 $ kubectl edit deploy/metrics-server -n kube-system
 ```
 
+### Docker Desktop
+
+Si vous utilisez un cluster créé avec Docker Desktop, il est nécessaire de modifier le deployment du metrics-server de façon à ce qu'il contienne la spécification suivante (ajout de l'option *--kubelet-insecure-tls* sous la clé *arg*)
+
+```
+...
+spec:
+      containers:
+      - args:
+        - --cert-dir=/tmp
+        - --secure-port=4443
+        - --kubelet-insecure-tls
+        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
+...
+```
+
+Vous pourrez ajouter cette option en éditant le Deployment avec la commande suivante:
+
+```
+$ kubectl edit deploy/metrics-server -n kube-system
+```
+
+## Accès aux métrics
+
 Au bout de quelques dizaines de secondes, le metrics-server commencera à collecter des metrics. Vous pouvez le vérifier avec la commande suivante qui récupère la consommation CPU et mémoire des nodes:
+
+- Exemple avec un cluster constitué de plusieurs nodes:
 
 ```
 $ kubectl top nodes
@@ -121,6 +151,13 @@ NAME           CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
 workers-bmp2   60m          3%     746Mi           24%
 workers-bmpp   52m          2%     899Mi           28%
 workers-bmps   58m          2%     821Mi           26%
+```
+
+- Exemple avec un cluster créé avec Docker Desktop:
+
+```
+NAME             CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+docker-desktop   309m         7%     1143Mi          60%
 ```
 
 ## Création de la ressource HorizontalPodAutoscaler

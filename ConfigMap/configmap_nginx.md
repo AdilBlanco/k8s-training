@@ -41,7 +41,7 @@ spec:
 Copiez cette spécification dans un fichier *whoami.yaml* puis créez le Pod et le Service avec la commande suivante:
 
 ```
-kubectl create -f whoami.yaml
+$ kubectl apply -f whoami.yaml
 ```
 
 Vérifiez ensuite que ces 2 objets ont été correctement lancés:
@@ -126,7 +126,7 @@ spec:
 Copiez cette spécification dans un fichier *proxy.yaml* puis créez le Pod et le Service avec la commande suivante:
 
 ```
-kubectl create -f proxy.yaml
+$ kubectl apply -f proxy.yaml
 ```
 
 Vérifiez ensuite que ces 2 objets ont été correctement lancés:

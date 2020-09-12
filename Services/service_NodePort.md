@@ -4,7 +4,6 @@ Dans cet exercice, vous allez créer un Pod et l'exposer à l'extérieur du clus
 
 ### 1. Création d'un Pod
 
-Note: si vous avez déja créé cette spécification de Pod dans un exercice précédent, vous pouvez passer à la question suivante.
 
 Créez un fichier *whoami.yaml* définissant un Pod ayant les propriétés suivantes:
 - nom: *whoami*
@@ -37,8 +36,6 @@ A l'aide de *kubectl* créez le Service défini dans *whoami-np.yaml*
 ### 5. Accès au Service depuis l'extérieur
 
 Lancez un navigateur sur le port 31000 de l'une des machines du cluster.
-
-Si vous utilisez **minikube**, vous n'avez qu'un seul node et l'URL sera de la forme *http://192.168.99.100:31000*
 
 ![Service NodePort](./images/service_NodePort.png)
 
@@ -103,7 +100,7 @@ La commande suivante permet de lancer le Service:
 
 ```
 $ kubectl apply -f whoami-np.yaml
-service "whoami-np" created
+service/whoami-np created
 ```
 
 ### 6. Cleanup

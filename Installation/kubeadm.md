@@ -4,10 +4,9 @@ Dans cette mise en pratique, vous allez mettre en place un cluster Kubernetes à
 
 ##  Hardware Requirements
 
-Pour la mise en place d'un cluster avec kubeadm, il est nécessaire d'avoir une ou plusieurs machines avec les spécifications suivantes:
+Pour la mise en place d'un cluster avec kubeadm, il est nécessaire d'avoir une ou plusieurs machines avec les spécifications suivantes (documentation officielle de Kubernetes):
 
 - Système d'exploitation
-
   * Ubuntu 16.04+
   * Debian 9+
   * CentOS 7
@@ -15,18 +14,25 @@ Pour la mise en place d'un cluster avec kubeadm, il est nécessaire d'avoir une 
   * Fedora 25+
   * HypriotOS v1.0.1+
   * Container Linux (tested with 1800.6.0)
-
 - 2 GB RAM minimum par machine
 - 2 CPUs minimum par machine
 
-Dans cet exemple nous considérons 3 machines virtuelles basées sur Ubuntu 18.04, sur lesquelles nous avons un accès ssh via une clé d'authentification. Ces machines sont nommées node1, node2 et node3.
+Dans cet exemple nous considérons 3 machines virtuelles basées sur Ubuntu 18.04, sur lesquelles nous avons un accès ssh. Nous ferons référence à ces machines en tant que *node1*, *node2* et *node3*.
 
 Afin de suivre cet exercice, vous pouvez créer des machines virtuelles:
--  en local par exemple en utilisant [Multipass](https://multipass.run)
--  ou bien sur l'infrastructure d'un cloud provider
+
+- en local par exemple en utilisant [Multipass](https://multipass.run). Une fois multipass installé, vous n'aurez plus qu'à lancer la commande suivante pour créer vos 3 machines virtuelles:
+
+```
+$ for i in $(seq 1 3); do multipass launch -n node$i; done
+```
+
+- en local directement avec VirtualBox ou une autre solution de virtualisation
+
+- sur l'infrastructure d'un cloud provider
 
 > Attention:
-Si vous souhaitez créer vos machines virtuelles sur l'infrastructure d'un cloud provider (Google Compute Engine, Amazon AWS, Packet, Rackspace, DigitalOcean, Civo, Scaleway, OVH, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques heures cependant).
+Si vous souhaitez créer vos machines virtuelles sur l'infrastructure d'un cloud provider (Google Compute Engine, Amazon AWS, Packet, Rackspace, DigitalOcean, Civo, Scaleway, OVH, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques minutes cependant).
 
 ## Kubectl
 
@@ -34,7 +40,7 @@ Assurez-vous d'avoir installé *kubectl* sur votre machine locale (cf exercice p
 
 # Configuration
 
-L'étape de configuration consiste à installer les logiciels nécessaires sur une infrastructure déjà provisionnée.
+L'étape de configuration consiste à installer les logiciels nécessaires sur les 3 machines que vous avez créées à l'étape précédente.
 
 Il y a différentes façon de réaliser cette configuration:
 - en se connectant manuellement en ssh sur chaque machine
@@ -49,86 +55,141 @@ Sur chaque machine, nous allons installer les éléments suivants:
 - le binaire *kubeadm* pour la création du cluster
 - le binaire *kubelet* pour la supervision des containers
 
-Pour cela, vous pouvez utiliser la commande suivante (en ayant au préalable positionné les variables d'environnement IP1, IP2, IP3 avec les IP des nodes respectifs).
+Connectez-vous en ssh sur chacune de vos machines virtuelles et lancez les commandes suivantes:
 
 Note:
-- dans l'exemple envisagé ici, nous avons accès root via une clé ssh, il vous faudra cependant changer légèrement le script ci-dessous si vous utilisez un autre utilisteur
-- il est possible d'installer une version précédente de Kubernetes au lieu de la dernière en date. Il faudra pour cela remplacer la dernière ligne de la commande précédente: ```apt-get update && apt-get install -y kubelet kubeadm``` par ```apt-get update && apt-get install -y kubelet=VERSION kubeadm=VERSION``` où VERSION est la version de Kubernetes que vous souhaitez installer (par exemple: 1.16.4)
+- assurez-vous au préalable que votre utilisateur a les droits *sudo*
+- par défaut, la dernière version de Kubernetes va être installée mais il est possible d'installer une version précédente. Il faudra pour cela remplacer la dernière ligne de la commande : ```sudo apt-get install -y kubelet kubeadm``` par ```sudo apt-get install -y kubelet=VERSION kubeadm=VERSION``` où VERSION est la version de Kubernetes que vous souhaitez installer (par exemple: 1.18.8)
+
+Note: si vous avez utilisé Multipass pour la création de vos machines virtuelles, vous pouvez obtenir un shell dans une de ces VMs avec la commande ```$ multipass shell NODE_NAME```
 
 ```
-for IP in $IP1 $IP2 $IP3; do
-ssh -o "StrictHostKeyChecking=no" root@$IP << EOF /bin/bash
-  curl https://get.docker.com | sh
-  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-  echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
-  apt-get update && apt-get install -y kubelet kubeadm
-EOF
-done
+# Installation de Docker
+$ curl -sSL https://get.docker.com | sh
+
+# Packages nécessaires pour installer Kubernetes via kubeadm
+$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+$ echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+$ sudo apt-get update && sudo apt-get install -y kubelet kubeadm
 ```
 
 ## Initialisation du cluster
 
-Lancer la commance suivante afin d'initialiser le cluster, à l'aide de *kubeadm*, depuis *node1*:
+Lancer la commande suivante afin d'initialiser le cluster depuis la première machine (node1):
 
 ```
-$ ssh root@$IP1 kubeadm init
+$ sudo kubeadm init
 ````
 
-La mise en place de l'ensemble des composants du master prendra quelques minutes. A la fin vous obtiendrez la commande à lancez depuis les autres VMs afin de les ajouter au cluster.
+Attention: si votre machine n'a pas les ressources CPU nécessaires, il est possible que vous obteniez l'erreur suivante:
+```
+error execution phase preflight: [preflight] Some fatal errors occurred:
+	[ERROR NumCPU]: the number of available CPUs 1 is less than the required 2
+```
+
+Dans ce cas vous pouvez relancer la commande d'initialisation avec un paramètre permettant d'ignorer cette erreur (ce n'est cependant pas une solution qui devra être utilisée pour la mise en place d'un cluster de production)
+
+```
+$ sudo kubeadm init --ignore-preflight-errors=NumCPU
+```
+
+La mise en place de l'ensemble des composants du master prendra quelques minutes. Vous obtiendrez alors la commande à lancez depuis les autres VMs afin de les ajouter au cluster:
+
+Exemple de commande renvoyée:
+```
+...
+kubeadm join 192.168.64.35:6443 --token 70bmhy.pe3l9wesjxc9ju4z \
+    --discovery-token-ca-cert-hash sha256:29f8816f6c8aa9815a86f1a82c535122f0b90ebca261169cc540466ed6ff9f3a
+```
 
 ## Ajout de nodes
 
-Vous pouvez copier/coller la commande de *join* obtenue précédemment, ou bien la récupérer avec la commande suivante:
+Vous devrez ensuite lancer la commande *kubeadm join* obtenue précédemment sur chacune des machines virtuelles afin de les ajouter au cluster (assurez-vous de lancer cette commande en *sudo*):
+
+Exemple de résultat de cette commande lancée depuis le *node2*:
+```
+$ sudo kubeadm join 192.168.64.35:6443 --token 70bmhy.pe3l9wesjxc9ju4z \
+    --discovery-token-ca-cert-hash sha256:29f8816f6c8aa9815a86f1a82c535122f0b90ebca261169cc540466ed6ff9f3a
+...
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+...
+```
+
+Vous obtiendrez rapidement une confirmation indiquant que la VM fait à présent bien partie du cluster.
+
+Note: si vous avez perdu la commande d'ajout de node, vous pouvez la regénérer avec la commande suivante (à lancer depuis le node master)
 
 ```
-$ JOIN_CMD=$(ssh root@$IP1 kubeadm token create --print-join-command)
-```
-
-Lancez la ensuite sur les nodes *node2* et *node3* afin de les ajouter au cluster:
-
-```
-$ for IP in $IP2 $IP3; do ssh root@$IP $JOIN_CMD; done
+$ sudo kubeadm token create --print-join-command
 ```
 
 ## Récupération du context
 
-Afin de pouvoir dialoguer avec le cluster que vous venez de mettre en place, vi le binaire *kubectl* que vous avez installé sur votre machine locale, il est nécessaire de récupérer le fichier de configuration du cluster. Utilisez pour cela les commandes suivantes depuis votre machine locale:
+Afin de pouvoir dialoguer avec le cluster via le binaire *kubectl* que vous avez installé sur votre machine locale, il est nécessaire de récupérer le fichier de configuration généré lors de l'installation.
+
+Pour cela, il faut donc récupérer le fichier */etc/kubernetes/admin.conf* présent sur le node master et le copier sur votre machine locale.
+
+Exemple de récupération du fichier de configuration
+```
+$ scp USER@$IP_DU_NODE_MASTER:/etc/kubernetes/admin.conf do-kube-config
+```
+
+Note: si vous avez utilisé *Multipass* pour mettre en place votre cluster, vous pouvez récupérer le fichier de configuration avec la commande suivante (il sera alors sauvegardé dans le fichier *kubeconfig* du répertoire courant):
 
 ```
-$ scp root@$IP1:/etc/kubernetes/admin.conf do-kube-config
-$ export KUBECONFIG=$PWD/do-kube-config
+$ multipass exec node1 -- sudo cat /etc/kubernetes/admin.conf > kubeconfig
+```
+
+Une fois que le fichier est présent en local, il faut simplement indiquer à *kubectl* ou il se trouve en positionnant la variable d'environnement *KUBECONFIG*:
+
+```
+$ export KUBECONFIG=$PWD/kubeconfig
 ```
 
 Listez alors les nodes du cluster, ils apparaitront avec le status *NotReady*.
 
 ```
 $ kubectl get nodes
-NAME      STATUS     ROLES    AGE     VERSION
-node1     NotReady   master   2m57s   v1.17.0
-node2     NotReady   <none>   33s     v1.17.0
-node3     NotReady   <none>   29s     v1.17.0
+NAME    STATUS     ROLES    AGE  VERSION
+k8s-1   NotReady   master   5m   v1.19.1
+k8s-2   NotReady   <none>   4m   v1.19.1
+k8s-3   NotReady   <none>   4m   v1.19.1
 ```
 
 ## Installation d'un addons pour le networking entre les Pods
 
-La commande suivante permet d'installer les composants nécessaires pour la communication entre les Pods qui seront déployés sur le cluster.
+La commande suivante permet d'installer les composants nécessaires pour la communication entre les Pods qui seront déployés sur le cluster:
 
 ```
 $ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 ```
 
-Note: il y a plusieurs solutions de networking qui peuvent être utilisées, la solution envisagée ici est Weave Net. L'article suivant donne une bonne comparaison des solutions les plus utilisées: [https://objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/](https://objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/)
+Vous verrez que plusieurs ressources sont alors créés pour mettre en place cette solution de networking:
+```
+serviceaccount/weave-net created
+clusterrole.rbac.authorization.k8s.io/weave-net created
+clusterrolebinding.rbac.authorization.k8s.io/weave-net created
+role.rbac.authorization.k8s.io/weave-net created
+rolebinding.rbac.authorization.k8s.io/weave-net created
+daemonset.apps/weave-net created
+```
+
+Note: il y a plusieurs solutions de networking qui peuvent être utilisées, la solution envisagée ici est Weave Net. L'article suivant donne une bonne comparaison des solutions les plus utilisées: [https://objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/](https://objectif-libre.com/fr/blog/2018/07/05/comparatif-solutions-reseaux-kubernetes/), celui-ci effectue un benchmark des différentes solutions [https://itnext.io/benchmark-results-of-kubernetes-network-plugins-cni-over-10gbit-s-network-updated-august-2020-6e1b757b9e49](https://itnext.io/benchmark-results-of-kubernetes-network-plugins-cni-over-10gbit-s-network-updated-august-2020-6e1b757b9e49)
 
 ## Vérification de l'état de santé des nodes
 
-Maintenant que la solution de networking a été installée, les nodes sont dans l'état *Ready*.
+Maintenant que la solution de networking a été installée, les nodes devraient être dans l'état *Ready* (il est possible que cela prennent quelques dizaines de secondes)
 
 ```
 $ kubectl get nodes
-NAME     STATUS   ROLES    AGE   VERSION
-node1    Ready    master   4m    v1.17.0
-node2    Ready    <none>   3m    v1.17.0
-node3    Ready    <none>   3m    v1.17.0
+NAME    STATUS   ROLES    AGE  VERSION
+k8s-1   Ready    master   6m   v1.19.1
+k8s-2   Ready    <none>   5m   v1.19.1
+k8s-3   Ready    <none>   5m   v1.19.1
 ```
 
-Le cluster est prêt à être utilisé.
+Le cluster est maintenant prêt à être utilisé.
+
+Note: le cluster que vous avez mis en place dans cet exercice contient un node master et 2 nodes worker. Il est également possible avec kubeadm de mettre en place un cluster HA  avec plusieurs nodes master en charge de la gestion de l'état du cluster.

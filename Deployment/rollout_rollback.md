@@ -6,9 +6,13 @@ A l'aide de la commande `kubectl create`, créez un Deployment
 - nommé *www*
 - définissant un Pod basé sur l'image *nginx:1.16*
 
+Note: la commande `kubectl create` fait partie des commandes dites impératives, elle permet de créer un Deployment sans passer par un fichier de spécification en yaml. Cette approche permet d'aller vite, elle est a utiliser dans un contexte de développement ou de debugging.
+
 ### 2. Scaling
 
 Changer le nombre de replicas de façon à en avoir 3
+
+Note: la commande `kubectl create` ne permet pas de spécifier le nombre de réplicas à la création d'un Deployment. Par défaut le Deployment créé à l'étape précédente a donc un seul réplica.
 
 ### 3. Liste des ressources
 
