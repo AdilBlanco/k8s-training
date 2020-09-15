@@ -354,13 +354,29 @@ pod/logstash-779b98c567-42fhz        1/1     Running   0          2m25s
 
 Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu dans Logstash, contenu qui sera filtré et envoyé à Elasticsearch.
 
-Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format NGinx. Le fichier nginx.log généré contient 1000 entrées de logs.
+Nous lançons pour cela un Pod basé sur l'image *mingrammer/flog* afin de générer 1000 entrées de log:
 
 ```
-$ docker run mingrammer/flog -f apache_combined > nginx.log
+$ kubectl run testlog --restart=Never --image=mingrammer/flog -- -f apache_combined
 ```
 
-Assurez-vous que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a fini de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
+Attendez que le Pod soit dans l'état *Completed* (ça ne devrait prendre que quelques secondes):
+
+```
+$ k get -w pods
+NAME      READY   STATUS              RESTARTS   AGE
+testlog   0/1     ContainerCreating   0          1s
+testlog   1/1     Running             0          5s
+testlog   0/1     Completed           0          5s
+```
+
+En utilisant la commande suivante, récupérez ensuite les logs qui ont été générés:
+
+```
+$ kubectl logs testlog > nginx.log
+```
+
+Assurez-vous tout d'abord que l'interface de *Kibana* est disponible, cela permet d'être sur que *Elasticsearch* a fini de démarrer et que *Kibana* a pu s'y connecter. Vous devriez obtenir l'interface suivante en utilisant l'adresse IP de l'une des machines du cluster et le port 31501.
 
 ![Kibana](./images/kibana-1.png)
 
