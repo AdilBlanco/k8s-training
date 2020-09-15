@@ -202,7 +202,7 @@ Pour envoyer un grand nombre de requête sur le service, nous allons utiliser l'
 Utilisez la commande suivante en remplaçant *NODE_IP* par l'adresse IP de l'un des nodes de votre cluster (vous pouvez obtenir les IPs des nodes à l'aide de `$ kubectl get nodes -o wide`):
 
 ```
-$ kubectl run ab --restart='Never' --image=lucj/ab -- -n 100000 -c 50 http://NODE_IP:31000/
+$ kubectl run ab --restart='Never' --image=lucj/ab -- -n 100000 -c 50 http://NODE_IP:30100/
 $ kubectl logs -f ab
 ```
 
