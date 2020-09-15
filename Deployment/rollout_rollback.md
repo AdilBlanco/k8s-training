@@ -10,9 +10,11 @@ Note: la commande `kubectl create` fait partie des commandes dites impératives,
 
 ### 2. Scaling
 
-Changer le nombre de replicas de façon à en avoir 3
+La commande `kubectl create` ne permet pas de spécifier le nombre de réplicas à la création d'un Deployment. Par défaut le Deployment créé à l'étape précédente a donc un seul réplica.
 
-Note: la commande `kubectl create` ne permet pas de spécifier le nombre de réplicas à la création d'un Deployment. Par défaut le Deployment créé à l'étape précédente a donc un seul réplica.
+Changez ce nombre de replicas de façon à en avoir 3.
+
+Note: pour cela vous pourrez avoir besoin de la commande `$ kubectl scale ...`. L'aide en ligne `$ kubectl scale --help` donne quelques exemples d'utilisation.
 
 ### 3. Liste des ressources
 
