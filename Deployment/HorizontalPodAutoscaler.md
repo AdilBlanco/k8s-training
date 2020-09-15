@@ -201,10 +201,9 @@ Pour envoyer un grand nombre de requête sur le service, nous allons utiliser l'
 
 Utilisez la commande suivante en remplaçant *NODE_IP* par l'adresse IP de l'un des nodes de votre cluster (vous pouvez obtenir les IPs des nodes à l'aide de `$ kubectl get nodes -o wide`):
 
-Note: assurez vous d'avoir installer Docker sur votre machine au préalable
-
 ```
-$ docker run lucj/ab -n 100000 -c 50 http://NODE_IP:30100/
+$ kubectl run ab --restart='Never' --image=lucj/ab -- -n 100000 -c 50 http://NODE_IP:31000/
+$ kubectl logs -f ab
 ```
 
 Depuis un autre terminal, observez l'évolution de la consommation du CPU et l'augmentation du nombre de réplicas (cela peux prendre quelques minutes)
@@ -232,4 +231,10 @@ Supprimez ensuite le metrics-server avec la commande suivante:
 
 ```
 $ kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+```
+
+Supprimez également le pod de test que vous aviez lancé:
+
+```
+$ kubectl delete pod ab
 ```

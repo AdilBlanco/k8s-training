@@ -39,6 +39,11 @@ Lancez un navigateur sur le port 31000 de l'une des machines du cluster.
 
 ![Service NodePort](./images/service_NodePort.png)
 
+Note: vous pouvez obtenir les adresses IP externes des nodes de votre cluster dans la colonne *EXTERNAL-IP* du résultat de la commande suivante:
+```
+$ kubectl get nodes -o wide
+```
+
 ### 6. Cleanup
 
 Supprimez l'ensemble des ressources créés dans cet exercice
