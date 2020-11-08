@@ -47,117 +47,91 @@ manifests
 
 ## 3. Installation d'un Ingress controller
 
-### Mise en place
+Un Ingress controller est nécessaire afin d'exposer les services à l'extérieur du cluster via des ressources de type *Ingress*.
 
-Un Ingress controller est nécessaire afin de prendre en compte la ressource Ingress qui est utilisée pour exposer les services à l'extérieur du cluster.
-
-- 1er cas
-
-Si votre cluster est déployé chez un cloud provider, utilisez la commande suivante afin de l'installer avec helm (avec la version 2 ou 3 en fonction de la version du client que vous avez installé sur votre machine locale):
-
-HELM 3:
+Assurez-vous d'avoir installé le client *helm* (dans la version 3.x.y) et lancez les commandes suivantes afin d'installer un Ingress Controller dans le namespace *ingress-nginx*:
 
 ```
-$ helm repo add stable https://kubernetes-charts.storage.googleapis.com
-$ helm install nginx-ingress stable/nginx-ingress
+$ kubectl create ns ingress-nginx
+$ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+$ helm install -n ingress-nginx ingress ingress-nginx/ingress-nginx
 ```
 
-HELM 2:
+A l'aide de la commande suivate, vérifiez que le Pod dans lequel tourne le Ingress Controller est correctement démarré:
+
+Attention, cette commande ne vous rendra pas la main, vous pourrez la stopper dès que le Pod présentera *1/1* dans la colonne *READY* et *Running* dans la colonne *STATUS*:
 
 ```
-$ helm install --name nginx-ingress nginx-stable/nginx-ingress
-```
-
-- 2ème cas
-
-Si vous êtes sur minikube, vous pouvez installer un Ingress Controller via un addon avec la commande suivante:
-
-```
-$ minikube addons enable ingress
-```
-
-### Vérification
-
-Après quelques secondes, vous devriez voir le Pod *nginx-ingress-controller* dans l'état running:
-
-```
-$ kubectl get po --all-namespaces | grep ingress
-default       nginx-ingress-controller-59ccb84d68-sg754        1/1     Running   0     33s
-default       nginx-ingress-default-backend-659bd647bd-8fqb9   1/1     Running   0     33s
+$ kubectl get pods -n ingress-nginx --watch
+NAME                                        READY   STATUS    RESTARTS   AGE
+ingress-nginx-controller-855bd8cb4c-6gn5l   1/1     Running   0          49s
 ```
 
 ## 4. Test de l'application
 
 ### Création
 
-Placez vous dans le répertoire *tick* et créez les différentes ressources présentes dans le folder *manifests*:
+Placez vous dans le répertoire *tick* et créez les différentes ressources présentes dans le répertoire *manifests*:
 
 ```
-$ kubectl apply -f manifests/
-configmap/telegraf-config created
-deployment.apps/chronograf created
-deployment.apps/influxdb created
-deployment.apps/kapacitor created
-deployment.apps/telegraf created
-ingress.extensions/tick created
-service/chronograf created
-service/influxdb created
-service/kapacitor created
-service/telegraf created
+$ kubectl apply -f manifests
 ```
 
-Vérifiez ensuite que la création s'est déroulée correctement:
+Vérifiez ensuite que la création s'est déroulée correctement en lançant la commande suivante:
 
 ```
 $ kubectl get deploy,po,svc,ingress
 ```
 
-Après quelques secondes, vous devriez obtenir un résultat proche de celui ci-dessous:
+Vous devriez obtenir un résultat proche de celui ci-dessous:
 
 ```
-$ kubectl  get deploy,po,svc,ingress
-NAME                                                           READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.extensions/chronograf                               1/1     1            1           3m36s
-deployment.extensions/influxdb                                 1/1     1            1           3m36s
-deployment.extensions/kapacitor                                1/1     1            1           3m36s
-deployment.extensions/my-nginx-nginx-ingress-controller        1/1     1            1           23m
-deployment.extensions/my-nginx-nginx-ingress-default-backend   1/1     1            1           23m
-deployment.extensions/telegraf                                 1/1     1            1           3m36s
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/chronograf   1/1     1            1           38s
+deployment.apps/influxdb     1/1     1            1           38s
+deployment.apps/kapacitor    1/1     1            1           38s
+deployment.apps/telegraf     1/1     1            1           38s
 
-NAME                                                          READY   STATUS    RESTARTS   AGE
-pod/chronograf-8bfff754d-qb28p                                1/1     Running   0          3m36s
-pod/influxdb-8b8df4bff-wmvzc                                  1/1     Running   0          3m36s
-pod/kapacitor-6d7bc6955c-s2tnj                                1/1     Running   0          3m36s
-pod/my-nginx-nginx-ingress-controller-656698fdb8-s9c69        1/1     Running   0          23m
-pod/my-nginx-nginx-ingress-default-backend-7dbf76c549-8q7pg   1/1     Running   0          23m
-pod/telegraf-85546c59b5-4tlpt                                 1/1     Running   0          3m35s
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/chronograf-868b4b665b-5xlw8   1/1     Running   0          38s
+pod/influxdb-7f98cb47dc-d2tlg     1/1     Running   0          38s
+pod/kapacitor-f65dd777c-xwgdx     1/1     Running   0          38s
+pod/telegraf-54c7f75f6f-pk7xf     1/1     Running   0          38s
 
-NAME                                             TYPE           CLUSTER-IP       EXTERNAL-IP    PORT(S)                      AGE
-service/chronograf                               NodePort       10.245.132.131   <none>         8888:31101/TCP               3m35s
-service/influxdb                                 ClusterIP      10.245.92.85     <none>         8086/TCP                     3m35s
-service/kapacitor                                NodePort       10.245.33.11     <none>         9092:31102/TCP               3m35s
-service/kubernetes                               ClusterIP      10.245.0.1       <none>         443/TCP                      3h52m
-service/my-nginx-nginx-ingress-controller        LoadBalancer   10.245.238.36    138.68.119.157   80:31827/TCP,443:31973/TCP   23m
-service/my-nginx-nginx-ingress-default-backend   ClusterIP      10.245.192.10    <none>         80/TCP                       23m
-service/telegraf                                 ClusterIP      10.245.14.123    <none>         8186/TCP                     3m35s
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/chronograf   ClusterIP   10.245.205.66    <none>        8888/TCP   38s
+service/influxdb     ClusterIP   10.245.158.139   <none>        8086/TCP   37s
+service/kapacitor    ClusterIP   10.245.65.240    <none>        9092/TCP   37s
+service/kubernetes   ClusterIP   10.245.0.1       <none>        443/TCP    121m
+service/telegraf     ClusterIP   10.245.151.236   <none>        8186/TCP   37s
 
-NAME                      HOSTS                                   ADDRESS          PORTS   AGE
-ingress.extensions/tick   telegraf.tick.com,chronograf.tick.com   138.68.157.142   80      3m35s
+NAME                      CLASS    HOSTS                                   ADDRESS   PORTS   AGE
+ingress.extensions/tick   <none>   telegraf.tick.com,chronograf.tick.com             80      38s
 ```
 
 ### Configuration du point d'entrée
 
 - 1er cas
 
-Si votre cluster est déployé chez un cloud provider qui supporte les services de type *LoadBalancer*, un composant load-balancer sera automatiquement créé sur l'infrastructure et il faudra utiliser l'adresse IP externe de ce dernier afin d'envoyer des requêtes HTTP à l'application. Dans l'exemple ci-dessus, l'IP externe est *138.68.119.157*, elle est obtenue dans le champ *EXTERNAL_IP* du service nginx-ingress-controller.
+Si votre cluster est déployé chez un cloud provider qui supporte les services de type *LoadBalancer*, un composant load-balancer sera automatiquement créé sur l'infrastructure et il faudra utiliser l'adresse IP externe de ce dernier afin d'envoyer des requêtes HTTP à l'application.
+
+La commande suivante vous permettra d'obtenir l'adresse IP de ce LoadBalancer:
+```
+$ kubectl get svc -n ingress-nginx
+NAME                                       TYPE         CLUSTER-IP    EXTERNAL-IP    PORT(S)                    AGE
+ingress-ingress-nginx-controller           LoadBalancer 10.245.40.95  157.245.28.245 80:32461/TCP,443:31568/TCP 6m34s
+ingress-ingress-nginx-controller-admission ClusterIP    10.245.67.139 <none>         443/TCP                    6m34s
+```
+
+Dans l'exemple ci-dessus, l'IP externe est *157.245.28.245*, elle est obtenue dans le champ *EXTERNAL_IP* du service *ingress-ingress-nginx-controller* (présent dans le namespace *ingress-nginx*).
 
 Pour cet exercice, il vous faudra mettre à jour le fichier */etc/hosts* de votre machine local de façon à ce que les sous-domaines *telegraf.tick.com* et *chronograf.tick.com* soient résolus vers cette adresse IP.
 
 Dans l'exemple ci-dessus, j'ai ajouté les entrées suivantes dans le fichier */etc/hosts*:
 
 ```
-138.68.119.157    telegraf.tick.com
-138.68.119.157    chronograf.tick.com
+157.245.28.245    telegraf.tick.com
+157.245.28.245    chronograf.tick.com
 ```
 
 - 2nd cas
@@ -175,31 +149,42 @@ Dépuis un navigateur, vous pourrez accèder à l'interface de *chronograf* depu
 
 ![Chronograf](./images/chronograf-1.png)
 
-### Envoi de données de test
+### Envoi des données de test
 
-En utilisant le code suivant, vous allez générer des données fictives, simulant une distribution sinusoidale de la température, et les envoyer à la stack *tick* via le endpoint exposé par *Telegraf*.
+En utilisant les instructions suivantes, vous allez générer des données fictives, simulant une distribution sinusoïdale de la température, et les envoyer à la stack *tick* via le endpoint exposé par *Telegraf*.
 
-Note: assurez vous au préalable que Docker soit installé sur votre machine.
+- Génération des données
+
+Vous lancerez pour cela un Pod basé sur l'image *lucj/genx* auquel vous donnerez quelques paramètres supplémentaires:
 
 ```
-# Generate dummy data
-docker run lucj/genx:0.1 -type cos -duration 3d -min 10 -max 25 -step 1h > /tmp/data
+$ kubectl run data --restart=Never --image=lucj/genx:0.1 -- -type cos -duration 3d -min 10 -max 25 -step 1h
+```
 
-# Send data to telegraf
-cat /tmp/data | while read line; do
+- Après quelques secondes, assurez-vous que le pod lancé précédemment est dans le status *Completed*:
+
+```
+$ kubectl get pod data
+NAME   READY   STATUS      RESTARTS   AGE
+data   0/1     Completed   0          10s
+```
+
+- Envoi des données
+
+La commande suivante récupère les données générées et les envoie à *Telegraf*:
+
+```
+kubectl logs data | while read line; do
   ts="$(echo $line | cut -d' ' -f1)000000000"
   value=$(echo $line | cut -d' ' -f2)
-  curl -i -XPOST http://telegraf.tick.com/write --data-binary "temp value=${value} ${ts}"
+  curl -is -XPOST http://telegraf.tick.com/write --data-binary "temp value=${value} ${ts}"
 done
 ```
 
-Vous devriez alors obtenir une succession de status 204, indiquant que l'ensemble des requêtes ont été créées correctement.
+Note: vous devriez obtenir une succession de status *204* indiquant que l'ensemble des données ont été correctement reçues
 
-Vous pouvez alors visualiser les données en utilisant la query suivante depuis le menu *Explore* de l'interface web de *Chronograf*:
+Vous pouvez alors visualiser ces données en utilisant la query ```select "value" from "test"."autogen"."temp"``` depuis le menu *Explore* de l'interface web de *Chronograf*.
 
-```
-select "value" from "test"."autogen"."temp"
-```
 
 ![Chronograf](./images/chronograf-2.png)
 
@@ -208,12 +193,12 @@ select "value" from "test"."autogen"."temp"
 Supprimez l'application avec la commande suivante:
 
 ```
-$ kubectl delete -f manifests/
+$ kubectl delete -f manifests
 ```
 
 Vous allez maintenant packager cette application dans un chart HELM.
 
-## 5. Création du chart
+## 5. Création d'un chart Helm
 
 Toujours depuis le répertoire *tick*, utilisez la commande suivante afin de créer un Chart nommé *tick_chart*.
 
@@ -232,17 +217,19 @@ Par défaut, celui-ci contient principalement les éléments suivants:
 
 ```
 $ tree tick_chart
-tick
+tick_chart
 ├── Chart.yaml
 ├── charts
 ├── templates
-│  ├── NOTES.txt
-│  ├── _helpers.tpl
-│  ├── deployment.yaml
-│  ├── ingress.yaml
-│  ├── service.yaml
-│  └── tests
-│    └── test-connection.yaml
+│   ├── NOTES.txt
+│   ├── _helpers.tpl
+│   ├── deployment.yaml
+│   ├── hpa.yaml
+│   ├── ingress.yaml
+│   ├── service.yaml
+│   ├── serviceaccount.yaml
+│   └── tests
+│       └── test-connection.yaml
 └── values.yaml
 ```
 
@@ -253,11 +240,11 @@ La première chose que vous allez faire est de supprimer tous les fichiers conte
 Supprimez également le contenu du fichier *values.yaml* (mais ne supprimez pas le fichier), le fichier *NOTES.txt* et le répertoire *test*.
 
 ```
-$ rm tick_chart/templates/*.yaml
-$ rm -r tick_chart/templates/tests
-$ rm tick_chart/templates/NOTES.txt
-$ cp manifests/*.yaml tick_chart/templates
-$ echo > tick_chart/values.yaml
+rm tick_chart/templates/*.yaml
+rm -r tick_chart/templates/tests
+rm tick_chart/templates/NOTES.txt
+cp manifests/*.yaml tick_chart/templates
+echo > tick_chart/values.yaml
 ```
 
 Le répertoire *tick_chart* aura alors le contenu suivant:
@@ -294,49 +281,41 @@ Vous devriez obtenir un résultat similaire au suivant:
 
 ```
 NAME: tick
-LAST DEPLOYED: Wed Feb 19 08:12:23 2020
+LAST DEPLOYED: Thu Sep 17 13:40:31 2020
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 ```
 
-Note: si vous avez utilisé helm version 2, vous obtiendrez un résultat contenant quelques informations supplémentaires
-
 Vérifiez ensuite la liste des releases (terminologie Helm) présentes:
 
 ```
-$ helm ls
-NAME         	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART               	APP VERSION
-nginx-ingress	default  	1       	2020-02-19 08:05:00.058407 +0100 CET	deployed	nginx-ingress-1.31.0	0.29.0
-tick         	default  	1       	2020-02-19 08:12:23.174983 +0100 CET	deployed	tick_chart-0.1.0    	1.16.0
+$ helm ls -A
+NAME   	NAMESPACE    	REVISION	UPDATED                              	STATUS  	CHART              	APP VERSION
+ingress	ingress-nginx	1       	2020-09-17 11:53:13.172588 +0200 CEST	deployed	ingress-nginx-3.1.0	0.35.0
+tick   	default      	1       	2020-09-17 13:40:31.674099 +0200 CEST	deployed	tick_chart-0.1.0   	1.16.0
 ```
-
-Note: si vous avez utilisé *Helm* pour déployer le Ingress Controller vous obtiendrez une liste contenant les 2 releases.
 
 ### Test de l'application
 
-De la même façon que précédemment, lancez les commandes suivantes afin d'envoyer des données dans la stack maintenant deployée sous la forme d'un chart Helm.
+Envoyez les données générées précédemment dans la stack qui est maintenant deployée sous la forme d'un chart Helm.
 
 ```
-# Generate dummy data
-docker run lucj/genx:0.1 -type cos -duration 3d -min 10 -max 25 -step 1h > /tmp/data
-
-# Send data to telegraf
-cat /tmp/data | while read line; do
+kubectl logs data | while read line; do
   ts="$(echo $line | cut -d' ' -f1)000000000"
   value=$(echo $line | cut -d' ' -f2)
-  curl -i -XPOST http://telegraf.tick.com/write --data-binary "temp value=${value} ${ts}"
+  curl -is -XPOST http://telegraf.tick.com/write --data-binary "temp value=${value} ${ts}"
 done
 ```
 
-Visualisez ensuite le résultat dans l'interface de *Chronograf*.
+Une nouvelle fois, visualisez ces données en utilisant la query ```select "value" from "test"."autogen"."temp"``` depuis le menu *Explore* de l'interface web de *Chronograf*.
 
 ### Utilisation du templating
 
-L'intérêt d'une aplication packagée dans un Chart Helm est de faciliter sa distribution et son déploiement notamment en utilisant la puissance des templates.
+L'intérêt d'une application packagée dans un Chart Helm est de faciliter sa distribution et son déploiement notamment en utilisant la puissance des templates.
 
-Dans cet exercice, nous allons faire en sorte de rendre dynamique les tags des différentes images. Pour cela, commencez par modifier le fichier *tick_chart/values.yaml* de façon à ce qu'il ait le contenu suivant afin d'utiliser la déclinaison *alpine* du tag de chaque image.
+Dans cet exercice, nous allons faire en sorte de rendre dynamique les tags des différentes images. Pour cela, commencez par modifier le fichier *tick_chart/values.yaml* de façon à ce qu'il ait le contenu suivant (nous allons utiliser la déclinaison *alpine* pour chaque image):
 
 ```
 telegraf:
@@ -381,15 +360,37 @@ Vous devriez obtenir un résultat similaire à celui ci-dessous:
 ```
 Release "tick" has been upgraded. Happy Helming!
 NAME: tick
-LAST DEPLOYED: Wed Feb 19 08:16:15 2020
+LAST DEPLOYED: Thu Sep 17 13:52:18 2020
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
 TEST SUITE: None
 ```
 
-Note: si vous avez utilisé helm version 2, vous obtiendrez un résultat contenant quelques informations supplémentaires
-
 Vérifiez ensuite que les Pods sont bien basés sur les nouvelles versions des images.
 
-Nous avons vu ici un exemple simple de l'utilisation du templating, l'important étant de comprendre son fonctionnement. Lorsque vous allez packager votre propre application dans un Chart Helm, vous allez généralement commencer par utiliser le templating pour des champs simples puis ajouter des éléments de templating de plus en plus complexes.
+Par exemple, les commandes suivantes permettent d'obtenir l'image qui est utilisée par le Pod dans lequel tourne *Telegraf*:
+
+- Récupération de la liste des Pods
+
+```
+$ kubectl get pod
+NAME                          READY   STATUS      RESTARTS   AGE
+chronograf-6cb9c64d56-vw97l   1/1     Running     0          13m
+data                          0/1     Completed   0          120m
+influxdb-64765784c9-gzr49     1/1     Running     0          13m
+kapacitor-7cd66b69f-j595b     1/1     Running     0          13m
+telegraf-6d84769594-z2p7h     1/1     Running     0          12m
+...
+```
+
+- récupération de l'image utilisée par le Pod *Telegraf*
+
+```
+$ kubectl get pod telegraf-6d84769594-z2p7h -o jsonpath='{ .spec.containers[0].image }'
+telegraf:1.13-alpine
+```
+
+## En résumé
+
+Nous avons vu ici un exemple simple de l'utilisation du templating, l'important étant de comprendre son fonctionnement. Lorsque vous allez packager vos propres applications dans des Chart Helm, vous allez généralement commencer par utiliser le templating pour des champs simples puis ajouter des éléments de templating de plus en plus complexes (structures conditionnelles, boucles, ...).

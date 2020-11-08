@@ -4,7 +4,11 @@
 
 Vous allez maintenant déployer des agents *fluentd* sur l'ensemble des machines du cluster. Ces agents seront configurés pour envoyer les logs dans la stack Elastic mise en place dans l'exercice précédent.
 
-Note: assurez-vous que la stack Elastic est toujours active, vous devrez la relancer si ce n'est pas le cas.
+Note: assurez-vous que la stack Elastic est toujours active. Si ce n'est pas le cas vous pouvez la relancer facilement avec la commande suivante:
+
+```
+$ kubectl apply -f https://files.techwhale.io/elastic.yaml
+```
 
 ## 2. Définition des droits d'accès
 
@@ -58,7 +62,7 @@ subjects:
 Copiez le contenu de cette spécification dans un fichier *rbac.yaml* et créez les ressources avec la commande suivante.
 
 ```
-kubectl create -f rbac.yaml
+kubectl apply -f rbac.yaml
 serviceaccount "fluentd" created
 clusterrole "fluentd" created
 clusterrolebinding "fluentd" created
@@ -148,7 +152,7 @@ Il y a plusieurs choses à noter ici:
 Copiez cette spécification dans le fichier *daemonset-fluentd.yaml* et utilisez la commande suivante pour lancer le DaemonSet:
 
 ```
-$ kubectl create -f daemonset-fluentd.yaml
+$ kubectl apply -f daemonset-fluentd.yaml
 daemonset.extensions "fluentd" created
 ```
 
@@ -165,3 +169,21 @@ fluentd-cfgbn    1/1       Running   0          32s
 Depuis l'interface de Kibana, vérifiez que de nouvelles entrées de logs sont reçues en permanence. Vous pourrez pour cela mettre en place le refresh automatique depuis l'interface.
 
 ![Kibana](./images/kibana-log-cluster.png)
+
+Vous pourriez par exemple lancer le Pod suivant afin de générer des logs fictifs et vous assurez que ceux-ci apparaissent bien dans Kibana:
+
+```
+$ kubectl run testlog --restart=Never --image=mingrammer/flog -- -f apache_combined
+```
+
+![Kibana](./images/kibana-testlog.png)
+
+## 5. Cleanup
+
+Vous pouvez maintenant supprimer les différentes ressources créées précédemment:
+
+```
+$ kubectl delete -f daemonset-fluentd.yaml
+$ kubectl delete -f rbac.yaml
+$ kubectl delete -f https://files.techwhale.io/elastic.yaml
+```

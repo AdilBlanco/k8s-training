@@ -4,20 +4,24 @@ Dans cet exercice, vous allez créer une ressource *Ingress* et l'utiliser pour 
 
 ## 1. Installation d'un Ingress Controller
 
-Un Ingress Controller est nécessaire afin de prendre en compte la ressource Ingress qui sera utilisée pour exposer les services à l'extérieur du cluster. C'est un reverse-proxy qui sera automatiquement configuré à l'aide des ressources Ingress.
+Un Ingress Controller est nécessaire afin de prendre en compte la ressource Ingress qui sera utilisée pour exposer les services à l'extérieur du cluster. C'est un reverse-proxy qui sera configuré à l'aide de ressources de type Ingress.
 
 Dans cet exercice nous allons déployer un Ingress Controller basé sur Nginx mais il est possible d'utiliser un autre type d'Ingress Controller (*HAProxy*, *Traefik*, ...).
 
 En utilisant la documentation officielle, installez le Ingress Controller qui correspond à votre environnement (https://kubernetes.github.io/ingress-nginx/deploy/)
 
-Assurez-vous que le controller fonctionne avec la commande suivante:
+En utilisant la commande suivante, attendez que les différents Pods soient correctement démarrés:
+
+Note: attention cette commande ne vous rendra pas la main, vous pourrez la stopper dès que le Pod *ingress-nginx-controller-xxx* présentera *1/1* dans la colonne *READY* et *Running* dans la colonne *STATUS*:
 
 ```
 $ kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx --watch
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-vd6sw        0/1     Completed   0          16s
+ingress-nginx-admission-patch-4lw8p         0/1     Completed   2          15s
+ingress-nginx-controller-66dc9984d8-5tnxt   0/1     Running     0          16s
+ingress-nginx-controller-66dc9984d8-5tnxt   1/1     Running     0          27s
 ```
-
-Note: une fois que le pod est en Running, faites un Ctrl-C pour arrêter la commande et reprendre la main
-
 ## 2. Lancement de la VotingApp
 
 Déployez la Voting App avec la commande suivante, celle-ci fait référence à une URL pointant vers un fichier définissant l'ensemble des ressources de la Voting App
@@ -108,24 +112,30 @@ L'interface de result est disponible:
 
 ## 7. Cleanup
 
-Supprimez la Voting App à l'aide de la commande suivante:
+- Supprimez la Voting App à l'aide de la commande suivante:
 
 ```
 $ kubectl delete -f https://files.techwhale.io/voting.yaml
 ```
 
-Vous pouvez également supprimer le Ingress Controller:
+- Vous pouvez également supprimer le Ingress Controller:
 
-- si vous êtes sur Minikube, utilisez la commande suivante:
+  * si vous êtes sur Minikube, utilisez la commande suivante:
 
 ```
 $ minikube addons disable ingress
 ```
 
--  si vous n'êtes pas sur Minikube, supprimez le namespace *ingress-nginx* avec la commande suivante:
+  * si vous n'êtes pas sur Minikube, supprimez le namespace *ingress-nginx* avec la commande suivante:
 
 ```
 $ kubectl delete ns ingress-nginx
+```
+
+- Supprimez également la ressource Ingress
+
+```
+$ kubectl delete -f vote_ingress.yaml
 ```
 
 ### En résumé

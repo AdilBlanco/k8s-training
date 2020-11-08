@@ -1,8 +1,12 @@
 Dans cet exercice vous allez utiliser un certificat x509 pour donner accès à votre cluster à un utilisateur. Vous lui donnerez également les permissions lui permettant de manipuler des Deployments et des Services dans un namespace dédié.
 
+## Prérequis
+
+Pour manipuler des structures JSON depuis la ligne de commande, vous pourrez être amené à utiliser l'utilitaire *jq*. Celui-ci peut être téléchargé depuis [https://stedolan.github.io/jq/](https://stedolan.github.io/jq/)
+
 ## Gestion des utilisateurs dans Kubernetes
 
-Lorsque vous utilisez *kubectl* ou l'interface web pour communiquer avec un cluster Kubernetes, des requêtes HTTP sont faites sur les endpoints exposés par l'API Server, la documentation de cette API est disponible sur https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.14).
+Lorsque vous utilisez *kubectl* ou l'interface web pour communiquer avec un cluster Kubernetes, des requêtes HTTP sont faites sur les endpoints exposés par l'API Server.
 
 Chaque requête envoyée à l'API Server doit être authentifiée (afin de s'assurer que la personne ou le processus à l'origine de la requête est connu du système) puis être autorisée (afin de s'assurer que l'utilisateur a le droit de réaliser l'action demandée).
 
@@ -19,7 +23,6 @@ En fonction du mecanisme utilisé, le plugin correspondant sera en charge de ré
 
 - l'identification de l'utilisateur sera récupéré dans le CN (*CommonName*) du certificat
 - les informations concernant le groupe éventuel auquel appartient l'utilisateur seront récupérées dans le champ O (*Organisation*)
-
 
 Il n'y a pas de ressources User ou Group à l'interieur d'un cluster Kubernetes, ces informations doivent être gérées à l'extérieur du cluster et envoyées avec chaque requête à l'API Server.
 
@@ -82,6 +85,10 @@ Le fichier *david.csr* résultant doit ensuite être envoyé à l'admin du clust
 
 Créer le répertoire *config/admin* et placez-y le fichier *david.csr*. Toujours dans ce répertoire, créez le fichier *csr.yml* avec le contenu suivant. Cette spécification sera utilisée pour créer une ressource de type *CertificateSigningRequest*.
 
+:fire: Attention, la ressource *CertificateSigningRequest* est disponible en stable depuis Kubernetes 1.19, la version beta est également disponible mais sera dépréciée à partir de Kubernetes 1.22.
+
+- si vous utilisez une installation de Kubernetes inférieure à la 1.19, vous pourrez utiliser le contenu suivant qui fait référence à la version beta de la ressource *CertificateSigningRequest*
+
 ```
 apiVersion: certificates.k8s.io/v1beta1
 kind: CertificateSigningRequest
@@ -95,6 +102,24 @@ spec:
   - digital signature
   - key encipherment
   - server auth
+  - client auth
+```
+
+- si vous utilisez Kubernetes 1.19, vous pourrez utiliser le contenu suivant qui fait référence à la version stable de la ressource *CertificateSigningRequest*
+
+```
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: mycsr
+spec:
+  groups:
+  - system:authenticated
+  request: ${BASE64_CSR}
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - digital signature
+  - key encipherment
   - client auth
 ```
 
@@ -137,12 +162,12 @@ Certificate:
     Data:
         Version: 3 (0x2)
         Serial Number:
-            33:b3:dc:04:53:2f:d2:54:5e:23:6e:70:2a:33:08:b5:11:12:fb:b1
+            18:af:dc:0b:60:6d:b1:ec:c6:2a:36:1c:06:17:0b:03
     Signature Algorithm: sha256WithRSAEncryption
         Issuer: CN=minikubeCA
         Validity
-            Not Before: Jun 25 06:08:00 2019 GMT
-            Not After : Jun 24 06:08:00 2020 GMT
+            Not Before: Oct 15 05:52:14 2020 GMT
+            Not After : Oct 15 05:52:14 2021 GMT
         Subject: O=dev, CN=david
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
@@ -172,7 +197,7 @@ Rappel: le schéma suivant indique les différentes ressources qui interviennent
 ![RBAC](./images/rbac.png)
 
 
-Vous allez maintenant définir un role qui servira à donner les droits de gestions des ressources de type *Pod*, *Service* et *Deployment*. Pour ces 2 groupes, nous définissons une liste de ressources et les actions qui doivent être authorisées sur celles-ci.
+Vous allez maintenant définir un role qui servira à donner les droits de gestion des ressources de type *Pod*, *Service* et *Deployment*. Pour ces 2 groupes, nous définissons une liste de ressources et les actions qui doivent être authorisées sur celles-ci.
 
 Note: les ressources *Pod* et *Service* appartiennent à la  version *core* de l'API (la valeur de la clé *apiGroups* est vide dans ce cas), alors que la ressource *Deployment* appartient à la version *apps* de l'API.
 
@@ -257,13 +282,13 @@ apiVersion: v1
 kind: Config
 clusters:
 - cluster:
-    certificate-authority-data: ${CLUSTER_CA}
+    certificate-authority-data: "${CLUSTER_CA}"
     server: ${CLUSTER_ENDPOINT}
   name: ${CLUSTER_NAME}
 users:
 - name: ${USER}
   user:
-    client-certificate-data: ${CLIENT_CERTIFICATE_DATA}
+    client-certificate-data: "${CLIENT_CERTIFICATE_DATA}"
 contexts:
 - context:
     cluster: ${CLUSTER_NAME}
@@ -292,14 +317,19 @@ $ export CLIENT_CERTIFICATE_DATA=$(kubectl get csr mycsr -o jsonpath='{.status.c
 ```
 
 - Authorité de certification du cluster
-```
-$ export CLUSTER_CA=$(kubectl config view --minify --raw -o json | jq '.clusters[0].cluster["certificate-authority-data"]')
-```
 
-Si vous êtes sur Minikube, la commande est légèrement différente:
+:fire: Attention, il y a plusieurs cas de figure ici:
+
+  * si vous utilisez *Minikube*, vous pouvez récupérer le cluster CA avec la commande suivante:
 
 ```
 $ export CLUSTER_CA=$(cat $HOME/.minikube/ca.crt | base64)
+```
+
+  * si vous n'utilisez pas Minikube, vous pouvez récupérer le cluster CA avec la commande suivante:
+
+```
+$ export CLUSTER_CA=$(kubectl config view --minify --raw -o json | jq -r '.clusters[0].cluster["certificate-authority-data"]')
 ```
 
 - URL du server d'API du cluster
@@ -339,8 +369,8 @@ Vérifiez alors que vous (en tant que David) avez bien accès au cluster:
 
 ```
 $ kubectl version
-Client Version: version.Info{Major:"1", Minor:"14", GitVersion:"v1.14.2", GitCommit:"66049e3b21efe110454d67df4fa62b08ea79a19b", GitTreeState:"clean", BuildDate:"2019-05-16T16:23:09Z", GoVersion:"go1.12.5", Compiler:"gc", Platform:"darwin/amd64"}
-Server Version: version.Info{Major:"1", Minor:"14", GitVersion:"v1.14.3", GitCommit:"5e53fd6bc17c0dec8434817e69b04a25d8ae0ff0", GitTreeState:"clean", BuildDate:"2019-06-06T01:36:19Z", GoVersion:"go1.12.5", Compiler:"gc", Platform:"linux/amd64"}
+Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", GitCommit:"1e11e4a2108024935ecfcb2912226cedeafd99df", GitTreeState:"clean", BuildDate:"2020-10-14T18:49:28Z", GoVersion:"go1.15.2", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.2", GitCommit:"f5743093fd1c663cb0cbc89748f730662345d44d", GitTreeState:"clean", BuildDate:"2020-09-16T13:32:58Z", GoVersion:"go1.15", Compiler:"gc", Platform:"linux/amd64"}
 ```
 
 Essayez de lister les nodes:
