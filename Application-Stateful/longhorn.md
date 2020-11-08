@@ -170,3 +170,13 @@ Depuis l'interface web de Longhorn vous pourrez alors voir que le volume est mai
 Depuis le menu *Node*, vous pourrez également voir que les 5G du volume sont répliqués sur les différentes nodes.
 
 ![Longhorn UI](./images/longhorn-4.png)
+
+## Cleanup
+
+Supprimez ensuite les ressources que vous avez créées:
+
+```
+$ kubectl delete deploy db
+$ kubectl delete pvc mongo-pvc
+$ kubectl delete -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml
+```
