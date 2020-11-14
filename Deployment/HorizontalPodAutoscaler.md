@@ -86,57 +86,7 @@ $ minikube addons enable metrics-server
 il est nécessaire de déployer le process *metrics-server* avec la commande suivante:
 
 ```
-$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
-```
-
-:fire: Quelques cas particuliers:
-
-### DigitalOcean
-
-Si vous utilisez un cluster managé sur DigitalOcean il est nécessaire de modifier le deployment du metrics-server de façon à ce qu'il contienne la spécification suivante (ajout de la clé *command*):
-
-```
-...
-      - name: metrics-server
-        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
-        command:
-          - /metrics-server
-          - --logtostderr
-          - --kubelet-insecure-tls=true
-          - --kubelet-preferred-address-types=InternalIP
-          - --v=2
-        args:
-          - --cert-dir=/tmp
-          - --secure-port=4443
-...
-```
-
-Vous pourrez ajouter cette clé *command* en éditant le Deployment avec la commande suivante:
-
-```
-$ kubectl edit deploy/metrics-server -n kube-system
-```
-
-### Docker Desktop
-
-Si vous utilisez un cluster créé avec Docker Desktop, il est nécessaire de modifier le deployment du metrics-server de façon à ce qu'il contienne la spécification suivante (ajout de l'option *--kubelet-insecure-tls* sous la clé *arg*)
-
-```
-...
-spec:
-      containers:
-      - args:
-        - --cert-dir=/tmp
-        - --secure-port=4443
-        - --kubelet-insecure-tls
-        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
-...
-```
-
-Vous pourrez ajouter cette option en éditant le Deployment avec la commande suivante:
-
-```
-$ kubectl edit deploy/metrics-server -n kube-system
+$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 
 ## Accès aux métrics
