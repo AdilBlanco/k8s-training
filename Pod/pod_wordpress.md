@@ -107,7 +107,7 @@ spec:
 Le Pod peut être lancé avec la commande suivante:
 
 ```
-$ kubectl create -f wordpress_pod.yaml
+$ kubectl apply -f wordpress_pod.yaml
 ```
 
 ### 3. Vérification du status du Pod
