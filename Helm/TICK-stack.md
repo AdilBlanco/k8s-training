@@ -19,7 +19,7 @@ Les données sont envoyées à *Telegraf*, et stockées dans un base de données
 
 ## 2. Fichiers manifests
 
-L'archive *manifests.zip* (en annexe) contient un répertoire *manifests* dans lequel se trouve l'ensemble des fichiers de configuration nécessaires pour déployer cette stack dans un cluster kubernetes:
+L'archive *manifests.tar*, disponible à l'adresse [https://gitlab.com/lucj/k8s-exercices/-/blob/master/Helm/tick/manifests.tar](https://gitlab.com/lucj/k8s-exercices/-/blob/master/Helm/tick/manifests.tar), contient l'ensemble des spécifications nécessaires pour déployer cette stack dans un cluster kubernetes:
 
 - un *Service* et un *Deployment* pour chaque composant (*Telegraf*, *Influxdb*, *Chronograf*, *Kapacitor*)
 - une *ConfigMap* contenant la configuration de *Telegraf*
@@ -27,7 +27,9 @@ L'archive *manifests.zip* (en annexe) contient un répertoire *manifests* dans l
   - le service *telegraf* sera exposé via *telegraf.tick.com*
   - le service *chronograf* sera exposé via *chronograf.tick.com*
 
-Créez un répertoire *tick*, récupérez l'archive *manifests.zip*, placez la dans le répertoire *tick* puis dézippez la. Le répertoire *tick* contiendra alors le répertoire *manifests* avec les fichiers suivants:
+Créer un répertoire *tick*, récupérez l'archive *manifests.tar* et placez la dans ce répertoire. Désarchivez la ensuite avec la commande  ```tar xvf manifests.tar```.
+
+Le répertoire *tick* contiendra alors un répertoire *manifests* avec les fichiers suivants:
 
 ```
 $ cd tick
@@ -49,20 +51,25 @@ manifests
 
 Un Ingress controller est nécessaire afin d'exposer les services à l'extérieur du cluster via des ressources de type *Ingress*.
 
-Assurez-vous d'avoir installé le client *helm* (dans la version 3.x.y) et lancez les commandes suivantes afin d'installer un Ingress Controller dans le namespace *ingress-nginx*:
+:fire: si vous avez déjà un *Ingress Controller* dans votre cluster (même si vous ne l'avez pas installé avec *Helm), vous pouvez passer à l'étape 4.
+
+Si vous n'avez pas de Ingress Controlleur, vous allez à présent l'installer en temps que Chart Helm.
+
+Pour cela, assurez-vous d'avoir installé le client *helm* (dans la version 3.x.y) et lancez les commandes suivantes:
 
 ```
-$ kubectl create ns ingress-nginx
 $ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-$ helm install -n ingress-nginx ingress ingress-nginx/ingress-nginx
+$ helm repo add stable https://charts.helm.sh/stable
+$ helm repo update
+$ helm install ingress ingress-nginx/ingress-nginx
 ```
 
-A l'aide de la commande suivate, vérifiez que le Pod dans lequel tourne le Ingress Controller est correctement démarré:
+A l'aide de la commande suivante, vérifiez que le Pod dans lequel tourne le Ingress Controller est correctement démarré:
 
 Attention, cette commande ne vous rendra pas la main, vous pourrez la stopper dès que le Pod présentera *1/1* dans la colonne *READY* et *Running* dans la colonne *STATUS*:
 
 ```
-$ kubectl get pods -n ingress-nginx --watch
+$ kubectl get pods --watch
 NAME                                        READY   STATUS    RESTARTS   AGE
 ingress-nginx-controller-855bd8cb4c-6gn5l   1/1     Running   0          49s
 ```
@@ -116,8 +123,12 @@ ingress.extensions/tick   <none>   telegraf.tick.com,chronograf.tick.com        
 Si votre cluster est déployé chez un cloud provider qui supporte les services de type *LoadBalancer*, un composant load-balancer sera automatiquement créé sur l'infrastructure et il faudra utiliser l'adresse IP externe de ce dernier afin d'envoyer des requêtes HTTP à l'application.
 
 La commande suivante vous permettra d'obtenir l'adresse IP de ce LoadBalancer:
+
+
+:fire: attention, il vous faudra préciser le namespace *ingress-nginx* si vous n'avez pas installé le Ingress Controller dans le namespace *default* 
+
 ```
-$ kubectl get svc -n ingress-nginx
+$ kubectl get svc
 NAME                                       TYPE         CLUSTER-IP    EXTERNAL-IP    PORT(S)                    AGE
 ingress-ingress-nginx-controller           LoadBalancer 10.245.40.95  157.245.28.245 80:32461/TCP,443:31568/TCP 6m34s
 ingress-ingress-nginx-controller-admission ClusterIP    10.245.67.139 <none>         443/TCP                    6m34s

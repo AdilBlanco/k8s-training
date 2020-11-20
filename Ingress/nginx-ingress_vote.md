@@ -22,6 +22,7 @@ ingress-nginx-admission-patch-4lw8p         0/1     Completed   2          15s
 ingress-nginx-controller-66dc9984d8-5tnxt   0/1     Running     0          16s
 ingress-nginx-controller-66dc9984d8-5tnxt   1/1     Running     0          27s
 ```
+
 ## 2. Lancement de la VotingApp
 
 Déployez la Voting App avec la commande suivante, celle-ci fait référence à une URL pointant vers un fichier définissant l'ensemble des ressources de la Voting App
@@ -36,27 +37,59 @@ La commande suivante liste les services existants:
 
 ```
 $ kubectl get svc
-NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-db           ClusterIP   10.99.192.60    <none>        5432/TCP         36m
-kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          16h
-redis        ClusterIP   10.111.62.16    <none>        6379/TCP         36m
-result       NodePort    10.107.254.26   <none>        5001:31001/TCP   36m
-vote         NodePort    10.99.171.171   <none>        5000:31000/TCP   36m
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+db           ClusterIP   10.245.16.246    <none>        5432/TCP         8s
+kubernetes   ClusterIP   10.245.0.1       <none>        443/TCP          78s
+redis        ClusterIP   10.245.187.226   <none>        6379/TCP         9s
+result       NodePort    10.245.167.55    <none>        5001:31002/TCP   8s
+vote         NodePort    10.245.230.88    <none>        5000:31001/TCP   9s
 ```
 
-Nous pouvons voir que le Service *vote* expose le port *5000* à l'intérieur du cluster, et le port *31000* à l'extérieur.
-
-De la même façon, nous voyons que le Service *result* expose le port *5001* à l'intérieur du cluster, et le port *31001* à l'extérieur.
-
-Note: nous pouvons également obtenir ces informations depuis les fichiers de spécifications des Services de *vote* et *result*.
-
+Nous pouvons voir que:
+- le Service *vote* expose le port *5000* à l'intérieur du cluster, et le port *31001* à l'extérieur.
+- le Service *result* expose le port *5001* à l'intérieur du cluster, et le port *31002* à l'extérieur.
 
 ## 4. Création de la ressource Ingress
 
-Créez, dans le fichier *vote_ingress.yaml*, la spécification suivante:
+:fire: depuis Kubernetes 1.19, l'apiVersion *networking.k8s.io/v1beta1* d'une ressource Ingress est dépréciée, il est préférable d'utiliser l'apiVersion *networking.k8s.io/v1* à la place. 
+
+- Si vous utilisez un cluster dont la version est supérieure à 1.19:
+
+créez un fichier *vote_ingress.yaml* contenant la spécification suivante:
 
 ```
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voting-domain
+spec:
+  rules:
+  - host: vote.votingapp.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vote
+            port:
+              number: 5000
+  - host: result.votingapp.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: result
+            port:
+              number: 5001
+```
+
+- Si vous utilisez un cluster dont la version est antérieure à 1.19
+
+```
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: voting-domain
@@ -76,9 +109,11 @@ spec:
         backend:
           serviceName: result
           servicePort: 5001
+
+
 ```
 
-Celle-ci définit une ressource Ingress contenant 2 *rules*:
+La spécification si dessus définit une ressource Ingress contenant 2 *rules*:
 - la première spécifie que les requêtes qui arrivent sur *http://vote.votingapp.com* sont forwardées sur le port *5000* du Service nommé *vote*
 - la seconde spécifie que les requêtes qui arrivent sur *http://result.votingapp.com* sont forwardées sur le port *5001* du Service nommé *result*
 
@@ -98,15 +133,15 @@ Dans le fichier */etc/hosts*, définissez les résolutions DNS des sous-domaines
 
 Vous pouvez maintenant voter depuis l'interface de vote et visualiser les résultats sur l'interface de results.
 
-L'interface de vote est disponible:
-- sur http://vote.votingapp.com (port 80) si vous avez exposé le Ingress Controller avec un service de type LoadBalancer
-- sur http://vote.votingapp.com:32000 si vous avez exposé le Ingress Controller avec un service de type NodePort (nous avions fixé la valeur de ce port à 32000 lors de la définition du Service)
+- L'interface de vote est disponible:
+  * sur http://vote.votingapp.com (port 80) si le Ingress Controller est exposé avec un service de type LoadBalancer
+  * sur http://vote.votingapp.com:NODE-PORT, si le Ingress Controller est exposé avec un service de type *NodePort* (remplacez alors *NODE-PORT* par le port du service en question)
 
 ![vote](./images/ingress_vote1.png)
 
-L'interface de result est disponible:
-- sur http://result.votingapp.com (port 80) si vous avez exposé le Ingress Controller avec un service de type LoadBalancer
-- sur http://result.votingapp.com:32000 si vous avez exposé le Ingress Controller avec un service de type NodePort (nous avions fixé la valeur de ce port à 32000 lors de la définition du Service)
+- L'interface de result est disponible:
+  * sur http://result.votingapp.com (port 80) si le Ingress Controller est exposé avec un service de type LoadBalancer
+  * sur http://result.votingapp.com:NODE-PORT si le Ingress Controller est exposé avec un service de type *NodePort* (remplacez alors *NODE-PORT* par le port du service en question)
 
 ![result](./images/ingress_vote2.png)
 
@@ -118,7 +153,7 @@ L'interface de result est disponible:
 $ kubectl delete -f https://files.techwhale.io/voting.yaml
 ```
 
-- Vous pouvez également supprimer le Ingress Controller:
+- Supprimez le Ingress Controller:
 
   * si vous êtes sur Minikube, utilisez la commande suivante:
 
@@ -126,10 +161,13 @@ $ kubectl delete -f https://files.techwhale.io/voting.yaml
 $ minikube addons disable ingress
 ```
 
-  * si vous n'êtes pas sur Minikube, supprimez le namespace *ingress-nginx* avec la commande suivante:
+  * si vous n'êtes pas sur Minikube, supprimez le namespace *ingress-nginx* (et les ressources qui ont été créées en même temps) avec les commandes suivantes:
 
 ```
 $ kubectl delete ns ingress-nginx
+$ kubectl delete clusterrole ingress-nginx
+$ kubectl delete clusterrolebinding ingress-nginx
+$ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 ```
 
 - Supprimez également la ressource Ingress
@@ -140,4 +178,4 @@ $ kubectl delete -f vote_ingress.yaml
 
 ### En résumé
 
-Une ressource Ingress permet de diriger les flux HTTP (et HTTPS) vers différents services de l'application en fonction du nom de domaine utilisé. Il est aussi possible d'établir des règles beaucoup plus fines en se basant sur l'URL de la requête. On peut également se servir d'une ressource Ingress pour mettre en place une terminaison TLS.
+Une ressource Ingress permet de diriger les flux HTTP vers différents services de l'application en fonction du nom de domaine utilisé. Il est aussi possible d'établir des règles beaucoup plus fines en se basant sur l'URL de la requête. On peut également se servir d'une ressource Ingress pour mettre en place une terminaison TLS.

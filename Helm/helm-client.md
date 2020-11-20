@@ -16,5 +16,5 @@ version.BuildInfo{Version:"v3.3.1", GitCommit:"249e5215cde0c3fa72e27eb7a30e8d55c
 Installez ensuite le repository officiel contenant les charts stable, aucun repository n'étant configuré par défaut:
 
 ```
-$ helm repo add stable https://kubernetes-charts.storage.googleapis.com
+$ helm repo add stable https://charts.helm.sh/stable
 ```

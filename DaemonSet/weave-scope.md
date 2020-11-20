@@ -43,3 +43,11 @@ L'interface sera alors disponible sur le port *4040* de la machine cliente.
 ![Weave Scope](./images/scope.png)
 
 Naviguez dans cette interface et visualisez les différents éléments.
+
+## 5. Cleanup
+
+Supprimez l'application Weave Scope avec la commande suivante:
+
+```
+$ kubectl delete -f "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+```

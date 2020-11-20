@@ -67,6 +67,8 @@ svc/vote         NodePort    10.99.171.171   <none>        5000:31000/TCP   1m
 
 L'interface de vote est disponible sur le port *31000* de n'importe quelle machine du cluster:
 
+Note: vous pouvez récupérer les IPs externes des machines de votre cluster avec la commande ```$ kubectl get nodes -o wide```
+
 ![vote](./images/vote1.png)
 
 De même, l'interface de resultat est disponible sur le port *31001* de n'importe quelle machine du cluster:

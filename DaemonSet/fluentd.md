@@ -27,7 +27,7 @@ metadata:
   namespace: kube-system
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: fluentd
@@ -45,7 +45,7 @@ rules:
 
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: fluentd
 roleRef:
@@ -56,13 +56,12 @@ subjects:
 - kind: ServiceAccount
   name: fluentd
   namespace: kube-system
----
 ```
 
 Copiez le contenu de cette spécification dans un fichier *rbac.yaml* et créez les ressources avec la commande suivante.
 
 ```
-kubectl apply -f rbac.yaml
+$ kubectl apply -f rbac.yaml
 serviceaccount "fluentd" created
 clusterrole "fluentd" created
 clusterrolebinding "fluentd" created
@@ -153,15 +152,13 @@ Copiez cette spécification dans le fichier *daemonset-fluentd.yaml* et utilisez
 
 ```
 $ kubectl apply -f daemonset-fluentd.yaml
-daemonset.extensions "fluentd" created
+daemonset.apps/fluentd created
 ```
 
 Nous pouvons alors vérifier qu'un Pod a été lancé sur chaque node du cluster.
 
 ```
 $ kubectl get po -n kube-system | grep "fluentd"
-NAME             READY     STATUS    RESTARTS   AGE
-fluentd-cfgbn    1/1       Running   0          32s
 ```
 
 ## 4. Visualisation des logs
@@ -170,7 +167,7 @@ Depuis l'interface de Kibana, vérifiez que de nouvelles entrées de logs sont r
 
 ![Kibana](./images/kibana-log-cluster.png)
 
-Vous pourriez par exemple lancer le Pod suivant afin de générer des logs fictifs et vous assurez que ceux-ci apparaissent bien dans Kibana:
+Lancer le Pod suivant afin de générer des logs fictifs et vous assurez que ceux-ci apparaissent bien dans Kibana:
 
 ```
 $ kubectl run testlog --restart=Never --image=mingrammer/flog -- -f apache_combined
@@ -183,7 +180,7 @@ $ kubectl run testlog --restart=Never --image=mingrammer/flog -- -f apache_combi
 Vous pouvez maintenant supprimer les différentes ressources créées précédemment:
 
 ```
-$ kubectl delete -f daemonset-fluentd.yaml
-$ kubectl delete -f rbac.yaml
-$ kubectl delete -f https://files.techwhale.io/elastic.yaml
+kubectl delete -f daemonset-fluentd.yaml
+kubectl delete -f rbac.yaml
+kubectl delete -f https://files.techwhale.io/elastic.yaml
 ```

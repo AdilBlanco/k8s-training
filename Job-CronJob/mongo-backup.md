@@ -14,13 +14,19 @@ Sur l'un de vos node, posez le label *tier=db*:
 $ kubectl label node NODE_NAME tier=db
 ```
 
-### 2. Création d'un Deployment Mongo
+### 2. Création d'un Pod Mongo
 
 Dans un fichier *mongo-pod.yaml*, définissez la spécification d'un Pod basé sur l'image *mongo:3.6*. Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut. Créez ensuite ce Pod.
+
+Aide: vous pouvez aussi créer ce Pod en utilisant la commande impérative ```kubectl run```
 
 ### 3. Exposition de la base Mongo
 
 Dans un fichier *mongo-svc.yaml*, définissez la spécification d'un Service, de type *clusterIP*, afin d'exposer le Pod précédent à l'intérieur du cluster, puis créez ensuite ce Service.
+
+Note: *MongoDB* écoute par défaut sur le port *27017*
+
+Aide: vous pouvez aussi créer ce Service en utilisant la commande impérative ```kubectl expose```
 
 ### 4. Définition d'un Job pour effectuer le dump de la base de données
 
@@ -114,6 +120,12 @@ Copiez cette spécification dans *mongo-pod.yaml* et lancez ce Pod avec la comma
 $ kubectl apply -f mongo-pod.yaml
 ```
 
+Note: vous pouvez également utiliser la commande impérative suivante pour créer le Pod *db*
+
+```
+$ kubectl run db --image=mongo:3.6
+```
+
 ### 3. Exposition de la base Mongo
 
 La spécification suivante définit un Service de type *ClusterIP*. Ce service permet d'exposer le Pod précédent à l'intérieur du cluster.
@@ -138,6 +150,11 @@ Copiez cette spécification dans *mongo-svc.yaml* et lancez ce Service avec la c
 $ kubectl apply -f mongo-svc.yaml
 ```
 
+Note: si pouvez également créer ce Service avec la commande impérative suivante:
+
+```
+$ kubectl expose pod/db --port 27017 --target-port 27017
+```
 
 ### 4. Définition d'un Job pour effectuer le dump de la base de données
 
