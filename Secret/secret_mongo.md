@@ -2,24 +2,25 @@
 
 ## Exercice
 
-Dans cet exercice nous allons voir l'utilisation d'un Secret pour se connecter à une base de données externe.
+Dans cet exercice vous allez utiliser un Secret pour vous connecter à une base de données externe.
 
 ### 1. Le context
 
-L'image *lucj/messages:1.0* contient une application simple qui écoute sur le port 80 et permet, via des requêtes HTTP, de créer des messages ou de lister les messages existant.
+L'image *lucj/messages:1.0* contient une application simple qui écoute sur le port 80 et permet, via des requêtes HTTP, de créer des messages ou de lister les messages existants.
 
-Ces messages sont sauvegardés dans une base de données *MongoDB* dont l'URL de connexion doit être fournie à l'application de façon à ce que celle-ci puisse s'y connecter. On peut lui fournir via une variable d'environnement MONGODB_URL ou via un fichier texte accessible depuis */run/secrets/MONGODB_URL*.
+Ces messages sont sauvegardés dans une base de données *MongoDB* dont l'URL de connexion doit être fournie à l'application de façon à ce que celle-ci puisse s'y connecter. Nous pouvons lui fournir via une variable d'environnement MONGODB_URL ou via un fichier texte accessible depuis */run/secrets/MONGODB_URL*.
 
 ### 2. La base de données
 
 Pour cet exercice la base de données suivante sera utilisée:
+
 - host: *db.techwhale.io*
 - port: *27017* (port par défaut de Mongo)
 - nom de la base: *message*
 - tls activé
 - utilisateur: *k8sExercice* / *k8sExercice*
 
-L'URL de connection est la suivante:
+L'URL de connection est donc la suivante:
 
 ```
 mongodb://k8sExercice:k8sExercice@db.techwhale.io:27017/message?ssl=true&authSource=admin
@@ -27,36 +28,42 @@ mongodb://k8sExercice:k8sExercice@db.techwhale.io:27017/message?ssl=true&authSou
 
 ### 3. Création du Secret
 
-Créez un Secret, nommé *mongo*, dont le champ *data* contient la clé *mongo_url* dont la valeur est la chaine de connection spécifiée ci-dessus.
+Créez un Secret nommé *mongo*, le champ *data* de celui-ci doit contenir la clé *mongo_url* dont la valeur est la chaine de connection spécifiée ci-dessus.
 
 Vous avez plusieurs options pour cela:
-- l'utilisation de la commande `kubectl create secret generic` avec l'option `--from-file`
-- l'utilisation de la commande `kubectl create secret generic` avec l'option `--from-literal`
-- l'utilisation d'un fichier de spécification
+- Option 1: utilisation de la commande `kubectl create secret generic` avec l'option `--from-file`
+- Option 2: utilisation de la commande `kubectl create secret generic` avec l'option `--from-literal`
+- Option 3: utilisation d'un fichier de spécification
 
 ### 4. Utilisation du Secret dans une variable d'environnement
 
 Définissez un Pod nommé *api-env* dont l'unique container a la spécification suivante:
+
 - nom: *api*
 - image: *lucj/messages:1.0*
 - une variable d'environnement *MONGODB_URL* ayant la valeur liée à la clé *mongo_url* du Secret *mongo* créé précédemment
 
-Créez le Pod et vérifier que vous pouvez créer un message avec la commande suivante (vous pourrez utiliser `kubectl port-forward` pour exposer l'application du Pod, l'unique container de celui-ci écoute sur le port 80)
+Créez ensuite ce Pod et exposez le en utilisant la commande `kubectl port-forward` en faisant en sorte que le port 8888 de votre machine locale soit mappé sur le port 80 du Pod *api-env*.
+
+Depuis un autre terminal, vérifiez que vous pouvez créer un message avec la commande suivante:
+
+Note: assurez vous de remplacer *YOUR_NAME* par votre prénom
 
 ```
-curl -H 'Content-Type: application/json' -XPOST -d '{"from":"me", "msg":"hello"}' http://IP:PORT/messages
+$ curl -H 'Content-Type: application/json' -XPOST -d '{"from":"YOUR_NAME", "msg":"hello"}' http://localhost:8888/messages
 ```
 
 ### 5. Utilisation du Secret dans un volume
 
 Définissez un Pod nommé *api-vol* ayant la spécification suivante:
+
 - un volume nommé *mongo-creds* basé sur le Secret *mongo* dont la clé *mongo_url* est renommée *MONGODB_URL* (utilisation du couple (key,path) sous la clé secret/items)
 - un container ayant la spécification suivante:
   - nom: *api*
   - image: *lucj/messages:1.0*
   - une instructions *volumeMounts* permettant de monter le volume *mongo-creds* sur le path */run/secrets*
 
-Créez le Pod et vérifier que vous pouvez créer un message.
+Créez le Pod et vérifier que vous pouvez créer un message de la même façon que dans le point précédent en exposant le Pod via un *port-forward*.
 
 ---
 
@@ -64,21 +71,21 @@ Créez le Pod et vérifier que vous pouvez créer un message.
 
 ### 3. Création du Secret
 
-1. Avec la commande `kubectl create secret generic` avec l'option `--from-file`
+- Option 1: utilisation de la commande `kubectl create secret generic` avec l'option `--from-file`
 
-On commence par créer un fichier *mongo_url* contenant la chaine de connexion à la base de données.
+Nous commençons par créer un fichier *mongo_url* contenant la chaine de connexion à la base de données.
 
 ```
 echo -n "mongodb://k8sExercice:k8sExercice@db.techwhale.io:27017/message?ssl=true&authSource=admin" > mongo_url
 ```
 
-On créé ensuite le Secret à partir de ce fichier:
+Nous crééons ensuite le Secret à partir de ce fichier:
 
 ```
 $ kubectl create secret generic mongo --from-file=mongo_url
 ```
 
-2. Avec la commande `kubectl create secret generic` avec l'option `--from-literal`
+- Option 2: utilisation de la commande `kubectl create secret generic` avec l'option `--from-literal`
 
 La commande suivante permet de créer le Secret à partir de valeurs littérales
 
@@ -87,7 +94,7 @@ $ kubectl create secret generic mongo \
 --from-literal=mongo_url='mongodb://k8sExercice:k8sExercice@db.techwhale.io:27017/message?ssl=true&authSource=admin'
 ```
 
-3. En utilisant un fichier de spécification
+- Option 3: utilisation d'un fichier de spécification
 
 La première étape est d'encrypter en base64 la chaine de connexion
 
@@ -97,7 +104,7 @@ $ echo -n 'mongodb://k8sExercice:k8sExercice@db.techwhale.io:27017/message?ssl=t
 bW9uZ29kYjovL2s4c...yY2U9YWRtaW4=
 ```
 
-Ensuite on peut définir le fichier de spécification mongo-secret.yaml:
+Ensuite nous pouvons définir le fichier de spécification mongo-secret.yaml:
 
 ```
 apiVersion: v1
@@ -136,7 +143,7 @@ spec:
           key: mongo_url
 ```
 
-On peut alors créer le Pod:
+Nous pouvons alors créer le Pod:
 
 ```
 $ kubectl create -f pod_messages_env.yaml
@@ -151,11 +158,17 @@ Forwarding from 127.0.0.1:8888 -> 80
 ...
 ```
 
-Depuis la machine locale, on peut alors envoyer une rquête POST sur l'API:
+Depuis un autre terminal sur notre machine locale, nous pouvons alors envoyer une requête POST sur l'API:
+
+Note: assurez vous de remplacer *YOUR_NAME* par votre prénom
 
 ```
-curl -H 'Content-Type: application/json' -XPOST -d '{"from":"YOUR_NAME", "msg":"hey"}' http://localhost:8888/messages
-{"from":"YOUR_NAME","msg":"hey","at":"2018-04-03T12:45:07.688Z","_id":"5ac37753dfe0ee000f9b65e0"}
+$ curl -H 'Content-Type: application/json' -XPOST -d '{"from":"YOUR_NAME", "msg":"hello"}' http://localhost:8888/messages
+```
+
+Vous recevrez une réponse en json similaire à celle ci-dessous:
+```
+{"from":"YOUR_NAME","msg":"hello","at":"2020-09-03T12:45:07.688Z","_id":"5ac37753dfe0ee000f9b65e0"}
 ```
 
 ### 5. Utilisation du Secret dans un volume
@@ -184,7 +197,7 @@ spec:
         path: MONGODB_URL
 ```
 
-On peut alors créer le Pod:
+Nous pouvons alors créer le Pod:
 
 ```
 $ kubectl create -f pod_messages_vol.yaml
@@ -199,14 +212,14 @@ Forwarding from 127.0.0.1:8889 -> 80
 ...
 ```
 
-Depuis la machine locale, on peut alors envoyer une requête POST sur l'API:
+Depuis la machine locale, nous pouvons alors envoyer une requête POST sur l'API:
 
 ```
-$ curl -H 'Content-Type: application/json' -XPOST -d '{"from":"me", "msg":"hola"}' http://localhost:8889/messages
+$ curl -H 'Content-Type: application/json' -XPOST -d '{"from":"me", "msg":"hello"}' http://localhost:8889/messages
 ```
 
 Si tout s'est bien passé, nous obtenons une réponse ayant le format suivant:
 
 ```
-{"from":"me","msg":"hola","at":"2018-04-03T13:05:11.408Z","_id":"5ac37c07bace38000f9b09e2"}
+{"from":"me","msg":"hola","at":"2020-09-03T13:05:11.408Z","_id":"5ac37c07bace38000f9b09e2"}
 ```

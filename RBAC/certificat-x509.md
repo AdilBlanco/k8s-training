@@ -254,8 +254,8 @@ Une fois le RoleBinding créé, si un utilisateur est reconnu comme étant David
 Note: vous auriez également pu définir un *RoleBinding* qui associe le *Role* précédent avec le group *dev* comme dans la spécification suivante. En faisant cela, ce role serait associé à chaque utilisateur utilisant un certificat contenant *dev* dans le champ *O* (Organisation)
 
  ```
- kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
  name: dev
  namespace: development

@@ -2,13 +2,13 @@
 
 Dans cet exercice, vous allez créer un *Job* qui servira à faire le dump d'une base de données *mongo*. Vous le modifierez ensuite pour en faire un *CronJob* et faire en sorte de réaliser ce dump à interval régulier.
 
-Pour réaliser cet exercice, vous allez poser un label sur l'un des nodes de votre cluster et faire en sorte que chaque Pod soit déployé sur le node en question via la contrainte *nodeSelector*. Cela est nécessaire car vous allez utiliser un réprtoire de ce node pour échanger des données entre des Pods. Ce n'est pas un setup de production mais simplement une contrainte pour cet exercice.
+Pour réaliser cet exercice, vous allez poser un label sur l'un des nodes de votre cluster et faire en sorte que chaque Pod soit déployé sur le node en question via la contrainte *nodeSelector*. Cela est nécessaire dans le cadre de cet exercice car vous allez utiliser le système de fichier de ce node pour échanger des données entre des Pods. Ce n'est pas un setup de production mais simplement une contrainte pour cet exercice.
 
 ## Exercice
 
 ### 1. Création d'un label
 
-Sur l'un de vos node, posez le label *tier=db*:
+Sur l'un de vos nodes, posez le label *tier=db*:
 
 ```
 $ kubectl label node NODE_NAME tier=db
@@ -16,7 +16,7 @@ $ kubectl label node NODE_NAME tier=db
 
 ### 2. Création d'un Pod Mongo
 
-Dans un fichier *mongo-pod.yaml*, définissez la spécification d'un Pod basé sur l'image *mongo:3.6*. Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut. Créez ensuite ce Pod.
+Dans un fichier *mongo-pod.yaml*, définissez la spécification d'un Pod basé sur l'image *mongo:3.6*. Ajoutez l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut. Créez ensuite ce Pod.
 
 Aide: vous pouvez aussi créer ce Pod en utilisant la commande impérative ```kubectl run```
 
@@ -30,11 +30,11 @@ Aide: vous pouvez aussi créer ce Service en utilisant la commande impérative `
 
 ### 4. Définition d'un Job pour effectuer le dump de la base de données
 
-Dans un fichier *mongo-dump-job.yaml*, définissez le spécification d'un Job, qui lance un Pod basé sur *mongo:3.6*.
+Dans un fichier *mongo-dump-job.yaml*, définissez le spécification d'un Job qui lance un Pod basé sur *mongo:3.6*.
 
-Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
+Ajoutez l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
 
-Dans la spécification du Job, le Pod devra également définir un volume permettant de persister des données dans le répertoire */dump* du node. Vous utiliserez pour cela l'instruction *volumes* suivante:
+Le Pod lancé par le Job devra également définir un volume permettant de persister des données dans le répertoire */dump* du node sur lequel il tourne. Vous utiliserez pour cela l'instruction *volumes* dans la partie correspondant à la spécification du Pod:
 
 ```
 volumes:
@@ -43,7 +43,7 @@ volumes:
     path: /dump
 ```
 
-Le container mongo de ce Pod devra monter ce volume dans son répertoire */dump*. Vous utiliserez pour cela l'instruction *volumeMounts* dans la spécification du container:
+Le container mongo de ce Pod devra monter ce volume dans son répertoire */dump*. Vous utiliserez pour cela l'instruction *volumeMounts* dans la spécification du container *mongo*:
 
 ```
 volumeMounts:
@@ -65,7 +65,7 @@ Lancez ensuite ce Job.
 
 Définissez la spécification d'un nouveau Pod, nommé *test*, basé sur Mongo et montant le répertoire */dump* du node dans le répertoire */dump* du container (cela permettra au container d'avoir accès au dump créé précédemment).
 
-Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
+Ajoutez l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
 
 Créez ensuite ce Pod, puis lancez un shell interactif dans ce Pod et, après avoir vérifié que le fichier */dump/db.gz* est présent, réalisez la restauration du dump en utilisant la commande suivante:
 
@@ -79,7 +79,9 @@ Dans un fichier *mongo-dump-cronjob.yaml*, définissez le spécification d'un Cr
 
 Ajouter l'instruction *nodeSelector* afin de déployer le Pod sur le node labelisé plus haut.
 
-Afin de conserver les différents dump, vous ferez en sorte que le container du Pod lance la commande suivante qui utilise un timestamp dans le nom du fichier.
+Afin de conserver les différents dump, vous ferez en sorte que le container du Pod lance la commande suivante:
+
+Note: celle ci ajoute un timestamp dans le nom du fichier de dump généré
 
 ```
 /bin/bash -c mongodump --gzip --host db --archive=/dump/$(date +"%Y%m%dT%H%M%S")-db.gz
@@ -150,7 +152,7 @@ Copiez cette spécification dans *mongo-svc.yaml* et lancez ce Service avec la c
 $ kubectl apply -f mongo-svc.yaml
 ```
 
-Note: si pouvez également créer ce Service avec la commande impérative suivante:
+Note: vous pouvez également créer ce Service avec la commande impérative suivante:
 
 ```
 $ kubectl expose pod/db --port 27017 --target-port 27017
@@ -217,7 +219,6 @@ spec:
         path: /dump
 ```
 
-
 Copiez cette spécification dans *mongo-pod-test.yaml* et lancez ce Pod avec la commande:
 
 ```
@@ -230,14 +231,14 @@ La commande suivante permet de lancer un shell interactif dans le container *mon
 $ kubectl exec -ti test -- bash
 ```
 
-Une fois dans ce container, on a accès au fichier de dump créé précédemment:
+Une fois dans ce container, vérifiez que vous avez accès au fichier de dump créé précédemment:
 
 ```
 $ ls /dump
 db.gz
 ```
 
-La restauration de ce dump est réalisée avec la commande suivante:
+Restaurez ensuite ce dump avec la commande suivante:
 
 ```
 $ mongorestore --drop  --archive=/dump/db.gz --gzip
@@ -287,10 +288,16 @@ $ kubectl apply -f mongo-dump-cronjob.yaml
 
 ### 7. Vérification des dump
 
-Lancez un shell interactif dans le container du pod *test* afin d'observer les dumps créés.
+Lancez un shell interactif dans le container du pod *test*:
 
 ```
-$ kubectl exec test -- ls /dump
+$ kubectl exec -ti test -- bash
+```
+
+Depuis ce shell, observez les dumps créés:
+
+```
+# ls /dump
 20190417T144810-db.gz
 20190417T144909-db.gz
 20190417T145010-db.gz

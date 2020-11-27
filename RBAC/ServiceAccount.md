@@ -263,7 +263,7 @@ Un ServiceAccount n'a pas d'utilité si des droits ne lui sont pas associés. C'
 La spécification suivante définie un *Role* permettant de lister les Pods qui sont dans le namespace *default*.
 
 ```
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: list-pods
@@ -288,7 +288,7 @@ $ kubectl apply -f role-list-pods.yaml
 La dernière étape consiste à associer le Role créé précédemment avec le ServiceAccount. Cela se fait à l'aide d'un RoleBinding dont la spécification se trouve ci-dessous:
 
 ```
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: list-pods_demo-sa

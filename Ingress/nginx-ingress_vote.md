@@ -89,7 +89,7 @@ spec:
 - Si vous utilisez un cluster dont la version est antérieure à 1.19
 
 ```
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: voting-domain
@@ -125,7 +125,8 @@ $ kubectl apply -f vote_ingress.yaml
 
 ## 6. Accès à l'application
 
-Dans le fichier */etc/hosts*, définissez les résolutions DNS des sous-domaines *vote.votingapp.com* et *result.votingapp.com*. Ceux-ci devront pointer vers:
+
+Dans le fichier */etc/hosts* (si vous êtes sur Windows il s'agit du fichier *C:\Windows\System32\drivers\etc\hosts* qu'il faudra ouvrir avec les droits administrateur), définissez les résolutions DNS des sous-domaines *vote.votingapp.com* et *result.votingapp.com*. Ceux-ci devront pointer vers:
 
 - l'adresse IP de Minikube (obtenue avec la commande ```minikube ip```) si vous utilisez cette solution
 - l'adresse IP d'une des machines de votre cluster si le Ingress Controller est exposé via un Service de type NodePort
