@@ -332,7 +332,7 @@ Comme le champ *type* de la ressource *Database* a comme valeur *mongo*, le *Pod
 Comme le *Pod* et le *Service* sont définis en tant qu'enfants de la ressource *Database* nous pouvons vérifier qu'ils sont supprimés avec celle-ci.
 
 ```
-$ kubectl delete -f mongo.yml
+$ kubectl delete database mongo-db
 database.zalando.org "mongo-db" deleted
 ```
 
