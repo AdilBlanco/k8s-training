@@ -4,13 +4,13 @@ Dans cet exercice, vous allez créer un Deployment et l'exposer à l'extérieur 
 
 ### 1. Spécification d'un Deployment
 
-Créez un fichier *vote_deployment.yaml* définissant un Deployment ayant les propriétés suivantes:
-- nom: *vote*
+Créez un fichier *ghost_deployment.yaml* définissant un Deployment ayant les propriétés suivantes:
+- nom: *ghost*
 - nombre de replicas: 3
-- définition d'un selector sur le label *app: vote*
+- définition d'un selector sur le label *app: ghost*
 - spécification du Pod:
-  * label *app: vote*
-  * un container nommé *vote* basé sur l'image *instavote/vote* et exposant le port *80*
+  * label *app: ghost*
+  * un container nommé *ghost* basé sur l'image *ghost* et exposant le port *2368*
 
 ### 2. Création du Deployment
 
@@ -18,7 +18,7 @@ Utilisez *kubectl apply* pour créer le Deployment
 
 ### 3. Status du Deployment
 
-A l'aide de *kubectl*, examinez le status du Deployment *vote*.
+A l'aide de *kubectl*, examinez le status du Deployment *ghost*.
 
 A partir de ces informations, que pouvez-vous dire par rapport au nombre de Pods gérés par ce Deployment ?
 
@@ -32,21 +32,19 @@ Créez un Service permettant d'exposer les Pods du Deployment à l'extérieur du
 
 Conseils:
 
-- vous pourrez commencer par créer une spécification pour le Service, en spécifiant que le *selector* doit permettre de regrouper les Pods ayant le label *app: vote*.
+- vous pourrez commencer par créer une spécification pour le Service, en spécifiant que le *selector* doit permettre de regrouper les Pods ayant le label *app: ghost*.
 
 - utilisez un service de type *NodePort*, vous pourrez par exemple le publier sur le port *31001* des nodes du cluster
 
-- le container basé sur l'image *instavote/vote* tourne sur le port *80*, ce port devra donc être référencé en tant que *targetPort* dans la spécification du Service.
+- le container basé sur l'image *ghost* tourne sur le port *2368*, ce port devra donc être référencé en tant que *targetPort* dans la spécification du Service.
 
 Note: n'hésitez pas à vous reporter à l'exercice sur les Services de type NodePort que nous avons vu précédemment
 
-Une fois le service créé, vous pourrez accéder à l'interface de vote sur *http://IP:31001* ou IP est l'adresse IP d'une machine du cluster Kubernetes.
+Une fois le service créé, vous pourrez accéder à l'interface de l'application *ghost* sur *http://IP:31001* ou IP est l'adresse IP d'une machine du cluster Kubernetes.
 
 Note: vous pouvez récupérer les IPs des machines de votre cluster avec la commande `$ kubectl get nodes -o wide`
 
-Attention: cette interface n'est pas branchée à un backend, il n'est pas encore possible de voter, si vous cliquez sur l'un des choix, vous obtiendrez une erreur. Nous reviendrons sur l'application de vote dans sa totalité très bientôt.
-
-![Interface de vote](./images/deployment_vote.png)
+![Interface de l'application ghost](./images/deployment_ghost.png)
 
 ### 6. Cleanup
 
@@ -58,28 +56,28 @@ Supprimez le Deployment ainsi que le Service créés précédemment.
 
 ### 1. Spécification d'un Deployment
 
-La spécification, définie dans le fichier *vote_deployment.yaml* est la suivante:
+La spécification, définie dans le fichier *ghost_deployment.yaml* est la suivante:
 
 ```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vote
+  name: ghost
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: vote
+      app: ghost
   template:
     metadata:
       labels:
-        app: vote
+        app: ghost
     spec:
       containers:
-      - name: vote
-        image: instavote/vote
+      - name: ghost
+        image: ghost
         ports:
-        - containerPort: 80
+        - containerPort: 2368
 ```
 
 ### 2. Création du Deployment
@@ -87,7 +85,7 @@ spec:
 La commande suivante permet de créer le Deployment
 
 ```
-$ kubectl apply -f vote_deployment.yaml
+$ kubectl apply -f ghost_deployment.yaml
 ```
 
 ### 3. Status du Deployment
@@ -97,7 +95,7 @@ La commande suivante permet d'obtenir le status du Deployment
 ```
 $ kubectl get deploy
 NAME   READY   UP-TO-DATE   AVAILABLE   AGE
-vote   3/3     3            3           10s
+ghost   3/3     3            3          51s
 ```
 
 ### 4. Status des Pods associés
@@ -107,37 +105,37 @@ La commande suivante permet de lister les Pods qui tournent sur le cluster
 ```
 $ kubectl get po
 NAME                    READY   STATUS    RESTARTS   AGE
-vote-579dcf5f74-f4lhf   1/1     Running   0          67s
-vote-579dcf5f74-ffjx9   1/1     Running   0          67s
-vote-579dcf5f74-frhg7   1/1     Running   0          67s
+ghost-548879c755-7kmpz   1/1     Running   0          68s
+ghost-548879c755-m5pjt   1/1     Running   0          68s
+ghost-548879c755-nwl9l   1/1     Running   0          68s
 ```
 
-On voit que les 3 Pods relatifs au Deployment *vote* sont listés. Ils sont tous les 3 actifs.
+On voit que les 3 Pods relatifs au Deployment *ghost* sont listés. Ils sont tous les 3 actifs.
 
 ### 5. Exposition des Pods du Deployment
 
-Dans un fichier *vote_service.yaml* nous définissons la spécification suivante:
+Dans un fichier *ghost_service.yaml* nous définissons la spécification suivante:
 
 ```
 apiVersion: v1
 kind: Service
 metadata:
-  name: vote
+  name: ghost
 spec:
   selector:
-    app: vote
+    app: ghost
   type: NodePort
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 2368
     nodePort: 31001
 ```
 
 On crée ensuite le Service avec la commande:
 
 ```
-$ kubectl apply -f vote_service.yaml
-service/vote created
+$ kubectl apply -f ghost_service.yaml
+service/ghost created
 ```
 
 ### 6. Cleanup
@@ -145,6 +143,6 @@ service/vote created
 Utilisez les commandes suivantes pour supprimer le Deployment et le Service:
 
 ```
-$ kubectl delete deploy/vote
-$ kubectl delete svc/vote
+$ kubectl delete deploy/ghost
+$ kubectl delete svc/ghost
 ```
