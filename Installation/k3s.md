@@ -22,7 +22,7 @@ $ IP=$(multipass info k3s-1 | grep IP | awk '{print $2}')
 
 ### 2. Installation de k3s
 
-Lancez l'installation de la distribution k3s dans la VM que vous venez de créer (celle-ci devrait prendre moins de 30 secondes !)
+Lancez l'installation de la distribution k3s dans la VM que vous venez de créer (celle-ci devrait prendre une trentaine de secondes !)
 
 ```
 $ multipass exec k3s-1 -- bash -c "curl -sfL https://get.k3s.io | sh -"
@@ -50,14 +50,16 @@ Positionnez ensuite la variable d'environnement *KUBECONFIG* de façon à ce qu'
 $ export KUBECONFIG=$PWD/k3s.cfg
 ```
 
+Cette variable d'environnement permet de configurer le binaire *kubectl* afin que celui-ci puisse communiquer avec le cluster.
+
 ### 4. Test
 
 Le cluster est maintenant prêt à être utilisé:
 
 ```
 $ kubectl get nodes
-NAME   STATUS   ROLES    AGE     VERSION
-k3s-1  Ready    master   2m40s   v1.16.3-k3s.2
+NAME    STATUS   ROLES                  AGE    VERSION
+k3s-1   Ready    control-plane,master   117s   v1.20.4+k3s1
 ```
 
 ## Cluster multi-nodes
@@ -74,7 +76,7 @@ done
 
 ### 2. Ajout de nodes
 
-Dans un premier temps il est nécessaire de récupérer, depuis le node master *k3s-1*, un token qui sera utilisé dans la suite pour ajouter un node au cluster K3s:
+Dans un premier temps il est nécessaire de récupérer, depuis le node master *k3s-1*, un token créé lors de l'installation. Ce token sera utilisé dans la suite pour ajouter un node au cluster:
 
 ```
 TOKEN=$(multipass exec k3s-1 sudo cat /var/lib/rancher/k3s/server/node-token)
@@ -101,9 +103,9 @@ Nous pouvons alors lister les nodes du cluster et vérifier que celui-ci est mai
 ```
 $ kubectl get nodes
 NAME    STATUS   ROLES    AGE    VERSION
-k3s-3   Ready    <none>   18s    v1.16.3-k3s.2
-k3s-2   Ready    <none>   45s    v1.16.3-k3s.2
-k3s-1   Ready    master   7m3s   v1.16.3-k3s.2
+k3s-1   Ready    control-plane,master   4m59s   v1.20.4+k3s1
+k3s-2   Ready    <none>                 26s     v1.20.4+k3s1
+k3s-3   Ready    <none>                 1s      v1.20.4+k3s1
 ```
 
 Le cluster est prêt à être utilisé.

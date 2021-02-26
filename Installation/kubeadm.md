@@ -36,7 +36,7 @@ Si vous souhaitez créer vos machines virtuelles sur l'infrastructure d'un cloud
 
 ## Kubectl
 
-Assurez-vous d'avoir installé *kubectl* sur votre machine locale (cf exercice précédent). Ce binaire permet de communiquer avec un cluster Kubernetes depuis la ligne de commande.
+Assurez-vous d'avoir installé *kubectl* sur votre machine locale (vous pouvez vous reporter à un exercice précédent pour cela). Ce binaire permet de communiquer avec un cluster Kubernetes depuis la ligne de commande.
 
 # Configuration
 
@@ -65,12 +65,12 @@ Note: si vous avez utilisé Multipass pour la création de vos machines virtuell
 
 ```
 # Installation de Docker
-$ curl -sSL https://get.docker.com | sh
+curl -sSL https://get.docker.com | sh
 
 # Packages nécessaires pour installer Kubernetes via kubeadm
-$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-$ echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-$ sudo apt-get update && sudo apt-get install -y kubelet kubeadm
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update && sudo apt-get install -y kubelet kubeadm
 ```
 
 ## Initialisation du cluster
@@ -79,7 +79,7 @@ Lancer la commande suivante afin d'initialiser le cluster depuis la première ma
 
 ```
 $ sudo kubeadm init
-````
+```
 
 Attention: si votre machine n'a pas les ressources CPU nécessaires, il est possible que vous obteniez l'erreur suivante:
 ```
@@ -90,7 +90,7 @@ error execution phase preflight: [preflight] Some fatal errors occurred:
 Dans ce cas vous pouvez relancer la commande d'initialisation avec un paramètre permettant d'ignorer cette erreur (ce n'est cependant pas une solution qui devra être utilisée pour la mise en place d'un cluster de production)
 
 ```
-$ sudo kubeadm init --ignore-preflight-errors=NumCPU
+$ sudo kubeadm init --ignore-preflight-errors=NumCPU,Mem
 ```
 
 La mise en place de l'ensemble des composants du master prendra quelques minutes. Vous obtiendrez alors la commande à lancez depuis les autres VMs afin de les ajouter au cluster:
@@ -98,8 +98,8 @@ La mise en place de l'ensemble des composants du master prendra quelques minutes
 Exemple de commande renvoyée:
 ```
 ...
-kubeadm join 192.168.64.35:6443 --token 70bmhy.pe3l9wesjxc9ju4z \
-    --discovery-token-ca-cert-hash sha256:29f8816f6c8aa9815a86f1a82c535122f0b90ebca261169cc540466ed6ff9f3a
+kubeadm join 192.168.64.11:6443 --token bv5cnn.vn9ekuocch4is9ue \
+    --discovery-token-ca-cert-hash sha256:625b8b9bcb3991a56281ce30696095ddd7240184a419fe26eb7a9110987df5d1
 ```
 
 ## Ajout de nodes
@@ -152,10 +152,10 @@ Listez alors les nodes du cluster, ils apparaitront avec le status *NotReady*.
 
 ```
 $ kubectl get nodes
-NAME    STATUS     ROLES    AGE  VERSION
-k8s-1   NotReady   master   5m   v1.19.1
-k8s-2   NotReady   <none>   4m   v1.19.1
-k8s-3   NotReady   <none>   4m   v1.19.1
+NAME    STATUS     ROLES                  AGE     VERSION
+node1   NotReady   control-plane,master   4m45s   v1.20.4
+node2   NotReady   <none>                 54s     v1.20.4
+node3   NotReady   <none>                 55s     v1.20.4
 ```
 
 ## Installation d'un addons pour le networking entre les Pods
@@ -184,12 +184,12 @@ Maintenant que la solution de networking a été installée, les nodes devraient
 
 ```
 $ kubectl get nodes
-NAME    STATUS   ROLES    AGE  VERSION
-k8s-1   Ready    master   6m   v1.19.1
-k8s-2   Ready    <none>   5m   v1.19.1
-k8s-3   Ready    <none>   5m   v1.19.1
+NAME    STATUS   ROLES                  AGE     VERSION
+node1   Ready    control-plane,master   7m35s   v1.20.4
+node2   Ready    <none>                 3m44s   v1.20.4
+node3   Ready    <none>                 3m45s   v1.20.4
 ```
 
 Le cluster est maintenant prêt à être utilisé.
 
-Note: le cluster que vous avez mis en place dans cet exercice contient un node master et 2 nodes worker. Il est également possible avec kubeadm de mettre en place un cluster HA  avec plusieurs nodes master en charge de la gestion de l'état du cluster.
+Note: le cluster que vous avez mis en place dans cet exercice contient un node master et 2 nodes worker. Il est également possible avec kubeadm de mettre en place un cluster HA avec plusieurs nodes master en charge de la gestion de l'état du cluster. Kubeadm est très utilisé pour l'installation et la gestion de cluster en environnement de production.

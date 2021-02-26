@@ -1,4 +1,4 @@
-Multipass est un utilitaire qui permet de lancer des machines virtuelles Ubuntu très facilement.
+Multipass est un utilitaire développé par Canonical, il permet de lancer des machines virtuelles Ubuntu facilement.
 
 En fonction de l'OS, Multipass peut utiliser différents hyperviseurs:
 - Hyper-V
@@ -26,11 +26,11 @@ Create, control and connect to Ubuntu instances.
 This is a command line utility for multipass, a
 service that manages Ubuntu instances.
 
-
 Options:
   -h, --help     Display this help
-  -v, --verbose  Increase logging verbosity, repeat up to three times for more
-                 detail
+  -v, --verbose  Increase logging verbosity. Repeat the 'v' in the short option
+                 for more detail. Maximum verbosity is obtained with 4 (or more)
+                 v's, i.e. -vvvv.
 
 Available commands:
   delete    Delete instances
@@ -42,6 +42,7 @@ Available commands:
   launch    Create and start an Ubuntu instance
   list      List all available instances
   mount     Mount a local directory in the instance
+  networks  List available network interfaces
   purge     Purge all deleted instances permanently
   recover   Recover deleted instances
   restart   Restart instances
@@ -72,6 +73,7 @@ Par défaut cette VM est configurée avec 1G de RAM, 1 cpu et 5 Go de disque mai
 
 ```
 $ multipass launch -n node2 -c 2 -m 3G -d 10G
+Launched: node2
 ```
 
 - information sur une VM
@@ -83,11 +85,11 @@ $ multipass info node1
 Name:           node1
 State:          Running
 IPv4:           192.168.64.11
-Release:        Ubuntu 18.04.3 LTS
-Image hash:     6afb97af96b6 (Ubuntu 18.04 LTS)
-Load:           0.07 0.06 0.02
-Disk usage:     999.4M out of 4.7G
-Memory usage:   75.0M out of 986.0M
+Release:        Ubuntu 20.04.2 LTS
+Image hash:     c5f2f08c6a1a (Ubuntu 20.04 LTS)
+Load:           1.62 0.44 0.15
+Disk usage:     1.2G out of 4.7G
+Memory usage:   136.7M out of 981.4M
 ```
 
 Il est également possible d'obtenir ces informations dans les formats json, csv ou yaml. Exemple en json:
@@ -97,32 +99,31 @@ $ multipass info node1 --format json
 {
     "errors": [
     ],
-
     "info": {
         "node1": {
             "disks": {
                 "sda1": {
                     "total": "5019643904",
-                    "used": "1675780096"
+                    "used": "1339346944"
                 }
             },
-            "image_hash": "6afb97af96b671572389935d6579557357ad7bbf2c2dd2cb52879c957c85dbee",
-            "image_release": "18.04 LTS",
+            "image_hash": "c5f2f08c6a1adee1f2f96d84856bf0162d33ea182dae0e8ed45768a86182d110",
+            "image_release": "20.04 LTS",
             "ipv4": [
                 "192.168.64.11"
             ],
             "load": [
-                0.1,
-                0.08,
-                0.06
+                1.57,
+                0.48,
+                0.17
             ],
             "memory": {
-                "total": 1033945088,
-                "used": 139534336
+                "total": 1029033984,
+                "used": 143314944
             },
             "mounts": {
             },
-            "release": "Ubuntu 18.04.3 LTS",
+            "release": "Ubuntu 20.04.2 LTS",
             "state": "Running"
         }
     }
@@ -134,32 +135,36 @@ $ multipass info node1 --format json
 ```
 $ multipass list
 Name                    State             IPv4             Image
-node1                   Running           192.168.64.11    Ubuntu 18.04 LTS
+node1                   Running           192.168.64.11    Ubuntu 20.04 LTS
+node2                   Running           192.168.64.12    Ubuntu 20.04 LTS
 ```
 
 - Lancement d'un shell dans la VM *node1*
 
 ```
 $ multipass shell node1
-Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 4.15.0-72-generic x86_64)
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-66-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com
  * Management:     https://landscape.canonical.com
  * Support:        https://ubuntu.com/advantage
 
-  System information as of Tue Dec 24 14:09:23 CET 2019
+  System information as of Fri Feb 26 09:25:36 CET 2021
 
-  System load:  0.01              Processes:              107
-  Usage of /:   33.4% of 4.67GB   Users logged in:        0
-  Memory usage: 19%               IP address for enp0s2:  192.168.64.11
-  Swap usage:   0%                IP address for docker0: 172.17.0.1
-
-
-3 packages can be updated.
-0 updates are security updates.
+  System load:  0.97              Processes:               114
+  Usage of /:   26.7% of 4.67GB   Users logged in:         0
+  Memory usage: 19%               IPv4 address for enp0s2: 192.168.64.11
+  Swap usage:   0%
 
 
-Last login: Tue Dec 24 14:06:16 2019 from 192.168.64.1
+1 update can be installed immediately.
+0 of these updates are security updates.
+To see these additional updates run: apt list --upgradable
+
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
 ubuntu@node1:~$
 ```
 
@@ -178,32 +183,33 @@ On peut alors vérifier que l'installation s'est déroulée correctement:
 ```
 $ multipass exec node1 -- sudo docker version
 Client: Docker Engine - Community
- Version:           19.03.5
- API version:       1.40
- Go version:        go1.12.12
- Git commit:        633a0ea838
- Built:             Wed Nov 13 07:29:52 2019
+ Version:           20.10.3
+ API version:       1.41
+ Go version:        go1.13.15
+ Git commit:        48d30b5
+ Built:             Fri Jan 29 14:33:21 2021
  OS/Arch:           linux/amd64
- Experimental:      false
+ Context:           default
+ Experimental:      true
 
 Server: Docker Engine - Community
  Engine:
-  Version:          19.03.5
-  API version:      1.40 (minimum version 1.12)
-  Go version:       go1.12.12
-  Git commit:       633a0ea838
-  Built:            Wed Nov 13 07:28:22 2019
+  Version:          20.10.3
+  API version:      1.41 (minimum version 1.12)
+  Go version:       go1.13.15
+  Git commit:       46229ca
+  Built:            Fri Jan 29 14:31:32 2021
   OS/Arch:          linux/amd64
   Experimental:     false
  containerd:
-  Version:          1.2.10
-  GitCommit:        b34a5c8af56e510852c35414db4c1f4fa6172339
+  Version:          1.4.3
+  GitCommit:        269548fa27e0089a8b8278fc4fc781d7f65a939b
  runc:
-  Version:          1.0.0-rc8+dev
-  GitCommit:        3e425f80a8c931f88e6d94a8c831b9d5aa481657
+  Version:          1.0.0-rc92
+  GitCommit:        ff819c7e9184c13b7c2607fe6c30ae19403a7aff
  docker-init:
-  Version:          0.18.0
-  GitCommit:        fec3683
+  Version:          0.19.0
+  GitCommit:        de40ad0
 ```
 
 - montage d'un répertoire local dans une VM
@@ -242,9 +248,9 @@ $ multipass exec node1 -- ls /tmp/hello
 - les commandes start / stop / restart / delete permettent de gérer le cycle de vie des VMs
 
 ```
-$ multipass delete node1
+$ multipass delete -p node1 node2
 ```
 
 ## En résumé
 
-Comme nous venons de le voir dans les exemples ci-dessus, Multipass est un utilitaire très pratique et extrêmement simple d'utilisation. Je vous conseille de l'installer car nous l'utiliserons dans la suite pour instancier plusieurs VMs et mettre en place un cluster Kubernetes en local.
+Comme nous venons de le voir dans les exemples ci-dessus, Multipass est un utilitaire très pratique et extrêmement simple d'utilisation. Je vous conseille de l'installer car vous pourrez l'utiliser dans la suite pour instancier plusieurs VMs et mettre en place un cluster Kubernetes en local.

@@ -107,7 +107,7 @@ $ ./minikube.exe start [options]
 La commande suivante permet de lancer Minikube en utilisant le driver détecté automatiquement (*docker* dans cet exemple). Le cluster kubernetes ainsi mis en place tournera dans un seul container.
 
 ````
-(⎈ |N/A:N/A)➜  ~ minikube start
+$ minikube start
 😄  minikube v1.16.0 on Darwin 11.0.1
 ✨  Automatically selected the docker driver. Other choices: hyperkit, virtualbox
 👍  Starting control plane node minikube in cluster minikube
@@ -124,10 +124,10 @@ La commande suivante permet de lancer Minikube en utilisant le driver détecté 
 🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
 ````
 
-Assurez-vous d'avoir installé le binaire *kubectl* (cf exercice précédent), celui-ci est indispensable pour communiquer avec Kubernetes depuis la ligne de commande. Lancez ensuite la commande suivante afin de lister les nodes du cluster:
+Assurez-vous d'avoir installé le binaire *kubectl* (cela a normalement été effectué dans un exercice précédent). *kubectl* est indispensable pour communiquer avec Kubernetes depuis la ligne de commande. Lancez ensuite la commande suivante afin de lister les nodes du cluster:
 
 ````
-(⎈ |minikube:default)➜  ~ kubectl get node
+$ kubectl get node
 NAME       STATUS   ROLES                  AGE   VERSION
 minikube   Ready    control-plane,master   40m   v1.20.0
 ````
@@ -137,7 +137,7 @@ minikube   Ready    control-plane,master   40m   v1.20.0
 La commande suivante permet de lancer un cluster de 3 nodes en spécifiant le driver *docker*.
 
 ````
-(⎈ |N/A:N/A)➜  ~ minikube start --driver docker --nodes 3
+$ minikube start --driver docker --nodes 3
 😄  minikube v1.16.0 on Darwin 11.0.1
 ✨  Using the docker driver based on user configuration
 👍  Starting control plane node minikube in cluster minikube
@@ -184,11 +184,10 @@ minikube-m03   Ready    <none>                 21s   v1.20.0
 Afin de détruire un cluster mis en place avec Minikube, il suffit de lancer la commande suivante:
 
 ````
-(⎈ |minikube:default)➜  ~ minikube delete
+$ minikube delete
 🔥  Deleting "minikube" in docker ...
 🔥  Deleting container "minikube" ...
 🔥  Deleting container "minikube-m02" ...
 🔥  Removing /Users/luc/.minikube/machines/minikube ...
 💀  Removed all traces of the "minikube" cluster.
-(⎈ |N/A:N/A)➜  ~
 ````
