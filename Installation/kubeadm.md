@@ -19,15 +19,19 @@ Pour la mise en place d'un cluster avec kubeadm, il est nécessaire d'avoir une 
 
 Dans cet exemple nous considérons 3 machines virtuelles basées sur Ubuntu 18.04, sur lesquelles nous avons un accès ssh. Nous ferons référence à ces machines en tant que *node1*, *node2* et *node3*.
 
-Afin de suivre cet exercice, vous pouvez créer des machines virtuelles:
+Afin de suivre cet exercice, vous pouvez par exemple créer des machines virtuelles avec l'une des méthodes suivantes:
 
-- en local par exemple en utilisant [Multipass](https://multipass.run). Une fois multipass installé, vous n'aurez plus qu'à lancer la commande suivante pour créer vos 3 machines virtuelles:
+- en local par exemple en utilisant [Multipass](https://multipass.run)
+
+Une fois multipass installé, vous n'aurez plus qu'à lancer la commande suivante pour créer vos 3 machines virtuelles:
 
 ```
-$ for i in $(seq 1 3); do multipass launch -n node$i; done
+$ for i in $(seq 1 3); do
+  multipass launch -n node$i -c 2 -m 2G -d 10G
+done
 ```
 
-- en local directement avec VirtualBox ou une autre solution de virtualisation
+- en local en utilisant [Vagrant](https://vagrantup.com) et [VirtualBox](https://virtualbox.org) ou une autre solution de virtualisation
 
 - sur l'infrastructure d'un cloud provider
 
@@ -60,8 +64,7 @@ Connectez-vous en ssh sur chacune de vos machines virtuelles et lancez les comma
 Note:
 - assurez-vous au préalable que votre utilisateur a les droits *sudo*
 - par défaut, la dernière version de Kubernetes va être installée mais il est possible d'installer une version précédente. Il faudra pour cela remplacer la dernière ligne de la commande : ```sudo apt-get install -y kubelet kubeadm``` par ```sudo apt-get install -y kubelet=VERSION kubeadm=VERSION``` où VERSION est la version de Kubernetes que vous souhaitez installer (par exemple: 1.18.8)
-
-Note: si vous avez utilisé Multipass pour la création de vos machines virtuelles, vous pouvez obtenir un shell dans une de ces VMs avec la commande ```$ multipass shell NODE_NAME```
+- si vous avez utilisé Multipass pour la création de vos machines virtuelles, vous pouvez obtenir un shell dans une de ces VMs avec la commande ```$ multipass shell NODE_NAME```
 
 ```
 # Installation de Docker
@@ -98,8 +101,8 @@ La mise en place de l'ensemble des composants du master prendra quelques minutes
 Exemple de commande renvoyée:
 ```
 ...
-kubeadm join 192.168.64.11:6443 --token bv5cnn.vn9ekuocch4is9ue \
-    --discovery-token-ca-cert-hash sha256:625b8b9bcb3991a56281ce30696095ddd7240184a419fe26eb7a9110987df5d1
+kubeadm join 192.168.33.10:6443 --token i2k2qo.jxqc9nbf2h73ebvj \
+    --discovery-token-ca-cert-hash sha256:5bafbd2f2fd318ffeee4f3440c596fecba434432d9d62d43fe308e84899ed07a
 ```
 
 ## Ajout de nodes
@@ -108,8 +111,8 @@ Vous devrez ensuite lancer la commande *kubeadm join* obtenue précédemment sur
 
 Exemple de résultat de cette commande lancée depuis le *node2*:
 ```
-$ sudo kubeadm join 192.168.64.35:6443 --token 70bmhy.pe3l9wesjxc9ju4z \
-    --discovery-token-ca-cert-hash sha256:29f8816f6c8aa9815a86f1a82c535122f0b90ebca261169cc540466ed6ff9f3a
+$ sudo kubeadm join 192.168.33.10:6443 --token i2k2qo.jxqc9nbf2h73ebvj \
+    --discovery-token-ca-cert-hash sha256:5bafbd2f2fd318ffeee4f3440c596fecba434432d9d62d43fe308e84899ed07a
 ...
 This node has joined the cluster:
 * Certificate signing request was sent to apiserver and a response was received.
