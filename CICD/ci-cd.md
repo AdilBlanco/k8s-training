@@ -1,16 +1,20 @@
-Dans cet exercice vous allez effectuer les actions suivantes:
-- coder un serveur web très simple
-- créer un projet GitLab pour gérer les sources
-- mettre en place un cluster Kubernetes basé sur k3s
-- intégrer ce cluster dans le projet GitLab
-- mettre en place un pipeline d'integration / déploiement continu
+Le but de cet exercice est de mettre en place un pipeline d'intégration et de déploiement continu. La partie *déploiement* sera déclenchée depuis le runner *GitLab*, c'est à dire depuis l'extérieur du cluster.
 
-Le but de l'ensemble de ces actions étant qu'une modification envoyée dans le projet GitLab déclenche automatiquement le déployment de la nouvelle version du code sur le cluster Kubernetes.
+Pour ce faire, vous allez effectuer les actions suivantes:
+- coder un serveur web très simple
+- créer un projet *GitLab* pour gérer les sources
+- mettre en place un cluster Kubernetes basé sur *k3s*
+- intégrer ce cluster dans le projet GitLab
+- mettre en place un pipeline d'integration et déployment automatique
+
+Le but de l'ensemble de ces actions étant qu'une modification envoyée dans le projet GitLab déclenche automatiquement les tests et le déployment de la nouvelle version du code sur le cluster Kubernetes.
 
 > Attention:
 Pour faire cet exercice dans sa totalité, il est nécessaire de créer une VM accessible depuis internet. Pour l'ensemble des cloud providers (Google Compute Engine, Amazon AWS, Packet, Rackspace, ...) l'instantiation de VMs est payante (peu cher pour un test de quelques heures cependant). Si vous ne souhaitez pas réaliser la manipulation jiusqu'au bout, n'hésitez pas à suivre cet exercice sans l'appliquer, l'essentiel étant de comprendre le flow global.
 
 ## 1. Création d'un serveur web simple
+
+Créez un folder nommé *api* sur votre machine locale puis positionnez vous dans celui-ci.
 
 En utilisant le langage de votre choix, développez un serveur web simple ayant les caractéristiques suivantes:
 - écoute sur le port 8000
@@ -180,16 +184,20 @@ $ docker build -t api .
 Une fois l'image créée, lancez un container avec la commande suivante:
 
 ```
-$ docker run -ti -p 8000:8000 api
+$ docker run --name api -d -p 8000:8000 api
 ```
 
-Puis vérifiez, depuis un autre terminal que le serveur fonctionne correctement:
+Puis vérifiez que le serveur fonctionne correctement:
 
 ```
 $ curl http://localhost:8000
 ```
 
-Stoppez ensuite le container avec `CTRL-C`
+Supprimez ensuite le container:
+
+```
+$ docker rm -f api
+```
 
 ---
 
@@ -211,39 +219,16 @@ Stoppez ensuite le container avec `CTRL-C`
 
 ![Gitlab](./images/gitlab_project-2.png)
 
-Suivez les instructions présentées dans la section "Push an existing folder" afin de pusher votre project dans ce repository GitLab.
+Suivez les instructions présentées dans la section "Push an existing folder" afin de pusher votre project dans ce repository GitLab. Il sera nécessaire de lancer les commandes suivantes depuis le folder *api* créé précedemment:
 
-Exemple pour la version Python du serveur:
+:fire: assurez-vous de remplacer *GITLAB_USER* par votre nom d'utilisateur sur GitLab
 
 ```
-luc@saturn:~/test$ git init
-Initialized empty Git repository in /Users/luc/test/.git/
-
-luc@saturn:~/test$ git remote add origin git@gitlab.com:lucj/test.git
-
-luc@saturn:~/test$ git add
-
-luc@saturn:~/test$ git commit -m "Initial commit"
-[master (root-commit) 0f48def] Initial commit
- 3 files changed, 16 insertions(+)
- create mode 100644 Dockerfile
- create mode 100644 app.py
- create mode 100644 requirements.txt
-
-luc@saturn:~/test$ git push -u origin master
-The authenticity of host 'gitlab.com (35.231.145.151)' can't be established.
-ECDSA key fingerprint is SHA256:HbW3g8zUjNSksFbqTiUWPWg2Bq1x8xdGUrliXFzSnUw.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added 'gitlab.com,35.231.145.151' (ECDSA) to the list of known hosts.
-Enumerating objects: 5, done.
-Counting objects: 100% (5/5), done.
-Delta compression using up to 8 threads
-Compressing objects: 100% (4/4), done.
-Writing objects: 100% (5/5), 545 bytes | 545.00 KiB/s, done.
-Total 5 (delta 0), reused 0 (delta 0)
-To gitlab.com:lucj/test.git
- * [new branch]      master -> master
-Branch 'master' set up to track remote branch 'master' from 'origin'.
+git init
+git remote add origin git@gitlab.com:GITLAB_USER/demo-api.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
 ```
 
 ![Gitlab](./images/gitlab_project-3.png)
@@ -413,7 +398,7 @@ Vous devriez obtenir un résultat similaire à celui ci-dessous, indiquant que l
 
 ```
 NAME      STATUS   ROLES    AGE   VERSION
-node1     Ready    master   17s   v1.16.3-k3s.2
+node1     Ready    master   17s   v1.20.4+k3s1
 ```
 
 Vous avez maintenant une cluster K3s fonctionnel.
@@ -443,7 +428,7 @@ Depuis votre machine locale, vous devriez maintenant pouvoir communiquer avec le
 ```
 $ kubectl get nodes
 NAME     STATUS   ROLES    AGE   VERSION
-node1   Ready    master   11m   v1.16.3-k3s.2
+node1    Ready    master   5m    v1.20.4+k3s1
 ```
 
 ### 3.2. Intégration du cluster avec votre repository GitLab
@@ -461,7 +446,9 @@ Afin d'intégrer, dans le projet GitLab, le cluster *k3s* que vous avez mis en p
 - ensuite, depuis le terminal dans lequel vous avez défini la variable d'environnement *KUBECONFIG*, executez la commande suivante:
 
 ```
-$ curl -sSL https://files.techwhale.io/kubeconfig.sh | bash
+$ curl -O https://luc.run/kubeconfig.sh
+$ chmod +x kubeconfig.sh
+$ ./kubeconfig.sh
 ```
 
 Vous obtiendrez les informations nécessaires pour l'intégration de votre cluster Kubernetes dans votre projet GitLab:
@@ -573,23 +560,16 @@ Dans le fichier *.gitlab-ci.yml* modifiez l'étape `deploy test` avec les instru
 deploy test:
   stage: deploy
   environment: staging
-  image: lucj/kubectl:1.16.2
+  image: lucj/kubectl:1.20.4
   script:
-    - kubectl config set-cluster my-cluster --server=${KUBE_URL} --certificate-authority="${KUBE_CA_PEM_FILE}"
-    - kubectl config set-credentials admin --token=${KUBE_TOKEN}
-    - kubectl config set-context my-context --cluster=my-cluster --user=admin --namespace default
-    - kubectl config use-context my-context
     - kubectl rollout restart deploy/www
   only:
     kubernetes: active
 ```
 
-Les instructions définies sous la clé *script* permettent de:
-- créer un context (au sens Kubernetes) à l'aide des variables d'environnement automatiquement créées lors de l'intégration du cluster dans le projet GitLab
-- configurer le binaire *kubectl* à l'aide de ce context
-- mettre à jour le Deployment
+Les instructions définies sous la clé *script* permettent de mettre à jour le Deployment
 
-Note: l'image utilisée (*lucj/kubectl:1.16.2*) contient seulement le binaire *kubectl* dont nous avons besoin dans le pipeline d'intégration continue afin de communiquer avec le cluster
+Note: l'image utilisée (*lucj/kubectl:1.20.4*) contient seulement le binaire *kubectl* dont nous avons besoin dans le pipeline d'intégration continue afin de communiquer avec le cluster
 
 Pour vérifiez qu'un changement dans le code du serveur déclenche une mise à jour de l'application, effectuez les modifications suivantes:
 - changez la chaine de caractères retournée par le serveur en "Hello!"
