@@ -254,7 +254,6 @@ En quelques secondes, vous pourrez voir qu'un PersistentVolume a été créé et
 
 ```
 $ kubectl get pv,pvc
-kubectl get pv,pvc
 NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                    STORAGECLASS      REASON   AGE
 persistentvolume/pvc-5e9aa1f8-534f-4103-8777-5571bf6cf2af   1Gi        RWO            Delete           Bound    default/ghost-pv-claim   rook-ceph-block            5s
 
