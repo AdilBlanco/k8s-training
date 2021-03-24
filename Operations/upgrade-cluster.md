@@ -7,15 +7,14 @@ Avoir accès à un cluster dans la version 1.18.12 créé avec *kubeadm*.
 Si vous souhaitez créer un cluster local 1.18.12 rapidement, vous pouvez lancer les commandes suivantes qui utilisent l'outils Multipass ([https://multipass.run](https://multipass.run)) présenté au début du cours.
 
 ```
-$ curl -sfL https://files.techwhale.io/mpk8s.sh -o mpk8s.sh
-$ chmod +x mpk8s.sh
-$ ./mpk8s.sh -v 1.18.12-00 -w 2
+$ curl -O https://luc.run/k8s.sh && chmod +x k8s.sh
+$ ./k8s.sh -v 1.18.12-00 -w 2
 ```
 
 En quelques minutes vous aurez un cluster dans la version souhaitée, celui-ci étant constitué d'un node master et de 2 nodes worker.
 
 ```
-$ export KUBECONFIG=$PWD/mpk8s.cfg
+$ export KUBECONFIG=$PWD/k8s.cfg
 
 $ kubectl get nodes
 NAME    STATUS   ROLES    AGE     VERSION
