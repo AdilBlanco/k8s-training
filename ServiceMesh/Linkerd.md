@@ -10,7 +10,7 @@ Si vous n'avez pas de cluster disponible, vous pouvez en créer un rapidement en
 - installer [Multipass](https://multipass.run)
 - lancer les commandes suivantes afin de créer 3 VMs et déployer un cluster k3s sur celles-ci (cela ne prendra que quelques minutes):
 
-* Depuis macOS ou Linux:
+### Depuis macOS ou Linux:
 
 Mise en place du cluster:
 ```
@@ -22,7 +22,7 @@ Configuration du client *kubectl* local:
 $ export KUBECONFIG=$PWD/k3s.cfg
 ```
 
-* Depuis Windows:
+### Depuis Windows:
 
 Mise en place du cluster:
 ```
@@ -35,7 +35,7 @@ Configuration du client *kubectl* local:
 $Env:KUBECONFIG="$pwd\kubeconfig.k3s"
 ```
 
-## Vérification
+### Vérification
 
 Assurez-vous ensuite que vous avez accès au cluster, par exemple en listant les nodes:
 
