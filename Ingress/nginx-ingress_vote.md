@@ -17,18 +17,28 @@ Note: attention cette commande ne vous rendra pas la main, vous pourrez la stopp
 ```
 $ kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx --watch
 NAME                                        READY   STATUS      RESTARTS   AGE
-ingress-nginx-admission-create-vd6sw        0/1     Completed   0          16s
-ingress-nginx-admission-patch-4lw8p         0/1     Completed   2          15s
-ingress-nginx-controller-66dc9984d8-5tnxt   0/1     Running     0          16s
-ingress-nginx-controller-66dc9984d8-5tnxt   1/1     Running     0          27s
+NAME                                   READY   STATUS              RESTARTS   AGE
+ingress-nginx-admission-create-jk5k2   0/1     Completed           0          12s
+ingress-nginx-admission-patch-7sp8b    0/1     Completed           1          12s
+ingress-nginx-controller-2q9vz         0/1     ContainerCreating   0          13s
+ingress-nginx-controller-4gznr         0/1     ContainerCreating   0          13s
+ingress-nginx-controller-fqnnr         0/1     ContainerCreating   0          13s
+ingress-nginx-controller-fqnnr         0/1     Running             0          15s
+ingress-nginx-controller-2q9vz         0/1     Running             0          15s
+ingress-nginx-controller-4gznr         0/1     Running             0          15s
+ingress-nginx-controller-fqnnr         1/1     Running             0          30s
+ingress-nginx-controller-2q9vz         1/1     Running             0          30s
+ingress-nginx-controller-4gznr         1/1     Running             0          30s
 ```
+
+Note: il faut faire un CTRL-C pour récupérer la main suite à l'utilisation de l'option *--watch$
 
 ## 2. Lancement de la VotingApp
 
-Déployez la Voting App avec la commande suivante, celle-ci fait référence à une URL pointant vers un fichier définissant l'ensemble des ressources de la Voting App
+Déployez la version 2 de la Voting App avec la commande suivante, celle-ci fait référence à une URL pointant vers un fichier définissant l'ensemble des ressources:
 
 ```
-$ kubectl apply -f https://files.techwhale.io/voting.yaml
+$ kubectl apply -f https://luc.run/vote-v2.yaml
 ```
 
 ## 3. Ports des Service vote et result
@@ -37,17 +47,19 @@ La commande suivante liste les services existants:
 
 ```
 $ kubectl get svc
-NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
-db           ClusterIP   10.245.16.246    <none>        5432/TCP         8s
-kubernetes   ClusterIP   10.245.0.1       <none>        443/TCP          78s
-redis        ClusterIP   10.245.187.226   <none>        6379/TCP         9s
-result       NodePort    10.245.167.55    <none>        5001:31002/TCP   8s
-vote         NodePort    10.245.230.88    <none>        5000:31001/TCP   9s
+NAME         TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)          AGE
+db           ClusterIP      10.105.243.210   <none>           5432/TCP         2m57s
+kubernetes   ClusterIP      10.96.0.1        <none>           443/TCP          31h
+redis        ClusterIP      10.108.131.17    <none>           6379/TCP         2m57s
+result       NodePort       10.97.79.33      <none>           80:30271/TCP     2m57s
+result-ui    NodePort       10.108.148.21    <none>           5001:31001/TCP   2m56s
+vote         NodePort       10.102.149.185   <none>           80:31002/TCP     2m56s
+vote-ui      NodePort       10.102.175.232   <none>           5000:31000/TCP   2m56s
 ```
 
 Nous pouvons voir que:
-- le Service *vote* expose le port *5000* à l'intérieur du cluster, et le port *31001* à l'extérieur.
-- le Service *result* expose le port *5001* à l'intérieur du cluster, et le port *31002* à l'extérieur.
+- le Service *vote-ui* expose le port *5000* à l'intérieur du cluster, et le port *31000* à l'extérieur.
+- le Service *resul-uit* expose le port *5001* à l'intérieur du cluster, et le port *31001* à l'extérieur.
 
 ## 4. Création de la ressource Ingress
 
@@ -71,7 +83,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: vote
+            name: vote-ui
             port:
               number: 5000
   - host: result.votingapp.com
@@ -81,7 +93,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: result
+            name: result-ui
             port:
               number: 5001
 ```
@@ -100,14 +112,14 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: vote
+          serviceName: vote-ui
           servicePort: 5000
   - host: result.votingapp.com
     http:
       paths:
       - path: /
         backend:
-          serviceName: result
+          serviceName: result-ui
           servicePort: 5001
 
 
@@ -151,7 +163,7 @@ Vous pouvez maintenant voter depuis l'interface de vote et visualiser les résul
 - Supprimez la Voting App à l'aide de la commande suivante:
 
 ```
-$ kubectl delete -f https://files.techwhale.io/voting.yaml
+$ kubectl delete -f https://luc.run/vote-v2.yaml
 ```
 
 - Supprimez le Ingress Controller:
@@ -165,10 +177,10 @@ $ minikube addons disable ingress
   * si vous n'êtes pas sur Minikube, supprimez le namespace *ingress-nginx* (et les ressources qui ont été créées en même temps) avec les commandes suivantes:
 
 ```
-$ kubectl delete ns ingress-nginx
-$ kubectl delete clusterrole ingress-nginx
-$ kubectl delete clusterrolebinding ingress-nginx
-$ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+kubectl delete ns ingress-nginx
+kubectl delete clusterrole ingress-nginx
+kubectl delete clusterrolebinding ingress-nginx
+kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 ```
 
 - Supprimez également la ressource Ingress
