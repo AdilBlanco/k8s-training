@@ -251,7 +251,7 @@ $ mongorestore --drop  --archive=/dump/db.gz --gzip
 La spécification suivante définit un CronJob qui effectue le dump de la base de données, accessible via le service nommé *db*, toutes les minutes.
 
 ```
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: dump
