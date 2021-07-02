@@ -82,6 +82,13 @@ NAME       PROVISIONER          RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEE
 longhorn   driver.longhorn.io   Delete          Immediate           true                   4m56s
 ```
 
+Note: si votre cluster ne contient pas déjà une StorageClass par défaut, vous pouvez utiliser la commande suivante afin d'utiliser *longhorn*:
+
+```
+$ kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+```
+
 ## Accès à l'interface web
 
 Utilisez la commande suivante pour exposer l'interface web de Longhorn via un *port-forward*:
