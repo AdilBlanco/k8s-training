@@ -16,7 +16,7 @@ L’application *Voting App* est composée de plusieurs micro-services, ceux uti
 * worker: service qui récupère les votes depuis redis et consolide les résultats dans une database postgres
 * db: database postgres dans laquelle sont stockés les résultats
 
-##  Récupération des repos GitLab
+##  Récupération du répo GitLab
 
 Lancez les commandes suivantes afin de récupérer le répository contenant notamment les fichiers manifests qui décrivent l'application:
 
@@ -25,7 +25,7 @@ mkdir VotingApp && cd VotingApp
 git clone https://gitlab.com/voting-application/config
 ```
 
-## Déployement de la version 2
+## Déploiement de la version 2
 
 Le répertoire *manifests/v2* contient l'ensemble des spécifications des ressources utilisées par la Voting App (dans sa version 2). Pour chaque micro-service de l'application, il y a un Deployment et un Service. Seul le micro-service *worker* n'a pas de Service associé, c'est le seul micro-service qui n'est pas exposé dans le cluster (aucun microservice ne l'appelle).
 
